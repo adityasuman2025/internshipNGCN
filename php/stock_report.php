@@ -57,8 +57,9 @@
 
 			<?php
 				include 'connect_db.php';
+				$creator_branch_code = $_COOKIE['logged_username_branch_code'];
 
-				$list_user_query = "SELECT * FROM stock ORDER BY id DESC";
+				$list_user_query = "SELECT * FROM stock WHERE creator_branch_code = '$creator_branch_code' ORDER BY id DESC";
 				$list_user_query_run = mysqli_query($connect_link, $list_user_query);
 
 				while($list_user_assoc = mysqli_fetch_assoc($list_user_query_run))

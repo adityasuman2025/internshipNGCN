@@ -86,27 +86,21 @@
 					<li work="manage_invoice">Manage Invoice</li>
 				</ul>
 			</li>
-			
-			
 
 			<li>Stock
 				<ul>
 					<li work="add_stock">Add Stock</li>
 					<li work="manage_stock">Manage Stock</li>
-					<li work="stock_report">Stock Report</li>
 				</ul>
 			</li>
 
 			<li>Reports
 				<ul>
-					<li>Todays Report</li>
-					<li>Purchase Report</li>
-					<li>Sales Report</li>
-					<li>Sales Report Product Wise</li>
-					<li>Sales Report Invoice Wise</li>
+					<li work="quotation_report">Quotation Report</li>
+					<li work="invoice_report">Invoice Report</li>
+					<li work="stock_report">Stock Report</li>
 				</ul>
 			</li>
-
 		</ul>
 	</div>
 

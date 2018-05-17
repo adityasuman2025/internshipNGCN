@@ -60,8 +60,6 @@
 
 			<li work="admin_manage_customer">Manage Customer</li>
 
-			<!-- <li work="admin_manage_product">Manage Product</li>
- -->
 			<li work="admin_manage_supplier">Manage Supplier</li>
 
 			<li work="admin_manage_purchase">Manage Purchase</li>
@@ -74,11 +72,9 @@
 
 			<li>Reports
 				<ul>
-					<li>Todays Report</li>
-					<li>Purchase Report</li>
-					<li>Sales Report</li>
-					<li>Sales Report Product Wise</li>
-					<li>Sales Report Invoice Wise</li>
+					<li work="admin_quotation_report">Quotation Report</li>
+					<li work="admin_invoice_report">Invoice Report</li>
+					<li work="admin_stock_report">Stock Report</li>
 				</ul>
 			</li>
 
