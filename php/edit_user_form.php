@@ -107,6 +107,8 @@
 	//on clicking on edit button
 		$('#user_save_edit_button').click(function()
 		{
+			$('.user_edit_span').html("<img class=\"gif_loader\" src=\"img/loaders1.gif\">");
+			
 			var user_id = "<?php echo $user_id;?>";
 			var username = $('#user_edit_form #user_entry_username').val();
 			var email = $('#user_edit_form #user_entry_email').val();
@@ -136,7 +138,7 @@
 								$('.user_edit_span').text('Successfully edited').css('color','green');
 								$('#user_edit_form').fadeOut(0);
 
-								$('.user_module_content').load('php/manage_user.php');
+								$('.user_module_content').html("<img class=\"gif_loader\" src=\"img/loaders1.gif\">").load('php/manage_user.php');
 							}
 							else
 							{
@@ -162,6 +164,8 @@
 	//on clicking on save password button
 		$('#save_password_button').click(function()
 		{
+			$('.user_edit_span').html("<img class=\"gif_loader\" src=\"img/loaders1.gif\">");
+
 			var user_id = "<?php echo $user_id;?>";
 			var password = $('.change_password_div #user_entry_password').val();
 			var password_again = $('.change_password_div #user_entry_password_again').val();
@@ -177,7 +181,7 @@
 					if(e==1)
 					{
 						$('.user_edit_span').text('Password successfully changed').css('color','green');
-						$('.change_password_div').fadeOut(0);
+						$('.change_password_div').html("<img class=\"gif_loader\" src=\"img/loaders1.gif\">").fadeOut(0);
 					}
 					else
 					{

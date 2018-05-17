@@ -1,5 +1,6 @@
 <?php
 	include 'connect_db.php';
+	$creator_branch_code = $_COOKIE['logged_username_branch_code'];
 ?>
 <!----add customer form------>
 	<div class="user_entry_form add_purchase_form">
@@ -9,7 +10,7 @@
 		<select id="purchase_supplier">
 			<option value=""></option>
 			<?php
-				$get_brand_query = "SELECT name FROM supplier";
+				$get_brand_query = "SELECT name FROM supplier WHERE creator_branch_code = '$creator_branch_code'";
 				$get_brand_query_run = mysqli_query($connect_link, $get_brand_query);
 
 				while($get_brand_result = mysqli_fetch_assoc($get_brand_query_run))
@@ -75,6 +76,12 @@
 
 <!--------script-------->
 	<script type="text/javascript">
+	//on clicking on add supplier button
+		$('#purchase_add_supplier').click(function()
+		{
+			$('.user_module_content').html("<img class=\"gif_loader\" src=\"img/loaders1.gif\">").load('php/add_supplier.php');
+		});
+
 	//on choosing purchase supplier
 		$('#purchase_supplier').change(function()
 		{
@@ -95,7 +102,7 @@
 	//on clicking on add new item button
 		$('#add_new_item_button').click(function()
 		{
-			var supplier = $('#purchase_supplier').val();
+			var supplier = $.trim($('#purchase_supplier').val());
 			if(supplier != "")
 			{
 				var add_html = "<tr></tr>";
@@ -104,10 +111,9 @@
 				$('.purchase_entry_table tr:last-child').load('php/item_info_form.php');
 
 			//for giving user options to choose item from that supplier
-				var supplier = $('#purchase_supplier').val();
-
 				$.post('php/list_supplier_item.php', {supplier: supplier}, function(data)
 				{
+					//alert(data);
 					$('.purchase_entry_table tr:last-child').find('#purchase_item').html(data);
 				});
 
@@ -149,10 +155,12 @@
 	//on clicking on add purchase button
 		$('#purchase_add_button').click(function()
 		{
+			$('.add_purchase_span').html("<img class=\"gif_loader\" src=\"img/loaders1.gif\">");
+			
 		//getting variable values
-			var purchase_supplier = $('#purchase_supplier').val();
-			var purchase_date = $('#purchase_date').val();
-			var purchase_inv_num = $('#purchase_inv_num').val();
+			var purchase_supplier = $.trim($('#purchase_supplier').val());
+			var purchase_date = $.trim($('#purchase_date').val());
+			var purchase_inv_num = $.trim($('#purchase_inv_num').val());
 			
 			if(purchase_supplier !="" && purchase_date !="" && purchase_inv_num !="")
 			{
@@ -173,11 +181,11 @@
 					{
 						if(e==1)
 						{
+						//disappearing the user entry form
+							$('.user_entry_form').html("<img class=\"gif_loader\" src=\"img/loaders1.gif\">").fadeOut(0);
+							
 							$('.add_purchase_span').text('Purchase has been successfully created').css('color','green');
 							$('#create_new_user_button').fadeIn(100);
-
-						//disappearing the user entry form
-							$('.user_entry_form').fadeOut(0);
 						}
 						else
 						{
@@ -196,7 +204,7 @@
 	//on clicking on add new purchase button
 		$('#create_new_user_button').click(function()
 		{
-			$('.user_module_content').load('php/add_purchase.php');
+			$('.user_module_content').html("<img class=\"gif_loader\" src=\"img/loaders1.gif\">").load('php/add_purchase.php');
 		});
 
 	</script>

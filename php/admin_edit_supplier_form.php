@@ -62,6 +62,8 @@
 	//on clicking on edit button
 		$('#user_save_edit_button').click(function()
 		{
+			$('.user_edit_span').html("<img class=\"gif_loader\" src=\"img/loaders1.gif\">");
+			
 			var supplier_id = "<?php echo $supplier_id;?>";
 			var name = $('#user_edit_form #user_entry_username').val();
 			var email = $('#user_edit_form #user_entry_email').val();
@@ -82,7 +84,7 @@
 					{
 						$('.user_edit_span').text('Successfully edited').css('color','green');
 						$('#user_edit_form').fadeOut(0);
-						$('.user_module_content').load('php/admin_manage_supplier.php');
+						$('.user_module_content').html("<img class=\"gif_loader\" src=\"img/loaders1.gif\">").load('php/admin_manage_supplier.php');
 					}
 					else
 					{

@@ -32,12 +32,14 @@
 	//on clicking on create user button
 		$('#user_entry_create_button').click(function()
 		{
-			var name = $('#user_entry_username').val();
-			var email = $('#user_entry_email').val();
-			var mobile = $('#user_entry_mob').val();
-			var address = $('#user_entry_address').val();
-			var details = $('#user_entry_details').val();
-			var type = $('#user_entry_type').val();
+			$('.user_entry_span').html("<img class=\"gif_loader\" src=\"img/loaders1.gif\">");
+			
+			var name = $.trim($('#user_entry_username').val());
+			var email = $.trim($('#user_entry_email').val());
+			var mobile = $.trim($('#user_entry_mob').val());
+			var address = $.trim($('#user_entry_address').val());
+			var details = $.trim($('#user_entry_details').val());
+			var type = $.trim($('#user_entry_type').val());
 
 			if(name!= "" && email!= "" && mobile!= "" && address!= "" & details!= "" && type!="")
 			{
@@ -49,7 +51,7 @@
 						$('#create_new_user_button').fadeIn(100);
 
 					//disappearing the user entry form
-						$('.user_entry_form').fadeOut(0);
+						$('.user_entry_form').html("<img class=\"gif_loader\" src=\"img/loaders1.gif\">").fadeOut(0);
 					}
 					else
 					{
@@ -67,7 +69,7 @@
 	//on clicking on create new user button
 		$('#create_new_user_button').click(function()
 		{
-			$('.user_module_content').load('php/add_supplier.php');
+			$('.user_module_content').html("<img class=\"gif_loader\" src=\"img/loaders1.gif\">").load('php/add_supplier.php');
 		});
 
 	</script>

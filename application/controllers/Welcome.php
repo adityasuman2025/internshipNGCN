@@ -33,4 +33,9 @@ class Welcome extends CI_Controller {
 		$this->load->view('admin');
 	}
 
+	public function quotation_editor()
+	{
+		$this->load->view('quotation_editor');
+	}
+
 }

@@ -72,6 +72,8 @@
 	//on clicking on edit button
 		$('#user_save_edit_button').click(function()
 		{
+			$('.user_edit_span').html("<img class=\"gif_loader\" src=\"img/loaders1.gif\">");
+			
 			var user_id = "<?php echo $user_id;?>";
 			var brand = $('#user_edit_form #user_entry_brand').val();
 			var model_name = $('#user_edit_form #user_entry_model_name').val();
@@ -91,7 +93,7 @@
 						$('.user_edit_span').text('Successfully edited').css('color','green');
 						$('#user_edit_form').fadeOut(0);
 
-						$('.user_module_content').load('php/manage_inventory.php');
+						$('.user_module_content').html("<img class=\"gif_loader\" src=\"img/loaders1.gif\">").load('php/manage_inventory.php');
 					}
 					else
 					{

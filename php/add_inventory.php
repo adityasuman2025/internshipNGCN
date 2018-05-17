@@ -50,6 +50,8 @@
 	//on clicking on inventory add button
 		$('#inv_add_button').click(function()
 		{
+			$('.inventory_feed').html("<img class=\"gif_loader\" src=\"img/loaders1.gif\">");
+			
 			var inv_brand = $.trim($('#inv_brand').val());
 			var inv_model_name = $.trim($('#inv_model_name').val());
 			var inv_model_num = $.trim($('#inv_model_num').val());
@@ -76,7 +78,7 @@
 					if(e == 1)
 					{
 						$('.inventory_feed').text('Inventory has been successfully added').css('color', 'green');
-						$('.inventory_form').fadeOut(0);
+						$('.inventory_form').html("<img class=\"gif_loader\" src=\"img/loaders1.gif\">").fadeOut(0);
 						$('#inv_add_new_button').fadeIn(0);
 					}
 					else
@@ -96,66 +98,7 @@
 	//on clicking on add new inventory button
 		$('#inv_add_new_button').click(function()
 		{
-			$('.user_module_content').load('php/add_inventory.php');
-		});
-
-	//switching tab b/w whole unit and parts only
-		$('.whole_unit_list_button').click(function()
-		{
-			$.post('php/list_whole_inventory.php', {}, function(data)
-			{
-				$('.list_inventory_table').html(data);
-
-			//on clicking on inventory delete icon
-				$('.inventory_delete_icon').click(function()
-				{
-					var user_id = $(this).attr('user_id');
-					
-					$.post('php/delete_inventory.php', {user_id:user_id}, function(e)
-					{
-						if(e==1)
-						{
-							location.href= "admin#admin_inventory";
-							location.reload();
-						}
-						else
-						{
-							$('.warn_box').text("Something went wrong while deleting the user");
-							$('.warn_box').fadeIn(200).delay(3000).fadeOut(200);
-						}
-					});
-				});
-
-			});
-		});
-
-		$('.parts_only_list_button').click(function()
-		{
-			$.post('php/list_part_inventory.php', {}, function(data)
-			{
-				$('.list_inventory_table').html(data);
-
-			//on clicking on inventory delete icon
-				$('.inventory_delete_icon').click(function()
-				{
-					var user_id = $(this).attr('user_id');
-					
-					$.post('php/delete_inventory.php', {user_id:user_id}, function(e)
-					{
-						if(e==1)
-						{
-							location.href= "admin#admin_inventory";
-							location.reload();
-						}
-						else
-						{
-							$('.warn_box').text("Something went wrong while deleting the user");
-							$('.warn_box').fadeIn(200).delay(3000).fadeOut(200);
-						}
-					});
-				});
-
-			});
+			$('.user_module_content').html("<img class=\"gif_loader\" src=\"img/loaders1.gif\">").load('php/add_inventory.php');
 		});
 
 	</script>

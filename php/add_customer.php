@@ -34,13 +34,15 @@
 	//on clicking on create user button
 		$('#user_entry_create_button').click(function()
 		{
-			var name = $('#user_entry_username').val();
-			var email = $('#user_entry_email').val();
-			var mobile = $('#user_entry_mob').val();
-			var address = $('#user_entry_address').val();
-			var pan = $('#user_entry_pan').val();
-			var gst = $('#user_entry_gst').val();
-			var shipping_address = $('#user_entry_shipping_address').val();
+			$('.user_entry_span').html("<img class=\"gif_loader\" src=\"img/loaders1.gif\">");
+			
+			var name = $.trim($('#user_entry_username').val());
+			var email = $.trim($('#user_entry_email').val());
+			var mobile = $.trim($('#user_entry_mob').val());
+			var address = $.trim($('#user_entry_address').val());
+			var pan = $.trim($('#user_entry_pan').val());
+			var gst = $.trim($('#user_entry_gst').val());
+			var shipping_address = $.trim($('#user_entry_shipping_address').val());
 
 			if(name!= "" && email!= "" && mobile!= "" && address!= "" & pan!= "" && gst!="" && shipping_address!= "")
 			{
@@ -48,11 +50,11 @@
 				{
 					if(e==1)
 					{
+					//disappearing the user entry form
+						$('.user_entry_form').html("<img class=\"gif_loader\" src=\"img/loaders1.gif\">").fadeOut(0);
+						
 						$('.user_entry_span').text('Customer has been successfully created').css('color','green');
 						$('#create_new_user_button').fadeIn(100);
-
-					//disappearing the user entry form
-						$('.user_entry_form').fadeOut(0);
 					}
 					else
 					{
@@ -70,7 +72,7 @@
 	//on clicking on create new user button
 		$('#create_new_user_button').click(function()
 		{
-			$('.user_module_content').load('php/add_customer.php');
+			$('.user_module_content').html("<img class=\"gif_loader\" src=\"img/loaders1.gif\">").load('php/add_customer.php');
 		});
 
 	</script>

@@ -13,7 +13,7 @@
 		}
 	?>
 
-	<title>User</title>
+	<title>Admin</title>
 </head>
 <body>
 
@@ -60,16 +60,17 @@
 
 			<li work="admin_manage_customer">Manage Customer</li>
 
-			<li work="admin_manage_product">Manage Product</li>
-
+			<!-- <li work="admin_manage_product">Manage Product</li>
+ -->
 			<li work="admin_manage_supplier">Manage Supplier</li>
 
 			<li work="admin_manage_purchase">Manage Purchase</li>
 
-			<li work="admin_manage_return">Manage Purchase</li>
+			<li work="admin_manage_return">Manage Return</li>
 
-			<li work="manage_quotation">Manage Quotation</li>
-			<li work="manage_invoice">Manage Invoice</li>
+			<li work="admin_manage_quotation">Manage Quotation</li>
+			<li work="admin_manage_invoice">Manage Invoice</li>
+			<li work="admin_manage_stock">Manage Stock</li>
 
 			<li>Reports
 				<ul>
@@ -101,7 +102,9 @@
 	
 	<!-----user module content area------->
 		<h3 class="user_module_heading"></h3>
-		<div class="user_module_content"></div>
+		<div class="user_module_content">
+			
+		</div>
 	</div>
 
 <!--------script-------->
@@ -180,7 +183,7 @@
 			var file = work + ".php";
 			var file_address = "php/" + file;
 
-			$('.user_module_content').load(file_address);
+			$('.user_module_content').html("<img class=\"gif_loader\" src=\"img/loaders1.gif\">").load(file_address);
 		});
 
 	</script>

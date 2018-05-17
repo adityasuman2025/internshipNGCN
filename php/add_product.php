@@ -159,10 +159,8 @@
 			var to_get = "part_number";
 			var query = "SELECT part_number FROM inventory WHERE brand='" + brand + "'";
 
-			//alert(query);
 			$.post('php/product_query_runner.php', {query:query, to_get:to_get}, function(e)
 			{
-				//alert(e);
 				$('.sel_pro_part_number').html(e);
 			});
 
@@ -173,6 +171,8 @@
 	//on clicking on product add button
 		$('#sel_pro_add_button').click(function()
 		{
+			$('.sel_pro_feed').html("<img class=\"gif_loader\" src=\"img/loaders1.gif\">");
+			
 			var inv_brand = $('.sel_pro_brand').val();
 			var inv_model_name = $.trim($('.sel_pro_model_name').val());
 			var inv_model_num = $.trim($('.sel_pro_model_number').val());
@@ -201,7 +201,7 @@
 					if(e == 1)
 					{
 						$('.sel_pro_feed').text('Inventory has been successfully added').css('color', 'green');
-						$('.user_entry_form').fadeOut(0);
+						$('.user_entry_form').html("<img class=\"gif_loader\" src=\"img/loaders1.gif\">").fadeOut(0);
 						$('#sel_new_pro_add_button').fadeIn(0);
 					}
 					else
@@ -220,7 +220,7 @@
 	//on clicking on create new user button
 		$('#sel_new_pro_add_button').click(function()
 		{
-			$('.user_module_content').load('php/add_product.php');
+			$('.user_module_content').html("<img class=\"gif_loader\" src=\"img/loaders1.gif\">").load('php/add_product.php');
 		});
 
 	</script>

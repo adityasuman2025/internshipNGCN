@@ -11,6 +11,14 @@ body, html
 	margin: 0;
 }
 
+.gif_loader
+{
+	//background: red;
+	width: 50%;
+	display: block;
+	margin: auto;
+}
+
 /*------index page-----*/
 	.index_cover img
 	{
@@ -87,6 +95,7 @@ body, html
 		padding: 5px;
 		background: #cc0000;
 		color: white;
+		margin: 2px;
 	}
 
 	#create_new_user_button
@@ -151,7 +160,7 @@ body, html
 	}
 
 /*----add inventory area-----*/
-	.inventory_form input
+	.inventory_form input, .inventory_form select
 	{
 		width: 300px;
 		height: 35px;
@@ -206,6 +215,11 @@ body, html
 	{ 
 	    display: none;  // Safari and Chrome
 	}
+
+	.inventory_list_container table
+	{
+		margin:auto;
+	} 
 
 	.inventory_list_container th
 	{
@@ -400,6 +414,7 @@ body, html
 	{
 		//background: red;
 		padding: 10px;
+		padding-left: 25px;
 		margin-top: 2px;
 		margin-bottom: 2px;
 		cursor: pointer;
@@ -534,8 +549,6 @@ body, html
 		color: white;
 	}
 
-/*----product tab--------*/
-
 /*------purchase tab---------*/
 	.add_purchase_form
 	{
@@ -580,9 +593,167 @@ body, html
 		cursor: pointer;
 	}
 
+/*-------quotation tab---------*/
+	.add_quotation_form
+	{
+		width: 100%;
+		overflow-x: scroll;
+		text-align: left;
+	}
+	
+	/*.add_quotation_form::-webkit-scrollbar 
+	{ 
+	   //display: none;  // Safari and Chrome
+	}*/
+
+	.add_quotation_form div
+	{
+		display: inline-block;
+		margin: 5px;
+		vertical-align: top;
+	}
+
+	.quotation_entry_table th
+	{
+		border: 1px grey solid;
+		background: silver;
+		padding: 5px;
+	}
+
+	.quotation_entry_table td
+	{
+		background: lightgrey;
+		border: 1px grey solid;
+	}
+
+	.quotation_entry_table input, .quotation_entry_table select
+	{
+		width: 140px;
+		border: none;
+	}
+
+	.quotation_entry_table td img
+	{
+		width: 17px;
+		margin: 4px;
+		margin-left: 8px;
+		margin-right: 8px;
+		cursor: pointer;
+	}
+
+	#gen_new_quotation_button
+	{
+		width: 300px;
+		height: 35px;
+		border-radius: 3px;
+		border: 1px grey solid;
+		padding: 5px;
+
+		display: none;
+	}
+
+	#quotation_part_total_price
+	{
+		background: #cc0000;
+	}
+
+/*----quotation listing area--------*/
+	.quotation_list_container
+	{
+		width: 100%;
+		overflow-x: scroll;
+		text-align: center;
+	}
+
+	.quotation_list_container table
+	{
+		margin: auto;
+	}
+
+	.quotation_list_container::-webkit-scrollbar 
+	{ 
+	    display: none;  // Safari and Chrome
+	}
+
+	.quotation_list_container th
+	{
+		border: 1px grey solid;
+		background: silver;
+		padding: 5px;
+		width: 150px;
+		text-align: center;
+	}
+
+	.quotation_list_container td
+	{
+		background: lightgrey;
+		border: 1px grey solid;
+		padding: 5px;
+		width: 150px;
+		text-align: center;
+	}
+
+	.quotation_list_container td img
+	{
+		width: 17px;
+		margin: 4px;
+		margin-left: 8px;
+		margin-right: 8px;
+		cursor: pointer;
+	}
+
+	.view_quotation_button
+	{
+		display: none;
+	}
+
+	.change_branch_button
+	{
+		width: auto;
+		height: 33px;
+		border-radius: 3px;
+		border: none;
+		padding: 5px;
+		background: #cc0000;
+		color: white;
+	}
+
+/*--------admin quotation area------*/
+	.search_date_div
+	{
+		padding: 7px;
+		background: #f1f1f1;
+		border-radius: 10px;
+		display: block;
+		margin: auto;
+		width: 70%;
+		text-align: center;
+		box-shadow: 0px 0px 1px grey;
+	}
+
+	.search_date_div input
+	{
+		width: 180px;
+		height: 33px;
+		border-radius: 3px;
+		box-shadow: 0px 0px 1px grey;
+		border: none;
+		padding: 3px;
+		margin: 3px;
+	}
+
+
 /*---media query-------*/
 @media screen and (max-width: 800px)
 {
+	.gif_loader
+	{
+		//background: red;
+		width: 100%;
+		display: block;
+		margin: auto;
+	}
+
 /*------index page-----*/
 	.index_cover img
 	{
@@ -689,10 +860,16 @@ body, html
 		left:0;
 	}
 
-/*------purchase tab------*/
+/*------purchase tab and quotation tab------*/
 	.purchase_entry_table input, .purchase_entry_table select
 	{
 		width: 130px;
+		border:none;
+	}
+
+	.quotation_entry_table input, .quotation_entry_table select
+	{
+		width: 100px;
 		border:none;
 	}
 }

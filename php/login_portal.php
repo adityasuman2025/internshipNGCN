@@ -17,6 +17,7 @@
 <script type="text/javascript">
 	$('.login_button').click(function()
 	{
+		$('.login_feed').html("<img class=\"gif_loader\" src=\"img/loaders1.gif\">");
 		
 		var input_username = $('.input_username').val();
 		var input_password = $('.input_password').val();

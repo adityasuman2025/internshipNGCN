@@ -68,14 +68,16 @@
 //on clicking on create user button
 	$('#user_entry_create_button').click(function()
 	{
-		var username = $('#user_entry_username').val();
-		var password = $('#user_entry_password').val();
-		var password_again = $('#user_entry_password_again').val();
-		var email = $('#user_entry_email').val();
-		var service_tax_no = $('#user_entry_serv_tax_no').val();
-		var isadmin = $('#user_entry_isadmin').val();
-		var address = $('#user_entry_address').val();
-		var branch_code = $('#user_entry_branch_code').val();
+		$('.user_entry_span').html("<img class=\"gif_loader\" src=\"img/loaders1.gif\">");
+		
+		var username = $.trim($('#user_entry_username').val());
+		var password = $.trim($('#user_entry_password').val());
+		var password_again = $.trim($('#user_entry_password_again').val());
+		var email = $.trim($('#user_entry_email').val());
+		var service_tax_no = $.trim($('#user_entry_serv_tax_no').val());
+		var isadmin = $.trim($('#user_entry_isadmin').val());
+		var address = $.trim($('#user_entry_address').val());
+		var branch_code = $.trim($('#user_entry_branch_code').val());
 
 		//alert(isadmin);
 		var query_recieved ="SELECT id FROM users WHERE username='" + username + "'";
@@ -103,7 +105,7 @@
 								$('#create_new_user_button').fadeIn(100);
 
 							//disappearing the user entry form
-								$('.user_entry_form').fadeOut(0);
+								$('.user_entry_form').html("<img class=\"gif_loader\" src=\"img/loaders1.gif\">").fadeOut(0);
 							}
 							else
 							{
@@ -125,6 +127,6 @@
 //on clicking on create new user button
 	$('#create_new_user_button').click(function()
 	{
-		$('.user_module_content').load('php/add_user.php');
+		$('.user_module_content').html("<img class=\"gif_loader\" src=\"img/loaders1.gif\">").load('php/add_user.php');
 	});
 </script>

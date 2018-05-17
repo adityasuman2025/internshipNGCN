@@ -56,6 +56,8 @@
 	//on clicking on edit button
 		$('#user_save_edit_button').click(function()
 		{
+			$('.user_edit_span').html("<img class=\"gif_loader\" src=\"img/loaders1.gif\">");
+			
 			var product_id = "<?php echo $product_id;?>";
 			var quantity = $('#user_edit_form #user_entry_quantity').val();
 			var price = $('#user_edit_form #user_entry_price').val();
@@ -72,7 +74,7 @@
 					{
 						$('.user_edit_span').text('Successfully edited').css('color','green');
 						$('#user_edit_form').fadeOut(0);
-						$('.user_module_content').load('php/manage_product.php');
+						$('.user_module_content').html("<img class=\"gif_loader\" src=\"img/loaders1.gif\">").load('php/manage_product.php');
 					}
 					else
 					{

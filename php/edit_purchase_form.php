@@ -50,6 +50,8 @@
 	//on clicking on edit button
 		$('#user_save_edit_button').click(function()
 		{
+			$('.user_edit_span').html("<img class=\"gif_loader\" src=\"img/loaders1.gif\">");
+			
 			var purchase_id = "<?php echo $purchase_id;?>";
 
 			var purchase_inv_num = $('#user_edit_form #purchase_inv_num').val();
@@ -68,7 +70,7 @@
 					{
 						$('.user_edit_span').text('Successfully edited').css('color','green');
 						$('#user_edit_form').fadeOut(0);
-						$('.user_module_content').load('php/manage_purchase.php');
+						$('.user_module_content').html("<img class=\"gif_loader\" src=\"img/loaders1.gif\">").load('php/manage_purchase.php');
 					}
 					else
 					{

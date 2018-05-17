@@ -45,16 +45,18 @@
 	//on clicking on create user button
 		$('#user_entry_create_button').click(function()
 		{
-			var company_name = $('#branch_entry_company_name').val();
-			var branch_name = $('#branch_entry_branch_name').val();
-			var branch_code = $('#branch_entry_branch_code').val();
-			var city = $('#branch_entry_branch_city').val();
-			var address = $('#branch_entry_branch_address').val();
-			var email = $('#branch_entry_branch_email').val();
-			var phone_number = $('#branch_entry_branch_phone').val();
-			var registration_number = $('#branch_entry_branch_registration').val();
-			var gst_number = $('#branch_entry_branch_gst').val();
-			var bank = $('#branch_entry_branch_bank').val();
+			$('.user_entry_span').html("<img class=\"gif_loader\" src=\"img/loaders1.gif\">");
+			
+			var company_name = $.trim($('#branch_entry_company_name').val());
+			var branch_name = $.trim($('#branch_entry_branch_name').val());
+			var branch_code = $.trim($('#branch_entry_branch_code').val());
+			var city = $.trim($('#branch_entry_branch_city').val());
+			var address = $.trim($('#branch_entry_branch_address').val());
+			var email = $.trim($('#branch_entry_branch_email').val());
+			var phone_number = $.trim($('#branch_entry_branch_phone').val());
+			var registration_number = $.trim($('#branch_entry_branch_registration').val());
+			var gst_number = $.trim($('#branch_entry_branch_gst').val());
+			var bank = $.trim($('#branch_entry_branch_bank').val());
 
 			if(company_name!= "" && branch_name!= "" && branch_code!= "" && city!= "" & address!= "" && email!="" && phone_number!= ""  && registration_number!= ""  && gst_number!= ""  && bank!= "")
 			{
@@ -62,11 +64,11 @@
 				{
 					if(e==1)
 					{
+					//disappearing the user entry form
+						$('.user_entry_form').html("<img class=\"gif_loader\" src=\"img/loaders1.gif\">").fadeOut(0);
+						
 						$('.user_entry_span').text('Branch has been successfully created').css('color','green');
 						$('#create_new_user_button').fadeIn(100);
-
-					//disappearing the user entry form
-						$('.user_entry_form').fadeOut(0);
 					}
 					else
 					{
@@ -84,7 +86,7 @@
 	//on clicking on create new user button
 		$('#create_new_user_button').click(function()
 		{
-			$('.user_module_content').load('php/add_branch.php');
+			$('.user_module_content').html("<img class=\"gif_loader\" src=\"img/loaders1.gif\">").load('php/add_branch.php');
 		});
 
 	</script>

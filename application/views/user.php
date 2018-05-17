@@ -41,17 +41,17 @@
 				<ul>
 					<li work="add_customer" id="menu_add_customer">Add Customer</li>
 					<li work="manage_customer">Manage Customer</li>
-					<li work="paid_customer">Paid Customer</li>
-					<li work="credit_customer">Credit Customer</li>
+					<!-- <li work="paid_customer">Paid Customer</li>
+					<li work="credit_customer">Credit Customer</li> -->
 				</ul>
 			</li>
 
-			<li>Product
+		<!-- 	<li>Product
 				<ul>
 					<li work="add_product" id="menu_add_product">Add Product</li>
 					<li work="manage_product">Manage Product</li>
 				</ul>
-			</li>
+			</li> -->
 
 			<li>Supplier
 				<ul>
@@ -67,31 +67,33 @@
 				</ul>
 			</li>
 
+			<li>Return
+				<ul>
+					<li work="add_return">Add Return</li>
+					<li work="manage_return">Manage Return</li>
+				</ul>
+			</li>
+
 			<li>Quotation/Invoice
 				<ul>
 					<li>New Quotation/Invoice</li>
 						<div>
-							<a>Service Quotation/Invoice</a>
-							<a>Sales Quotation/Invoice</a>
+							<a work="add_service_quotation">Service Quotation/Invoice</a>
+							<a work="add_sales_quotation">Sales Quotation/Invoice</a>
 						</div>						
 					
-					<li>Manage Quotation</li>
-					<li>Manage Invoice</li>
+					<li work="manage_quotation">Manage Quotation</li>
+					<li work="manage_invoice">Manage Invoice</li>
 				</ul>
 			</li>
 			
-			<li>Return
-				<ul>
-					<li>Add Return</li>
-					<li>Manage Return</li>
-				</ul>
-			</li>
+			
 
 			<li>Stock
 				<ul>
-					<li>Stock Report</li>
-					<li>Stock Report Customer Wise</li>
-					<li>Stock Report Supplier Wise</li>
+					<li work="add_stock">Add Stock</li>
+					<li work="manage_stock">Manage Stock</li>
+					<li work="stock_report">Stock Report</li>
 				</ul>
 			</li>
 
@@ -204,7 +206,7 @@
 			var file = work + ".php";
 			var file_address = "php/" + file;
 
-			$('.user_module_content').load(file_address);
+			$('.user_module_content').html("<img class=\"gif_loader\" src=\"img/loaders1.gif\">").load(file_address);
 		});
 
 	</script>

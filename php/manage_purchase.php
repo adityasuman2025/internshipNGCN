@@ -93,7 +93,7 @@
 			{
 				if(e==1)
 				{
-					$('.user_module_content').load('php/manage_purchase.php');
+					$('.user_module_content').html("<img class=\"gif_loader\" src=\"img/loaders1.gif\">").load('php/manage_purchase.php');
 				}
 				else
 				{

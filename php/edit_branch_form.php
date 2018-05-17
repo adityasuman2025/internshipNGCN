@@ -87,6 +87,8 @@
 	//on clicking on edit button
 		$('#user_save_edit_button').click(function()
 		{
+			$('.user_edit_span').html("<img class=\"gif_loader\" src=\"img/loaders1.gif\">");
+			
 			var branch_id = "<?php echo $branch_id; ?>";
 			
 			var company_name = $('#branch_entry_company_name').val();
@@ -111,7 +113,7 @@
 					{
 						$('.user_edit_span').text('Successfully edited').css('color','green');
 						$('#user_edit_form').fadeOut(0);
-						$('.user_module_content').load('php/manage_branch.php');
+						$('.user_module_content').html("<img class=\"gif_loader\" src=\"img/loaders1.gif\">").load('php/manage_branch.php');
 					}
 					else
 					{
