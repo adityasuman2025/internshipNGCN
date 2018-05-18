@@ -12,34 +12,6 @@
 		$('#table_export2').tableExport();
 	</script>
 
-<!-----for pdf generation------>
-	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.3.5/jspdf.debug.js"></script>
-	<script type="text/javascript" src="js/html2canvas.js"></script>
-
-	<script type="text/javascript">
-	     function generatePDF() {
-	        window.scrollTo(0, 0);
-
-	        var table_height = $('#table_export').height() + 1000;
-	        var table_width = $('#table_export').width() + 200;
-	 	//	alert(table_width);
-	      
-	        var pdf = new jsPDF('p', 'pt', [table_width, table_height]);
-	 
-	        html2canvas($("#table_export")[0], {
-	            onrendered: function(canvas) {
-	                //document.body.appendChild(canvas);
-	                var ctx = canvas.getContext('2d');
-	                var imgData = canvas.toDataURL("image/png", 1.0);
-	                var width = canvas.width;
-	                var height = canvas.clientHeight;
-	                pdf.addImage(imgData, 'PNG', 10, 10, (width - 10), (height));
-	 				pdf.save('returns.pdf');
-	            }
-	        });
-	    }
-    </script>
-
 <!--------option to choose branch-------->
 	<b class="admin_select_branch_text">Select Branch Code</b>
 
@@ -63,8 +35,6 @@
 	<br>
 
 <!------------table area---------->
-	<button id="pdf" onclick="javascript:generatePDF()">Export to pdf</button>
-
 	<div id="table_export" class="inventory_list_container">
 		<h3>
 			<?php

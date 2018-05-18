@@ -1,6 +1,7 @@
 <br>
+
 <div class="login_portal">
-	<br>
+	<img src="img/logo.jpg">
 	<input class="input_username" type="text" name="" placeholder="Username">
 	<br>
 	<br>
@@ -11,7 +12,7 @@
 	<button class="login_button">Login</button>
 	<br>
 	<br>
-	<a class="forget_pass_button" href="">Forgot password</a>
+	<!-- <a class="forget_pass_button" href="">Forgot password</a> -->
 </div>
 
 <script type="text/javascript">
@@ -33,11 +34,11 @@
 				}
 				else if(e==1)
 				{
-					location.href = "admin";
+					location.href = "admin.php";
 				}
 				else if(e==2)
 				{
-					location.href = "user";
+					location.href = "user.php";
 				}
 
 			});

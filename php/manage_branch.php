@@ -7,7 +7,7 @@
 	</script>
 
 <!-----for pdf generation------>
-	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.3.5/jspdf.debug.js"></script>
+	<!-- <script type="text/javascript" src="js/jspdf.debug.js"></script>
 	<script type="text/javascript" src="js/html2canvas.js"></script>
 
 	<script type="text/javascript">
@@ -32,11 +32,12 @@
 	            }
 	        });
 	    }
-    </script>
+    </script> -->
 
 <h3>Manage Branch</h3>
 <div class="inventory_list_container">
-	<button id="pdf" onclick="javascript:generatePDF()">Export to pdf</button>
+	
+	<!-- <button id="pdf" onclick="javascript:generatePDF()">Export to pdf</button> -->
 	<table id="table_export" class="list_inventory_table">
 		<tr>
 			<th>Company Name</th>

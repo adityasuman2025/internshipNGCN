@@ -1,8 +1,8 @@
 <?php
 	$mysql_host = "localhost";
-	$mysql_user = "root";
-	$mysql_pass = "";
-	$mysql_db = "may_18";
+	$mysql_user = "pnds_may_18";
+	$mysql_pass = "may_18";
+	$mysql_db = "pnds_may_18";
 
 	if($connect_link = mysqli_connect($mysql_host, $mysql_user, $mysql_pass, $mysql_db))
 	{

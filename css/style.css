@@ -36,7 +36,7 @@ body, html
 		border-radius: 3px;
 		margin:auto;
 		text-align: center;
-		padding: 4%;
+		padding: 2%;
 	}
 
 	.login_button
@@ -457,7 +457,7 @@ body, html
 		top:0px;
 		left: 20%;
 		z-index: 10;
-
+		vertical-align: middle;
 		transition: .7s;
 	}
 
@@ -467,18 +467,22 @@ body, html
 		//background: red;
 		display: inline-block;
 		text-align: left;
+		vertical-align: middle;
 	}
+
 
 	.mob_menu_button
 	{
 		height: 50px;
 		cursor: pointer;
 		display: none;
+		vertical-align: middle;
 	}
 
 	.company_logo
 	{
-		height: 50px;
+		height: 45px;
+		vertical-align: middle;
 		//margin-left: 10px;
 	}
 
@@ -742,6 +746,30 @@ body, html
 		margin: 3px;
 	}
 
+/*---------user dashboard area----------*/
+	.dashboard_container
+	{
+		width: 100%;
+	}
+
+	.dashboard_container button
+	{
+		width: 30%;
+		height: 150px;
+		vertical-align: bottom;
+		border-radius: 3px;
+		margin: 5px;
+		//color: black;
+		font-size: 120%;
+		text-align: left;
+		padding: 10px;
+	}
+
+	.dashboard_container button img
+	{
+		height: 80%;
+		padding: 10px;
+	}
 
 /*---media query-------*/
 @media screen and (max-width: 800px)
@@ -760,7 +788,7 @@ body, html
 		width: 100%;
 		height: 200px;
 		object-fit: cover;
-		object-position: center;
+		object-position: bottom;
 	}
 
 /*-----login portal------*/
@@ -872,4 +900,24 @@ body, html
 		width: 100px;
 		border:none;
 	}
+
+/*---------user dashboard area----------*/
+	
+	.dashboard_container button
+	{
+		width: 90%;
+		height: 110px;
+		vertical-align: bottom;
+		border-radius: 3px;
+		margin: 5px;
+		//color: black;
+		font-size: 120%;
+	}
+
+	.dashboard_container button img
+	{
+		height: 80%;
+	}
+
+
 }
