@@ -1,3 +1,16 @@
+<?php
+
+//if user is already logged in
+	if(isset($_COOKIE['logged_username']) && $_COOKIE['isadmin'] ==1)
+	{
+		header("Location:admin.php");
+	}
+	else if(isset($_COOKIE['logged_username']) && $_COOKIE['isadmin'] ==0)//if user is already logged in and the user is not an admin
+	{
+		header("Location:user.php");
+	}
+?>
+
 <html>
 <head>
 	<?php
@@ -14,20 +27,8 @@
 	</div>
 
 <!--------log in portal------>
-	<?php
-	//if user is already logged in and the user is also an admin
-		if(isset($_COOKIE['logged_username']) && $_COOKIE['isadmin'] ==1)
-		{
-			header("Location:admin.php");
-		}
-		else if(isset($_COOKIE['logged_username']) && $_COOKIE['isadmin'] ==0)//if user is already logged in and the user is not an admin
-		{
-			header("Location:user.php");
-		}
-		else //if the user is not already logged in
-		{
-			include('php/login_portal.php');
-		}
+	<?php	
+		include('php/login_portal.php');
 	?>
 
 </body>
