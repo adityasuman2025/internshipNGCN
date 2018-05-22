@@ -11,6 +11,7 @@
 	<table id="table_export" class="list_inventory_table">
 		<tr>
 			<th>Name</th>
+			<th>Company Name</th>
 			<th>Email</th>
 			<th>Mobile</th>
 			<th>Address</th>
@@ -35,6 +36,7 @@
 				
 				echo "<tr>";
 					echo "<td>" .$manage_customer_result['name'] . "</td>";
+					echo "<td>" .$manage_customer_result['company_name'] . "</td>";
 					echo "<td>" . $manage_customer_result['email'] . "</td>";
 					echo "<td>" . $manage_customer_result['mobile'] . "</td>";
 					echo "<td>" . $manage_customer_result['address'] . "</td>";

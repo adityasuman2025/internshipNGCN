@@ -3,11 +3,11 @@
 ?>
 
 <!-------inventory area----->
-	<div class="inventory_tab">
+	<!-- <div class="inventory_tab">
 		<button class="whole_unit_button">Whole Unit</button>
 		<button class="parts_only_button">Parts Only</button>
 	</div>
-	<br><br>
+	<br><br> -->
 
 <!-----inventory form---->
 	<div class="inventory_form">
@@ -16,7 +16,7 @@
 			<option value=""></option>
 
 			<?php
-				$get_brand_query = "SELECT brand FROM inventory";
+				$get_brand_query = "SELECT brand FROM inventory GROUP BY brand";
 				$get_brand_query_run = mysqli_query($connect_link, $get_brand_query);
 
 				while($get_brand_result = mysqli_fetch_assoc($get_brand_query_run))
@@ -76,16 +76,16 @@
 <!-----------script------------>
 	<script type="text/javascript">
 		
-	//switching tab b/w whole unit and parts only
-		$('.whole_unit_button').click(function()
-		{
-			$('.parts_only_input').fadeOut(0);
-		});
+	// //switching tab b/w whole unit and parts only
+	// 	$('.whole_unit_button').click(function()
+	// 	{
+	// 		$('.parts_only_input').fadeOut(0);
+	// 	});
 
-		$('.parts_only_button').click(function()
-		{
-			$('.parts_only_input').fadeIn(0);
-		});
+	// 	$('.parts_only_button').click(function()
+	// 	{
+	// 		$('.parts_only_input').fadeIn(0);
+	// 	});
 
 	//on selecting a brand
 		$('#inv_brand').change(function()
@@ -93,7 +93,7 @@
 			$(this).attr('disabled', 'disabled').css('border', '1px solid lightgrey');
 
 			var brand = $(this).val();
-			var query = "SELECT model_name FROM inventory WHERE brand ='" + brand + "'";
+			var query = "SELECT model_name FROM inventory WHERE brand ='" + brand + "' GROUP BY model_name";
 			var to_get = "model_name";
 
 			$.post('php/product_query_runner.php', {query:query , to_get:to_get}, function(data)
@@ -109,7 +109,7 @@
 			$(this).attr('disabled', 'disabled').css('border', '1px solid lightgrey');
 
 			model_name = $(this).val();
-			var query = "SELECT model_number FROM inventory WHERE model_name ='" + model_name + "'";
+			var query = "SELECT model_number FROM inventory WHERE model_name ='" + model_name + "' GROUP BY model_number";
 			var to_get = "model_number";
 
 			$.post('php/product_query_runner.php', {query:query , to_get:to_get}, function(data)
@@ -125,7 +125,7 @@
 			$(this).attr('disabled', 'disabled').css('border', '1px solid lightgrey');
 
 			model_number = $(this).val(); //making it universal variable to use in, on selecting a part_name
-			var query = "SELECT part_name FROM inventory WHERE model_number ='" + model_number + "' AND model_name = '" + model_name + "'";
+			var query = "SELECT part_name FROM inventory WHERE model_number ='" + model_number + "' AND model_name = '" + model_name + "' GROUP BY part_name";
 			var to_get = "part_name";
 
 			$.post('php/product_query_runner.php', {query:query , to_get:to_get}, function(data)
@@ -186,7 +186,7 @@
 				var inv_type = "part";
 			}
 
-			if(inv_brand !="" && inv_model_name !="" && inv_model_num !="" && inv_quantity !="" && inv_sales_price !="" && inv_supplier_price !="" && inv_hsn_code !="")
+			if(inv_brand !="" && inv_model_name !="" && inv_model_num !="" && inv_quantity !="")
 			{			
 				$.post('php/create_stock.php', {inv_brand:inv_brand, inv_model_name:inv_model_name, inv_model_num:inv_model_num, inv_part_name:inv_part_name, inv_part_number:inv_part_number, inv_quantity:inv_quantity, inv_type:inv_type, inv_sales_price:inv_sales_price, inv_supplier_price:inv_supplier_price, inv_hsn_code:inv_hsn_code}, function(e)
 				{

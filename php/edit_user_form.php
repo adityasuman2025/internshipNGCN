@@ -13,8 +13,6 @@
 	$password = $list_user_assoc['password'];
 	$isadmin = $list_user_assoc['isadmin'];
 	$email = $list_user_assoc['email'];
-	$serv_tax_no = $list_user_assoc['serv_tax_no'];
-	$address = $list_user_assoc['address'];
 	$branch_code = $list_user_assoc['branch_code'];
 
 ?>
@@ -52,16 +50,6 @@
 			?>
 		</select>
 		<br><br>
-
-		Service Tax Number:
-		<br>
-		<input type="text" value="<?php echo $serv_tax_no; ?>" id="user_entry_serv_tax_no">
-		<br>
-
-		Address:
-		<br>
-		<textarea id="user_entry_address"><?php echo $address; ?></textarea>
-		<br>
 
 		Branch Code:
 		<br>
@@ -112,9 +100,7 @@
 			var user_id = "<?php echo $user_id;?>";
 			var username = $('#user_edit_form #user_entry_username').val();
 			var email = $('#user_edit_form #user_entry_email').val();
-			var service_tax_no = $('#user_edit_form #user_entry_serv_tax_no').val();
 			var isadmin = $('#user_edit_form #user_entry_isadmin').val();
-			var address = $('#user_edit_form #user_entry_address').val();
 			var branch_code = $('#user_edit_form #user_entry_branch_code').val();
 
 			var query_recieved ="SELECT id FROM users WHERE username='" + username + "' AND id !='" + user_id + "'";
@@ -126,9 +112,9 @@
 				}
 				else
 				{							
-					if(username!= "" && email!= "" && service_tax_no!= "" & isadmin!= "" && address!="" && branch_code!= "" )
+					if(username!= "" && email!= "" && isadmin!= "" && branch_code!= "" )
 					{
-						var query_recieved = "UPDATE users SET username ='" + username + "', email ='" + email + "', serv_tax_no = '" + service_tax_no + "', isadmin = '" + isadmin + "', address = '" + address + "', branch_code = '" + branch_code + "' WHERE id = '" + user_id + "'";
+						var query_recieved = "UPDATE users SET username ='" + username + "', email ='" + email + "', isadmin = '" + isadmin + "', branch_code = '" + branch_code + "' WHERE id = '" + user_id + "'";
 						// alert(query_recieved);
 
 						$.post('php/query_runner.php', {query_recieved:query_recieved}, function(e)

@@ -102,7 +102,7 @@
 			var gst_number = $('#branch_entry_branch_gst').val();
 			var bank = $('#branch_entry_branch_bank').val();
 
-			if(company_name!= "" && branch_name!= "" && branch_code!= "" & city!= "" && address!="" && email!= "" && phone_number!= "" && registration_number!="" && gst_number!= "" && bank!= "")
+			if(company_name!= "" && branch_name!= "" && branch_code!= "" & city!= "" && address!="" && phone_number!= "" && bank!= "")
 			{
 				var query_recieved = "UPDATE branch SET company_name ='" + company_name + "', branch_name ='" + branch_name + "', branch_code = '" + branch_code + "', city = '" + city + "', address = '" + address + "', email = '" + email + "', phone_number = '" + phone_number + "', registration_number = '" + registration_number + "', gst_number = '" + gst_number + "', bank = '" + bank + "' WHERE id = '" + branch_id + "'";
 				// alert(query_recieved);

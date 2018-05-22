@@ -189,7 +189,7 @@ body, html
 
 	.parts_only_input
 	{
-		display: none;
+		//display: none;
 	}
 
 	#inv_add_new_button
@@ -257,7 +257,7 @@ body, html
 
 	.part_only_table
 	{
-		display: none;
+		//display: none;
 	}
 
 /*-----admin branch selector-----*/
@@ -720,6 +720,11 @@ body, html
 		padding: 5px;
 		background: #cc0000;
 		color: white;
+	}
+
+	#invoice_gen_button
+	{
+		float: right;
 	}
 
 /*--------admin quotation area------*/

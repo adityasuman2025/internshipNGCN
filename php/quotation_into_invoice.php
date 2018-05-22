@@ -23,7 +23,7 @@
 		</select>
 		<br><br>
 		
-		<input type="button" value="Generate Quotation" id="user_save_edit_button">
+		<input type="button" value="Generate Invoice" id="user_save_edit_button">
 		<br>
 	</div>
 		
@@ -56,11 +56,11 @@
 							{
 								$('.user_edit_span').text('Invoice has been successfully generated from the quotation').css('color','green');
 								$('#user_edit_form').fadeOut(0);
-								$('.user_module_content').html("<img class=\"gif_loader\" src=\"img/loaders1.gif\">").load('php/manage_quotation.php');
+								$('.user_module_content').html("<img class=\"gif_loader\" src=\"img/loaders1.gif\">").load('php/manage_invoice.php');
 							}
 							else
 							{
-								$('.user_edit_span').text('Something went wrong while changinf the stock data in the database').css('color','red');
+								$('.user_edit_span').text('Something went wrong while changing the stock data in the database').css('color','red');
 							}
 						});
 					}

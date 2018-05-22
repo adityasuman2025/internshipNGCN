@@ -72,12 +72,9 @@
 
 			<li>Quotation/Invoice
 				<ul>
-					<li>New Quotation</li>
-						<div>
-							<a work="add_service_quotation">Service Quotation</a>
-							<a work="add_sales_quotation">Sales Quotation</a>
-						</div>						
-					
+					<li work="add_service_quotation">New Service Quotation/Invoice</li>
+					<li work="add_sales_quotation">New Sales Quotation/Invoice</li>
+			
 					<li work="manage_quotation">Manage Quotation</li>
 					<li work="manage_invoice">Manage Invoice</li>
 				</ul>
@@ -183,14 +180,14 @@
 		})
 
 	//to generate heading of the content
-		$('.user_menu li li, .user_menu li a').click(function()
+		$('.user_menu li li').click(function()
 		{
 			var heading = $(this).text();
 			$('.user_module_heading').text(heading);
 		});
 
 	//to generate the content of the selected option
-		$('.user_menu li li, .user_menu li a').click(function()
+		$('.user_menu li li').click(function()
 		{
 			var user_username = "<?php echo $_COOKIE['logged_username']; ?>";
 			var work = $.trim($(this).attr('work'));

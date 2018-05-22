@@ -3,6 +3,9 @@
 		<input id="user_entry_username" type="text" placeholder="Customer Name">
 		<br>
 		<br>
+		<input id="user_entry_company" type="text" placeholder="Company Name">
+		<br>
+		<br>
 		<input type="email" placeholder="Customer Email" id="user_entry_email">
 		<br>
 		<br>
@@ -37,6 +40,7 @@
 			$('.user_entry_span').html("<img class=\"gif_loader\" src=\"img/loaders1.gif\">");
 			
 			var name = $.trim($('#user_entry_username').val());
+			var company_name = $.trim($('#user_entry_company').val());
 			var email = $.trim($('#user_entry_email').val());
 			var mobile = $.trim($('#user_entry_mob').val());
 			var address = $.trim($('#user_entry_address').val());
@@ -44,9 +48,9 @@
 			var gst = $.trim($('#user_entry_gst').val());
 			var shipping_address = $.trim($('#user_entry_shipping_address').val());
 
-			if(name!= "" && email!= "" && mobile!= "" && address!= "" & pan!= "" && gst!="" && shipping_address!= "")
+			if(name!= "" && mobile!= "" && address!= "")
 			{
-				$.post('php/create_customer.php', {name:name, email:email, mobile:mobile, address:address, pan:pan, gst:gst, shipping_address:shipping_address}, function(e)
+				$.post('php/create_customer.php', {name:name, company_name:company_name, email:email, mobile:mobile, address:address, pan:pan, gst:gst, shipping_address:shipping_address}, function(e)
 				{
 					if(e==1)
 					{

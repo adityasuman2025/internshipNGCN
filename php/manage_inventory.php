@@ -3,50 +3,50 @@
 	<script type="text/javascript" src="js/tableexport.min.js"></script>
 
 	<script type="text/javascript">
-		$('#table_export1').tableExport();
+		//$('#table_export1').tableExport();
 		$('#table_export2').tableExport();
 	</script>
 
 <!---------user list container------>
 	<h3>Manage Inventory</h3>
-	<div class="inventory_tab">
+	<!-- <div class="inventory_tab">
 		<button class="whole_unit_list_button">Whole Unit</button>
 		<button class="parts_only_list_button">Parts Only</button>
 	</div>
 	<br><br>
-
+ -->
 	<div id="table_export" class="inventory_list_container">
 
-		<table id="table_export1" class="whole_unit_table">
+		<!-- <table id="table_export1" class="whole_unit_table">
 			<tr>
 				<th>Brand</th>
 				<th>Model Name</th>
 				<th>Model Number</th>
 				<th>Actions</th>
-			</tr>
+			</tr> -->
 
 			<?php
-				include 'connect_db.php';
+				// include 'connect_db.php';
 
-				$list_user_query = "SELECT * FROM inventory WHERE type = 'whole' ORDER BY id DESC";
-				$list_user_query_run = mysqli_query($connect_link, $list_user_query);
+				// $list_user_query = "SELECT * FROM inventory WHERE type = 'whole' ORDER BY id DESC";
+				// $list_user_query_run = mysqli_query($connect_link, $list_user_query);
 
-				while($list_user_assoc = mysqli_fetch_assoc($list_user_query_run))
-				{
-					$user_id = $list_user_assoc['id'];
-					echo "<tr>";
+				// while($list_user_assoc = mysqli_fetch_assoc($list_user_query_run))
+				// {
+				// 	$user_id = $list_user_assoc['id'];
+				// 	echo "<tr>";
 						
-						echo "<td>" . $list_user_assoc['brand'] . "</td>";
-						echo "<td>" . $list_user_assoc['model_name'] . "</td>";
-						echo "<td>" . $list_user_assoc['model_number'] . "</td>";
-						echo "<td>";
-							echo "<img user_id=\"$user_id\" class=\"inventory_edit_icon\" src=\"img/edit.png\"/>";
-							echo "<img user_id=\"$user_id\" class=\"inventory_delete_icon\" src=\"img/delete.png\"/>";			
-						echo "</td>";
-					echo "</tr>";
-				}
+				// 		echo "<td>" . $list_user_assoc['brand'] . "</td>";
+				// 		echo "<td>" . $list_user_assoc['model_name'] . "</td>";
+				// 		echo "<td>" . $list_user_assoc['model_number'] . "</td>";
+				// 		echo "<td>";
+				// 			echo "<img user_id=\"$user_id\" class=\"inventory_edit_icon\" src=\"img/edit.png\"/>";
+				// 			echo "<img user_id=\"$user_id\" class=\"inventory_delete_icon\" src=\"img/delete.png\"/>";			
+				// 		echo "</td>";
+				// 	echo "</tr>";
+				// }
 			?>
-		</table>
+		<!-- </table> -->
 
 		<table id="table_export2" class="part_only_table">
 			<tr>
@@ -62,7 +62,7 @@
 			<?php
 				include 'connect_db.php';
 
-				$list_user_query = "SELECT * FROM inventory WHERE type = 'part' ORDER BY id DESC";
+				$list_user_query = "SELECT * FROM inventory ORDER BY id DESC";
 				$list_user_query_run = mysqli_query($connect_link, $list_user_query);
 
 				while($list_user_assoc = mysqli_fetch_assoc($list_user_query_run))
@@ -89,18 +89,18 @@
 
 <!-----------script----------->
 	<script type="text/javascript">
-	//switching tab b/w whole unit and parts only
-		$('.whole_unit_list_button').click(function()
-		{
-			$('.whole_unit_table').fadeIn(0);
-			$('.part_only_table').fadeOut(0);
-		});
+	// //switching tab b/w whole unit and parts only
+	// 	$('.whole_unit_list_button').click(function()
+	// 	{
+	// 		$('.whole_unit_table').fadeIn(0);
+	// 		$('.part_only_table').fadeOut(0);
+	// 	});
 
-		$('.parts_only_list_button').click(function()
-		{
-			$('.part_only_table').fadeIn(0);
-			$('.whole_unit_table').fadeOut(0);
-		});
+	// 	$('.parts_only_list_button').click(function()
+	// 	{
+	// 		$('.part_only_table').fadeIn(0);
+	// 		$('.whole_unit_table').fadeOut(0);
+	// 	});
 
 	//on clicking on inventory delete icon
 		$('.inventory_delete_icon').click(function()

@@ -1,11 +1,11 @@
 <!-------inventory area----->
 	<h3>Add Inventory</h3>
 
-	<div class="inventory_tab">
+	<!-- <div class="inventory_tab">
 		<button class="whole_unit_button">Whole Unit</button>
 		<button class="parts_only_button">Parts Only</button>
-	</div>
-	<br><br>
+	</div> -->
+	<!-- <br><br> -->
 
 <!-----inventory form---->
 	<div class="inventory_form">
@@ -36,16 +36,16 @@
 <!-----------script------------>
 	<script type="text/javascript">
 		
-	//switching tab b/w whole unit and parts only
-		$('.whole_unit_button').click(function()
-		{
-			$('.parts_only_input').fadeOut(0);
-		});
+	// //switching tab b/w whole unit and parts only
+	// 	$('.whole_unit_button').click(function()
+	// 	{
+	// 		$('.parts_only_input').fadeOut(0);
+	// 	});
 
-		$('.parts_only_button').click(function()
-		{
-			$('.parts_only_input').fadeIn(0);
-		});
+	// 	$('.parts_only_button').click(function()
+	// 	{
+	// 		$('.parts_only_input').fadeIn(0);
+	// 	});
 
 	//on clicking on inventory add button
 		$('#inv_add_button').click(function()

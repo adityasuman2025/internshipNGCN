@@ -1,5 +1,7 @@
 <?php
 	include 'connect_db.php';
+	$creator_branch_code = $_COOKIE['logged_username_branch_code'];
+
 	if(isset($_POST['new_id']))
 	{
 		$new_id = (int)$_POST['new_id'];
@@ -11,11 +13,13 @@
 ?>
 
 <tr id="<?php echo $new_id; ?>">
+	<td><input type="text" id="quotation_description"></td>
+
 	<td>
 		<select id="quotation_brand">
 			<option value=""></option>
 				<?php
-					$get_brand_query = "SELECT brand FROM stock";
+					$get_brand_query = "SELECT brand FROM stock WHERE creator_branch_code = '$creator_branch_code' GROUP BY brand";
 					$get_brand_query_run = mysqli_query($connect_link, $get_brand_query);
 
 					while($get_brand_result = mysqli_fetch_assoc($get_brand_query_run))
@@ -42,10 +46,6 @@
 	</td>
 
 	<td>
-		<input type="text" id="quotation_service_id">	
-	</td>
-
-	<td>
 		<select id="quotation_part_name">
 			<option value=""></option>					
 		</select>
@@ -57,7 +57,11 @@
 
 	<td><input type="number" value="0" id="quotation_part_quantity"></td>
 	<td><input type="number" value="0" id="quotation_part_rate"></td>
-	<td><input type="number" value="0" id="quotation_part_gst"></td>
+
+	<td><input type="number" value="0" id="quotation_part_cgst"></td>
+	<td><input type="number" value="0" id="quotation_part_sgst"></td>
+	<td><input type="number" value="0" id="quotation_part_igst"></td>
+					
 	<td><input type="text" id="quotation_part_hsn_code"></td>
 	<td><input type="button" style="background: #cc0000; color: white; margin: 2px; width: auto;" value="calculate" id="quotation_part_total_price"></td>
 	<td>
@@ -66,6 +70,8 @@
 
 <!------script----------->
 	<script type="text/javascript">
+		creator_branch_code = "<?php echo $creator_branch_code; ?>";
+
 	//on selecting a brand
 		$('tr:last #quotation_brand').change(function()
 		{
@@ -73,7 +79,7 @@
 			this_thing = $(this); 
 
 			brand = $(this).val();
-			var query = "SELECT model_name FROM stock WHERE brand ='" + brand + "'";
+			var query = "SELECT model_name FROM stock WHERE brand ='" + brand + "' AND creator_branch_code = '" + creator_branch_code + "' GROUP BY model_name";
 			var to_get = "model_name";
 
 			$.post('php/product_query_runner.php', {query:query , to_get:to_get}, function(data)
@@ -91,7 +97,7 @@
 
 			model_name = $(this).val();
 			//alert(model_name);
-			var query = "SELECT model_number FROM stock WHERE model_name ='" + model_name + "'";
+			var query = "SELECT model_number FROM stock WHERE model_name ='" + model_name + "' AND creator_branch_code = '" + creator_branch_code + "' GROUP BY model_number";
 			var to_get = "model_number";
 
 			$.post('php/product_query_runner.php', {query:query , to_get:to_get}, function(data)
@@ -110,7 +116,7 @@
 			model_number = $(this).val(); //making it universal variable to use in, on selecting a part_name
 
 		//giving options to choose from part_name			
-			var query = "SELECT part_name FROM stock WHERE model_number ='" + model_number + "' AND model_name = '" + model_name + "'";
+			var query = "SELECT part_name FROM stock WHERE model_number ='" + model_number + "' AND model_name = '" + model_name + "' AND creator_branch_code = '" + creator_branch_code + "' GROUP BY model_number";
 			var to_get = "part_name";
 
 			$.post('php/product_query_runner.php', {query:query , to_get:to_get}, function(data)
@@ -120,7 +126,7 @@
 			});
 
 		//checking the availability of that item in stock
-			var query = "SELECT in_stock FROM stock WHERE model_number ='" + model_number + "' AND model_name = '" + model_name + "' AND brand = '" + brand + "' AND part_name = ''";
+			var query = "SELECT in_stock FROM stock WHERE model_number ='" + model_number + "' AND model_name = '" + model_name + "' AND brand = '" + brand + "' AND part_name = '' AND creator_branch_code = '" + creator_branch_code + "'";
 			var to_get = "in_stock";
 
 			$.post('php/query_result_viewer.php', {query:query , to_get:to_get}, function(data)
@@ -153,7 +159,7 @@
 			this_thing = $(this); 
 
 		//checking the availability of that item in stock
-			var query = "SELECT in_stock FROM stock WHERE model_number ='" + model_number + "' AND model_name = '" + model_name + "' AND brand = '" + brand + "' AND part_name = '" + part_name + "'";
+			var query = "SELECT in_stock FROM stock WHERE model_number ='" + model_number + "' AND model_name = '" + model_name + "' AND brand = '" + brand + "' AND part_name = '" + part_name + "' AND creator_branch_code = '" + creator_branch_code + "'";
 			var to_get = "in_stock";
 
 			$.post('php/query_result_viewer.php', {query:query , to_get:to_get}, function(data)
@@ -183,10 +189,12 @@
 		{
 			var quantity = parseInt($(this).parent().parent().find('#quotation_part_quantity').val());
 			var rate = parseInt($(this).parent().parent().find('#quotation_part_rate').val());
-			var gst = parseInt($(this).parent().parent().find('#quotation_part_gst').val());
+			var cgst = parseInt($(this).parent().parent().find('#quotation_part_cgst').val());
+			var sgst = parseInt($(this).parent().parent().find('#quotation_part_sgst').val());
+			var igst = parseInt($(this).parent().parent().find('#quotation_part_igst').val());
 
-			var total_price = (rate + (rate * gst/100))*quantity;
-
+			var total_price = (rate + (rate * (cgst+sgst+igst)/100))*quantity;
+			
 			$(this).val(total_price);
 			//alert(total_price);
 		});
@@ -202,7 +210,17 @@
 			$(this).parent().parent().find('#quotation_part_total_price').val('calculate');
 		});
 
-		$('tr:last #quotation_part_gst').keyup(function()
+		$('tr:last #quotation_part_cgst').keyup(function()
+		{
+			$(this).parent().parent().find('#quotation_part_total_price').val('calculate');
+		});
+
+		$('tr:last #quotation_part_sgst').keyup(function()
+		{
+			$(this).parent().parent().find('#quotation_part_total_price').val('calculate');
+		});
+
+		$('tr:last #quotation_part_igst').keyup(function()
 		{
 			$(this).parent().parent().find('#quotation_part_total_price').val('calculate');
 		});

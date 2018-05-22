@@ -16,9 +16,6 @@
 		<input type="email" placeholder="Email ID" id="user_entry_email">
 		<br>
 		<br>
-		<input type="text" placeholder="Service Tax Number" id="user_entry_serv_tax_no">
-		<br>
-		<br>
 
 		Is Admin
 		<br>
@@ -27,10 +24,6 @@
 			<option value="1">Yes</option>
 			<option value="0">No</option>
 		</select>
-		<br>
-		<br>
-
-		<textarea placeholder="Address" id="user_entry_address"></textarea>
 		<br>
 		<br>
 
@@ -74,9 +67,7 @@
 		var password = $.trim($('#user_entry_password').val());
 		var password_again = $.trim($('#user_entry_password_again').val());
 		var email = $.trim($('#user_entry_email').val());
-		var service_tax_no = $.trim($('#user_entry_serv_tax_no').val());
 		var isadmin = $.trim($('#user_entry_isadmin').val());
-		var address = $.trim($('#user_entry_address').val());
 		var branch_code = $.trim($('#user_entry_branch_code').val());
 
 		//alert(isadmin);
@@ -95,9 +86,9 @@
 				}
 				else
 				{
-					if(username!= "" && password!= "" && email!= "" && service_tax_no!= "" & isadmin!= "" && address!="" && branch_code!= "" )
+					if(username!= "" && password!= "" && email!= "" && isadmin!= "" && branch_code!= "" )
 					{
-						$.post('php/create_user.php', {username:username, password:password, email:email, service_tax_no:service_tax_no, isadmin:isadmin, address:address, branch_code:branch_code}, function(e)
+						$.post('php/create_user.php', {username:username, password:password, email:email, isadmin:isadmin, branch_code:branch_code}, function(e)
 						{
 							if(e==1)
 							{

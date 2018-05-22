@@ -1,5 +1,7 @@
 <?php
 	include 'connect_db.php';
+	$creator_branch_code = $_COOKIE['logged_username_branch_code'];
+
 	if(isset($_POST['new_id']))
 	{
 		$new_id = (int)$_POST['new_id'];
@@ -8,23 +10,28 @@
 	{
 		$new_id ="";
 	}
+
+	//$new_serial = $_POST['new_serial'];
 ?>
 
 <tr id="<?php echo $new_id; ?>">
+	<td><input type="text" id="quotation_description"></td>
+
 	<td>
 		<select id="quotation_part_name">
 			<option value=""></option>					
 		</select>
 	</td>
-
 	<td><input type="text" id="quotation_part_serial_num"></td>
-	
-	<td><input type="number" disabled="disabled" id="quotation_part_in_stock"></td>
 
+	<td><input type="number" disabled="disabled" id="quotation_part_in_stock"></td>
 	<td><input type="number" value="0" id="quotation_part_quantity"></td>
 	<td><input type="number" value="0" id="quotation_part_rate"></td>
-	<td><input type="number" value="0" id="quotation_part_gst"></td>
+	<td><input type="number" value="0" id="quotation_part_cgst"></td>
+	<td><input type="number" value="0" id="quotation_part_sgst"></td>
+	<td><input type="number" value="0" id="quotation_part_igst"></td>
 	<td><input type="text" id="quotation_part_hsn_code"></td>
+
 	<td><input type="button" style="background: #cc0000; color: white; margin: 2px; width: auto;" value="calculate" placeholder="Total Price" id="quotation_part_total_price"></td>
 	<td>
 		<img class="item_delete_icon" src="img/delete.png">
@@ -32,6 +39,8 @@
 
 <!------script----------->
 	<script type="text/javascript">
+		creator_branch_code = "<?php echo $creator_branch_code; ?>";
+
 	//for giving user options to choose part from that model name and model number of the brand
 		$.post('php/list_model_part.php', {model_name: model_name, model_number: model_number}, function(data)
 		{
@@ -48,7 +57,7 @@
 				part_name = $(this).val();
 
 			//checking the availability of that item in stock
-				var query = "SELECT in_stock FROM stock WHERE model_number ='" + model_number + "' AND model_name = '" + model_name + "' AND part_name = '" + part_name + "'";
+				var query = "SELECT in_stock FROM stock WHERE model_number ='" + model_number + "' AND model_name = '" + model_name + "' AND part_name = '" + part_name + "' AND creator_branch_code = '" + creator_branch_code + "'";
 				var to_get = "in_stock";
 
 				$.post('php/query_result_viewer.php', {query:query , to_get:to_get}, function(data)
@@ -72,37 +81,47 @@
 					}
 				});
 			});
+
+		//on clicking on calculate
+			$('tr:last #quotation_part_total_price').click(function()
+			{
+				var quantity = parseInt($(this).parent().parent().find('#quotation_part_quantity').val());
+				var rate = parseInt($(this).parent().parent().find('#quotation_part_rate').val());
+				var cgst = parseInt($(this).parent().parent().find('#quotation_part_cgst').val());
+				var sgst = parseInt($(this).parent().parent().find('#quotation_part_sgst').val());
+				var igst = parseInt($(this).parent().parent().find('#quotation_part_igst').val());
+
+				var total_price = (rate + (rate * (cgst+sgst+igst)/100))*quantity;
 			
+				$(this).val(total_price);
+				//alert(total_price);
+			});
 
-			//on clicking on calculate
-				$('tr:last #quotation_part_total_price').click(function()
-				{
-					var quantity = parseInt($(this).parent().parent().find('#quotation_part_quantity').val());
-					var rate = parseInt($(this).parent().parent().find('#quotation_part_rate').val());
-					var gst = parseInt($(this).parent().parent().find('#quotation_part_gst').val());
+		//on change of quantity, rate or gst after calculation
+			$('tr:last #quotation_part_quantity').keyup(function()
+			{
+				$(this).parent().parent().find('#quotation_part_total_price').val('calculate');
+			});
 
-					var total_price = (rate + (rate * gst/100))*quantity;
+			$('tr:last #quotation_part_rate').keyup(function()
+			{
+				$(this).parent().parent().find('#quotation_part_total_price').val('calculate');
+			});
 
-					$(this).val(total_price);
-					//alert(total_price);
-				});
+			$('tr:last #quotation_part_cgst').keyup(function()
+			{
+				$(this).parent().parent().find('#quotation_part_total_price').val('calculate');
+			});
 
-			//on change of quantity, rate or gst after calculation
-				$('tr:last #quotation_part_quantity').keyup(function()
-				{
-					$(this).parent().parent().find('#quotation_part_total_price').val('calculate');
-				});
+			$('tr:last #quotation_part_sgst').keyup(function()
+			{
+				$(this).parent().parent().find('#quotation_part_total_price').val('calculate');
+			});
 
-				$('tr:last #quotation_part_rate').keyup(function()
-				{
-					$(this).parent().parent().find('#quotation_part_total_price').val('calculate');
-				});
-
-				$('tr:last #quotation_part_gst').keyup(function()
-				{
-					$(this).parent().parent().find('#quotation_part_total_price').val('calculate');
-				});
-
+			$('tr:last #quotation_part_igst').keyup(function()
+			{
+				$(this).parent().parent().find('#quotation_part_total_price').val('calculate');
+			});
 		});
 
 	//on clicking on delete item button

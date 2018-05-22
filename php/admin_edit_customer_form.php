@@ -79,7 +79,7 @@
 			var gst = $('#user_edit_form #user_entry_gst').val();
 			var shipping_address = $('#user_edit_form #user_entry_shipping_address').val();
 
-			if(name!= "" && email!= "" && mobile!= "" & pan!= "" && address!="" && gst!= "" && shipping_address!= "" )
+			if(name!= "" && mobile!= "" && address!="")
 			{
 				var query_recieved = "UPDATE customers SET name ='" + name + "', email ='" + email + "', mobile = '" + mobile + "', pan = '" + pan + "', address = '" + address + "', gst = '" + gst + "', shipping_address = '" + shipping_address + "' WHERE id = '" + customer_id + "'";
 				// alert(query_recieved);

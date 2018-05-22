@@ -58,7 +58,7 @@
 			var gst_number = $.trim($('#branch_entry_branch_gst').val());
 			var bank = $.trim($('#branch_entry_branch_bank').val());
 
-			if(company_name!= "" && branch_name!= "" && branch_code!= "" && city!= "" & address!= "" && email!="" && phone_number!= ""  && registration_number!= ""  && gst_number!= ""  && bank!= "")
+			if(company_name!= "" && branch_name!= "" && branch_code!= "" && city!= "" & address!= "" && phone_number!= "" && bank!= "")
 			{
 				$.post('php/create_branch.php', {company_name:company_name, branch_name:branch_name, branch_code:branch_code, city:city, address:address, email:email, phone_number:phone_number, registration_number:registration_number, gst_number:gst_number, bank:bank}, function(e)
 				{

@@ -355,14 +355,22 @@
 
 		//for getting pdf of the quotation
 			var session_of = quotation_num;
-			var session_name = "pdf_quotation_of";
+			var session_name = "pdf_invoice_of";
 				
 			$.post('php/session_creator.php', {session_of: session_of, session_name: session_name}, function(e)
 			{
-				//alert(e);
+				if(e ==1)
+				{
+					window.open('php/invoice_pdf.php', '_blank');	
+				}
+				else
+				{
+					$('.warn_box').text("Something went wrong while generating pdf file of the quotation.");
+					$('.warn_box').fadeIn(200).delay(3000).fadeOut(200);
+				}
 			});
 
-			window.open('php/invoice_pdf.php', '_blank');	
+			//window.open('php/invoice_pdf.php', '_blank');	
 		});
 	
 	//on clicking on search button
