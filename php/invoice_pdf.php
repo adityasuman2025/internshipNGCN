@@ -44,6 +44,8 @@
 			$branch_address = $get_branch_info_assoc['address'];
 			$branch_email = $get_branch_info_assoc['email'];
 			$branch_phone_number = $get_branch_info_assoc['phone_number'];
+			$branch_gst_number = $get_branch_info_assoc['gst_number'];
+			$branch_bank = $get_branch_info_assoc['bank'];
 
 		//getting customer info
 			$get_customer_info_query = "SELECT * FROM customers WHERE name = '$customer_name'";
@@ -125,9 +127,13 @@
 		$pdf->Cell(120, 5, $branch_company_name, 0, 0);
 		$pdf->Cell(69, 5, $customer_name . ' (' . $customer_company_name . ')' , 0, 1);
 
-	//4th line
-		$pdf->Cell(120, 5, $branch_address, 0, 0);
-		$pdf->Cell(69, 5, $customer_address, 0, 1); //end of line
+	//4th line (address)
+		$pdf->Cell(120, 5, substr($branch_address, 0, 50), 0, 0);
+		$pdf->Cell(69, 5, substr($customer_address, 0, 30), 0, 1); //end of line
+
+	//4th line (address)
+		$pdf->Cell(120, 5, substr($branch_address, 50, 500), 0, 0);
+		$pdf->Cell(69, 5, substr($customer_address, 30, 300), 0, 1); //end of line
 
 	//5th line
 		$pdf->Cell(120, 5, $branch_phone_number, 0, 0);
@@ -136,6 +142,10 @@
 	//6th line
 		$pdf->Cell(120, 5, $branch_email, 0, 0);
 		$pdf->Cell(69, 5, $customer_email, 0, 1); //end of line
+
+	//(gst of branch) 7th line 
+		$pdf->Cell(120, 5, "GST Number: ". $branch_gst_number, 0, 0);
+		$pdf->Cell(69, 5, '', 0, 1); //end of line
 
 	//leaving blank space
 		$pdf->Cell(189, 3, '', 0, 1);
@@ -216,21 +226,26 @@
 
 			$pdf->Cell(69, 5, $customer_name, 0, 1);//end of line
 
-		//10th line
-			
+		//10th line	
 			if($customer_shipping_address == '')
 			{
 				$pdf->Cell(20, 5, 'Branch: ', 0, 0);
 				$pdf->Cell(100, 5, $creator_branch_code, 0, 0);
 
-				$pdf->Cell(69, 5, $customer_address, 0, 1); //end of line
+				$pdf->Cell(69, 5, substr($customer_address, 0, 30), 0, 1); //end of line
+
+				$pdf->Cell(120, 5, '', 0, 0);
+				$pdf->Cell(69, 5, substr($customer_address, 30, 300), 0, 1); //end of line
 			}
 			else
 			{
 				$pdf->Cell(20, 5, 'Branch: ', 0, 0);
 				$pdf->Cell(100, 5, $creator_branch_code, 0, 0);
+				
+				$pdf->Cell(69, 5, substr($customer_shipping_address, 0, 30), 0, 1); //end of line
 
-				$pdf->Cell(69, 5, $customer_shipping_address, 0, 1); //end of line
+				$pdf->Cell(120, 5, '', 0, 0);
+				$pdf->Cell(69, 5, substr($customer_shipping_address, 30, 300), 0, 1); //end of line
 			}
 			
 		//11th line
@@ -251,20 +266,17 @@
 		$pdf->SetFont('Arial', 'B', 13); //font
 		$pdf->SetTextColor(0,0,0); //text color //black
 
-		$pdf->Cell(13, 6, 'S. No', 1, 0);
-		$pdf->Cell(77, 6, 'ITEM', 1, 0);
+		$pdf->Cell(8, 7, 'No', 1, 0, 'C');
+		$pdf->Cell(82, 7, 'ITEM', 1, 0, 'C');
 
-		$pdf->Cell(13, 6, 'HSN', 1, 0);	
-		$pdf->Cell(13, 6, 'Unit', 1, 0);
-		$pdf->Cell(18, 6, 'Rate', 1, 0);
-		$pdf->Cell(15, 6, 'CGST', 1, 0);
-		$pdf->Cell(15, 6, 'SGST', 1, 0);
-		$pdf->Cell(15, 6, 'IGST', 1, 0);
-		$pdf->Cell(20, 6, 'Price', 1, 1); //end of line
+		$pdf->Cell(13, 7, 'HSN', 1, 0, 'C');	
+		$pdf->Cell(13, 7, 'Unit', 1, 0, 'C');
+		$pdf->Cell(18, 7, 'Rate', 1, 0, 'C');
+		$pdf->Cell(15, 7, 'CGST', 1, 0, 'C');
+		$pdf->Cell(15, 7, 'SGST', 1, 0, 'C');
+		$pdf->Cell(15, 7, 'IGST', 1, 0, 'C');
+		$pdf->Cell(20, 7, 'Price', 1, 1, 'C'); //end of line
 		
-		$pdf->SetFont('Arial', '', 11); //font
-		$pdf->SetTextColor(30, 30, 30); //text color //black
-
 	//get item infos
 		$total_amount = 0;
 		
@@ -294,40 +306,108 @@
 			$total_amount = $total_amount + $item_total_price;
 
 		//generating pdf of the item
-			$pdf->Cell(13, 6, $item_serial, 1, 0);
+			$pdf->SetFont('Arial', '', 11); //font
+			$pdf->SetTextColor(30, 30, 30); //text color //black
+
+			$pdf->Cell(8, 5, $item_serial, 'LR', 0, 'C');
 
 			if($type == 'service')
 			{
-				$pdf->Cell(77, 6, $item_part_name . ' (Serial: ' . $item_part_serial_number . ')' , 1, 0);
+				$pdf->Cell(82, 5, $item_part_name . ' (Serial: ' . $item_part_serial_number . ')' , 0, 0);
 			}
 			else if ($type == 'sales')
 			{
-				$pdf->Cell(77, 6, $item_brand . ' ' . $item_model_name . ' ' . $item_model_number . ' ' . $item_part_name . ' (Serial: ' . $item_part_serial_number . ')' , 1, 0);
+				$pdf->Cell(82, 5, $item_brand . ' ' . $item_model_name . ' ' . $item_model_number . ' ' . $item_part_name . ' (Serial: ' . $item_part_serial_number . ')', 0, 0);
 			}
 			
-			$pdf->Cell(13, 6, $item_hsn_code , 1, 0);	
-			$pdf->Cell(13, 6, $item_quantity , 1, 0);
-			$pdf->Cell(18, 6, $item_rate , 1, 0);
-			$pdf->Cell(15, 6, $item_cgst*$item_rate/100, 1, 0);
-			$pdf->Cell(15, 6, $item_sgst*$item_rate/100, 1, 0);
-			$pdf->Cell(15, 6, $item_igst*$item_rate/100, 1, 0);
-			$pdf->Cell(20, 6, $item_total_price, 1, 1); //end of line
+			$pdf->Cell(13, 5, $item_hsn_code ,'L', 0,'C');	
+			$pdf->Cell(13, 5, $item_quantity , 'L', 0,'C');
+			$pdf->Cell(18, 5, $item_rate ,  'L', 0,'C');
+			$pdf->Cell(15, 5, $item_cgst*$item_rate/100,  'L', 0,'C');
+			$pdf->Cell(15, 5, $item_sgst*$item_rate/100, 'L', 0,'C');
+			$pdf->Cell(15, 5, $item_igst*$item_rate/100, 'L', 0,'C');
+			$pdf->Cell(20, 5, $item_total_price, 'LR', 1,'C'); //end of line
 
-			$pdf->Cell(13, 6, '', 1, 0);
-			$pdf->SetFont('Arial', 'B', 12); //font
-			$pdf->Cell(26, 6, 'Description' , 1, 0);
-			$pdf->SetFont('Arial', '', 11); //font
-			$pdf->Cell(160, 6, $item_description, 1, 1); //end of line
+		//description area
+			$pdf->Cell(8, 5, '', 'LRB', 0);
+			$pdf->SetFont('Arial', 'B', 11); //font
+			$pdf->Cell(82, 5, "DESC: " . $item_description, 'B', 0);
 
+			$pdf->Cell(13, 5, '' ,'LB', 0);	
+			$pdf->Cell(13, 5, '' , 'LB', 0);
+			$pdf->Cell(18, 5, '' ,  'LB', 0);
+			$pdf->Cell(15, 5, '',  'LB', 0);
+			$pdf->Cell(15, 5, '', 'LB', 0);
+			$pdf->Cell(15, 5, '', 'LB', 0);
+			$pdf->Cell(20, 5, '', 'LRB', 1); //end of line
 		}
 
-	//Totaling up line
+	//Totaling up line (Purchased Item heading)
+		$number = $total_amount; //our number is total amount
+
+		$no = round($number);
+		$point = round($number - $no, 2) * 100;
+		$hundred = null;
+		$digits_1 = strlen($no);
+		$i = 0;
+		$str = array();
+		$words = array('0' => '', '1' => 'one', '2' => 'two',
+		'3' => 'three', '4' => 'four', '5' => 'five', '6' => 'six',
+		'7' => 'seven', '8' => 'eight', '9' => 'nine',
+		'10' => 'ten', '11' => 'eleven', '12' => 'twelve',
+		'13' => 'thirteen', '14' => 'fourteen',
+		'15' => 'fifteen', '16' => 'sixteen', '17' => 'seventeen',
+		'18' => 'eighteen', '19' =>'nineteen', '20' => 'twenty',
+		'30' => 'thirty', '40' => 'forty', '50' => 'fifty',
+		'60' => 'sixty', '70' => 'seventy',
+		'80' => 'eighty', '90' => 'ninety');
+
+		$digits = array('', 'hundred', 'thousand', 'lakh', 'crore');
+
+		while ($i < $digits_1) 
+		{
+			$divider = ($i == 2) ? 10 : 100;
+			$number = floor($no % $divider);
+			$no = floor($no / $divider);
+			$i += ($divider == 10) ? 1 : 2;
+			if ($number) 
+			{
+				$plural = (($counter = count($str)) && $number > 9) ? 's' : null;
+				$hundred = ($counter == 1 && $str[0]) ? ' and ' : null;
+				$str [] = ($number < 21) ? $words[$number] .
+				    " " . $digits[$counter] . $plural . " " . $hundred
+				    :
+				    $words[floor($number / 10) * 10]
+				    . " " . $words[$number % 10] . " "
+				    . $digits[$counter] . $plural . " " . $hundred;
+			} else $str[] = null;
+		}
+		$str = array_reverse($str);
+		$result = implode('', $str);
+		$points = ($point) ?
+		"." . $words[$point / 10] . " " . 
+		  $words[$point = $point % 10] : '';
+		$in_words =  $result . "Rupees";
+
+
+		$pdf->SetTextColor(204,0,0); //text color //red
+		$pdf->SetFont('Arial', '', 11); //font
+		$pdf->Cell(144, 8, $in_words, 1, 0);
+
 		$pdf->SetFont('Arial', 'B', 12); //font
 		$pdf->SetTextColor(0, 0, 0); //text color //black
+		$pdf->Cell(30, 8, 'Total Amount', 1, 0);
+		$pdf->Cell(25, 8, $total_amount, 1, 1); //end of line
 
-		$pdf->Cell(130, 7, '', 1, 0);
-		$pdf->Cell(38, 7, 'Total Amount', 1, 0);
-		$pdf->Cell(30, 7, $total_amount, 1, 1);
+	//leaving blank space
+		$pdf->Cell(200, 5, '', 0, 1);
+
+	//branch bank details
+		$pdf->SetFont('Arial', 'B', 12); //font
+		$pdf->Cell(189, 5, 'Bank Details:', 0, 1);
+
+		$pdf->SetFont('Arial', '', 11); //font
+		$pdf->MultiCell(189, 5, $branch_bank, 0,1);
 
 	//Payment method
 		$pdf->Cell(189, 7, '', 0, 1);
@@ -347,6 +427,11 @@
 		$pdf->SetTextColor(204,0,0); //text color //red
 		$pdf->SetFont('Arial', '', 11); //font
 		$pdf->Cell(45, 5, $date_of_payment, 0, 1);
+
+	//another page for terms and conditions
+		$pdf -> AddPage();
+		$pdf->SetTextColor(0, 0, 0); //text color //black
+		$pdf->Cell(189, 5, 'Bank Details:', 0, 1);
 
 	$pdf->Output();
 	//$pdf->Output('D','Invoice-' . $quotation_num. '.pdf');	

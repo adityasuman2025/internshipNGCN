@@ -204,7 +204,7 @@
 			}
 			else
 			{
-				$('.inventory_feed').text('Please fill all the details').css('color', 'red');
+				$('.inventory_feed').text('At least you need to choose brand, model name, model number and quantity.').css('color', 'red');
 			}		
 		});
 

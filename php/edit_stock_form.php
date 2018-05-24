@@ -70,7 +70,7 @@
 			var supplier_price = $('#user_edit_form #user_entry_supplier_price').val();
 			var hsn_code = $('#user_edit_form #user_entry_hsn_code').val();
 								
-			if(sold!= "" && in_stock!= "" && sales_price!= "" && supplier_price!= "" && hsn_code!= "")
+			if(sold!= "" && in_stock!= "")
 			{
 				var query_recieved = "UPDATE stock SET sold ='" + sold + "', in_stock ='" + in_stock + "', sales_price = '" + sales_price + "', supplier_price = '" + supplier_price + "', hsn_code = '" + hsn_code + "' WHERE id = '" + user_id + "'";
 			

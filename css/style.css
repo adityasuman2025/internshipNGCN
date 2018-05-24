@@ -213,7 +213,7 @@ body, html
 
 	.inventory_list_container::-webkit-scrollbar 
 	{ 
-	    display: none;  // Safari and Chrome
+	    //display: none;  // Safari and Chrome
 	}
 
 	.inventory_list_container table

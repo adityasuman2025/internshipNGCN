@@ -9,7 +9,7 @@
 			<select id="quotation_brand">
 				<option value=""></option>
 					<?php
-						$get_brand_query = "SELECT brand FROM stock";
+						$get_brand_query = "SELECT brand FROM stock GROUP BY brand";
 						$get_brand_query_run = mysqli_query($connect_link, $get_brand_query);
 
 						while($get_brand_result = mysqli_fetch_assoc($get_brand_query_run))
@@ -59,7 +59,7 @@
 			$(this).attr('disabled', 'disabled').css('border', '1px solid lightgrey');
 
 			brand = $(this).val();
-			var query = "SELECT model_name FROM stock WHERE brand ='" + brand + "'";
+			var query = "SELECT model_name FROM stock WHERE brand ='" + brand + "' GROUP BY model_name";
 			var to_get = "model_name";
 
 			$.post('php/product_query_runner.php', {query:query , to_get:to_get}, function(data)
@@ -75,7 +75,7 @@
 			$(this).attr('disabled', 'disabled').css('border', '1px solid lightgrey');
 
 			model_name = $(this).val();
-			var query = "SELECT model_number FROM stock WHERE model_name ='" + model_name + "' AND brand ='" + brand + "'";
+			var query = "SELECT model_number FROM stock WHERE model_name ='" + model_name + "' AND brand ='" + brand + "' GROUP BY model_number";
 			var to_get = "model_number";
 
 			$.post('php/product_query_runner.php', {query:query , to_get:to_get}, function(data)
