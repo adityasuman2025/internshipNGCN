@@ -17,6 +17,7 @@
 
 	<select id="admin_select_branch">
 		<option value=""></option>
+		<option value="*">All Branch</option>
 		<?php			
 			$get_brand_query = "SELECT * FROM branch";
 			$get_brand_query_run = mysqli_query($connect_link, $get_brand_query);
@@ -52,6 +53,20 @@
 		<table id="table_export1" class="list_inventory_table">
 			<tr>
 				<th>Customer</th>
+				<?php
+					if(isset($selected_branch))
+					{
+						if($selected_branch == '*')
+						{
+							echo "<th>Branch Code</th>";
+						}
+					}
+					else
+					{
+						echo "<th>Branch Code</th>";
+					}
+				?>
+
 				<th>Invoice Number</th>
 				<th>Brand</th>
 				<th>Model Name</th>
@@ -70,7 +85,16 @@
 					$user_username = $_COOKIE['logged_username'];
 					$creator_branch_code = $_COOKIE['logged_username_branch_code'];
 
-					$manage_customer_query = "SELECT * FROM returns WHERE type='whole' AND creator_branch_code='$selected_branch' ORDER BY id DESC";
+					if($selected_branch == '*')
+					{
+						$manage_customer_query = "SELECT * FROM returns WHERE type='whole' ORDER BY id DESC";
+					}
+					else
+					{
+						$manage_customer_query = "SELECT * FROM returns WHERE type='whole' AND creator_branch_code = '$selected_branch' ORDER BY id DESC";
+					}
+
+					// $manage_customer_query = "SELECT * FROM returns WHERE type='whole' AND creator_branch_code='$selected_branch' ORDER BY id DESC";
 					$manage_customer_query_run = mysqli_query($connect_link, $manage_customer_query);
 
 					while($manage_customer_result = mysqli_fetch_assoc($manage_customer_query_run))
@@ -79,6 +103,57 @@
 						
 						echo "<tr>";
 							echo "<td>" .$manage_customer_result['customer'] . "</td>";
+							if($selected_branch == '*')
+							{
+								echo "<td>" .$manage_customer_result['creator_branch_code'] . "</td>";
+							}
+
+							echo "<td>" . $manage_customer_result['invoice_num'] . "</td>";
+							echo "<td>" . $manage_customer_result['brand'] . "</td>";
+							echo "<td>" . $manage_customer_result['model_name'] . "</td>";
+							echo "<td>" . $manage_customer_result['model_number'] . "</td>";
+							echo "<td>" . $manage_customer_result['return_note'] . "</td>";
+							echo "<td>" . $manage_customer_result['date'] . "</td>";		
+							echo "<td>" . $manage_customer_result['creator_username'] . "</td>";
+
+							echo "<td>";
+								echo "<img return_id=\"$return_id\" class=\"product_edit_icon\" src=\"img/edit.png\"/>";
+								echo "<img return_id=\"$return_id\" class=\"product_delete_icon\" src=\"img/delete.png\"/>";
+								
+							echo "</td>";
+						echo "</tr>";
+					}
+				}
+				else
+				{
+					$selected_branch = '*';
+
+					$user_username = $_COOKIE['logged_username'];
+					$creator_branch_code = $_COOKIE['logged_username_branch_code'];
+
+					if($selected_branch == '*')
+					{
+						$manage_customer_query = "SELECT * FROM returns WHERE type='whole' ORDER BY id DESC";
+					}
+					else
+					{
+						$manage_customer_query = "SELECT * FROM returns WHERE type='whole' AND creator_branch_code = '$selected_branch' ORDER BY id DESC";
+					}
+
+					// $manage_customer_query = "SELECT * FROM returns WHERE type='whole' AND creator_branch_code='$selected_branch' ORDER BY id DESC";
+					$manage_customer_query_run = mysqli_query($connect_link, $manage_customer_query);
+
+					while($manage_customer_result = mysqli_fetch_assoc($manage_customer_query_run))
+					{
+						$return_id = $manage_customer_result['id'];
+						
+						echo "<tr>";
+							echo "<td>" .$manage_customer_result['customer'] . "</td>";
+							if($selected_branch == '*')
+							{
+								echo "<td>" .$manage_customer_result['creator_branch_code'] . "</td>";
+							}
+
 							echo "<td>" . $manage_customer_result['invoice_num'] . "</td>";
 							echo "<td>" . $manage_customer_result['brand'] . "</td>";
 							echo "<td>" . $manage_customer_result['model_name'] . "</td>";
@@ -105,6 +180,20 @@
 		<table id="table_export2" class="list_inventory_table">
 			<tr>
 				<th>Customer</th>
+				<?php
+					if(isset($selected_branch))
+					{
+						if($selected_branch == '*')
+						{
+							echo "<th>Branch Code</th>";
+						}
+					}
+					else
+					{
+						echo "<th>Branch Code</th>";
+					}
+				?>
+
 				<th>Invoice Number</th>
 				<th>Brand</th>
 				<th>Model Name</th>
@@ -126,7 +215,16 @@
 					$user_username = $_COOKIE['logged_username'];
 					$creator_branch_code = $_COOKIE['logged_username_branch_code'];
 
-					$manage_customer_query = "SELECT * FROM returns WHERE type='part' AND creator_branch_code= '$selected_branch' ORDER BY id DESC";
+					if($selected_branch == '*')
+					{
+						$manage_customer_query = "SELECT * FROM returns WHERE type='part' ORDER BY id DESC";
+					}
+					else
+					{
+						$manage_customer_query = "SELECT * FROM returns WHERE type='part' AND creator_branch_code = '$selected_branch' ORDER BY id DESC";
+					}
+
+					// $manage_customer_query = "SELECT * FROM returns WHERE type='part' AND creator_branch_code= '$selected_branch' ORDER BY id DESC";
 					$manage_customer_query_run = mysqli_query($connect_link, $manage_customer_query);
 
 					while($manage_customer_result = mysqli_fetch_assoc($manage_customer_query_run))
@@ -135,6 +233,10 @@
 						
 						echo "<tr>";
 							echo "<td>" .$manage_customer_result['customer'] . "</td>";
+							if($selected_branch == '*')
+							{
+								echo "<td>" .$manage_customer_result['creator_branch_code'] . "</td>";
+							}
 							echo "<td>" . $manage_customer_result['invoice_num'] . "</td>";
 							echo "<td>" . $manage_customer_result['brand'] . "</td>";
 							echo "<td>" . $manage_customer_result['model_name'] . "</td>";

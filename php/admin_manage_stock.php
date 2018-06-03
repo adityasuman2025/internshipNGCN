@@ -17,6 +17,7 @@
 
 	<select id="admin_select_branch">
 		<option value=""></option>
+		<option value="*">All Branch</option>
 		<?php			
 			$get_brand_query = "SELECT * FROM branch";
 			$get_brand_query_run = mysqli_query($connect_link, $get_brand_query);
@@ -104,6 +105,19 @@
 
 		<table id="table_export2" class="part_only_table">
 			<tr>
+				<?php
+					if(isset($selected_branch))
+					{
+						if($selected_branch == '*')
+						{
+							echo "<th>Branch Code</th>";
+						}
+					}
+					else
+					{
+						echo "<th>Branch Code</th>";
+					}
+				?>
 				<th>Brand</th>
 				<th>Model Name</th>
 				<th>Model Number</th>
@@ -123,13 +137,71 @@
 				{
 					$selected_branch = $_SESSION['selected_branch'];
 				
-					$list_user_query = "SELECT * FROM stock WHERE creator_branch_code = '$selected_branch' ORDER BY id DESC";
+					if($selected_branch == '*')
+					{
+						$list_user_query = "SELECT * FROM stock ORDER BY id DESC";
+					}
+					else
+					{
+						$list_user_query = "SELECT * FROM stock WHERE creator_branch_code = '$selected_branch' ORDER BY id DESC";
+					}
+
+					//$list_user_query = "SELECT * FROM stock WHERE creator_branch_code = '$selected_branch' ORDER BY id DESC";
+					
 					$list_user_query_run = mysqli_query($connect_link, $list_user_query);
 
 					while($list_user_assoc = mysqli_fetch_assoc($list_user_query_run))
 					{
 						$user_id = $list_user_assoc['id'];
 						echo "<tr>";
+							if($selected_branch == '*')
+							{
+								echo "<td>" .$list_user_assoc['creator_branch_code'] . "</td>";
+							}
+							
+							echo "<td>" . $list_user_assoc['brand'] . "</td>";
+							echo "<td>" . $list_user_assoc['model_name'] . "</td>";
+							echo "<td>" . $list_user_assoc['model_number'] . "</td>";
+							echo "<td>" . $list_user_assoc['part_name'] . "</td>";
+							echo "<td>" . $list_user_assoc['part_number'] . "</td>";
+							echo "<td>" . $list_user_assoc['sold'] . "</td>";
+							echo "<td>" . $list_user_assoc['in_stock'] . "</td>";
+							echo "<td>" . $list_user_assoc['sales_price'] . "</td>";
+							echo "<td>" . $list_user_assoc['supplier_price'] . "</td>";
+							echo "<td>" . $list_user_assoc['hsn_code'] . "</td>";
+							echo "<td>" . $list_user_assoc['creator_username'] . "</td>";
+							echo "<td>";
+								echo "<img user_id=\"$user_id\" class=\"inventory_edit_icon\" src=\"img/edit.png\"/>";
+								echo "<img user_id=\"$user_id\" class=\"inventory_delete_icon\" src=\"img/delete.png\"/>";			
+							echo "</td>";
+						echo "</tr>";
+					}
+				}
+				else
+				{
+					$selected_branch = '*';
+				
+					if($selected_branch == '*')
+					{
+						$list_user_query = "SELECT * FROM stock ORDER BY id DESC";
+					}
+					else
+					{
+						$list_user_query = "SELECT * FROM stock WHERE creator_branch_code = '$selected_branch' ORDER BY id DESC";
+					}
+
+					//$list_user_query = "SELECT * FROM stock WHERE creator_branch_code = '$selected_branch' ORDER BY id DESC";
+					
+					$list_user_query_run = mysqli_query($connect_link, $list_user_query);
+
+					while($list_user_assoc = mysqli_fetch_assoc($list_user_query_run))
+					{
+						$user_id = $list_user_assoc['id'];
+						echo "<tr>";
+							if($selected_branch == '*')
+							{
+								echo "<td>" .$list_user_assoc['creator_branch_code'] . "</td>";
+							}
 							
 							echo "<td>" . $list_user_assoc['brand'] . "</td>";
 							echo "<td>" . $list_user_assoc['model_name'] . "</td>";

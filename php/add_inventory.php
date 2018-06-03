@@ -1,30 +1,27 @@
 <!-------inventory area----->
 	<h3>Add Inventory</h3>
-
-	<!-- <div class="inventory_tab">
-		<button class="whole_unit_button">Whole Unit</button>
-		<button class="parts_only_button">Parts Only</button>
-	</div> -->
-	<!-- <br><br> -->
-
+	
 <!-----inventory form---->
 	<div class="inventory_form">
 		<input id="inv_brand" type="text" placeholder="Brand">
 		<br><br>
-		<input id="inv_model_name" type="text" placeholder="Model Name">
+		<input id="inv_model_name" type="text" placeholder="Product/Part">
 		<br><br>
-		<input id="inv_model_num" type="text" placeholder="Model Number">
+		<input id="inv_model_num" type="text" placeholder="Product/Part Code">
+		<br><br>
+		<input id="inv_hsn_code" type="text" placeholder="HSN Code">
+		<br><br>
+		<input type="text" id="inv_desc" placeholder="Description">
 		<br><br>
 
-		<div class="parts_only_input">
-			<input id="inv_part_name" type="text" placeholder="Part Name">
-			<br><br>
-			<input id="inv_part_number" type="text" placeholder="Part Number">
-			<br><br>
-			<input type="text" id="inv_part_desc" placeholder="Part Description">
-			<br><br>
-		</div>
+		Is a Product or Part
+		<br>
+		<select id="inv_type">
+			<option value="product">Product</option>
+			<option value="part">Part</option>
 
+		</select>
+		<br><br>
 		<input type="submit" id="inv_add_button" value="Add">
 	</div>
 
@@ -35,17 +32,6 @@
 
 <!-----------script------------>
 	<script type="text/javascript">
-		
-	// //switching tab b/w whole unit and parts only
-	// 	$('.whole_unit_button').click(function()
-	// 	{
-	// 		$('.parts_only_input').fadeOut(0);
-	// 	});
-
-	// 	$('.parts_only_button').click(function()
-	// 	{
-	// 		$('.parts_only_input').fadeIn(0);
-	// 	});
 
 	//on clicking on inventory add button
 		$('#inv_add_button').click(function()
@@ -55,25 +41,14 @@
 			var inv_brand = $.trim($('#inv_brand').val());
 			var inv_model_name = $.trim($('#inv_model_name').val());
 			var inv_model_num = $.trim($('#inv_model_num').val());
-			var inv_part_name = $.trim($('#inv_part_name').val());
-			var inv_part_number = $.trim($('#inv_part_number').val());
-			var inv_part_desc = $.trim($('#inv_part_desc').val());
-			var inv_type = "";
+			var inv_hsn_code = $.trim($('#inv_hsn_code').val());
+			var inv_desc = $.trim($('#inv_desc').val());
+			var inv_type = $.trim($('#inv_type').val());
 
-		//for choosing b/w whole unit and part only
-			if(inv_part_name =="" && inv_part_number =="" && inv_part_desc =="")
-			{
-				var inv_type = "whole";
-			}
-			else //for parts only
-			{
-				var inv_type = "part";
-			}
-
-			if(inv_brand !="" && inv_model_name !="" && inv_model_num !="")
+			if(inv_brand !="" && inv_model_name !="" && inv_model_num !="" && inv_hsn_code !='' && inv_type !='')
 			{
 			
-				$.post('php/create_inventory.php', {inv_brand:inv_brand, inv_model_name:inv_model_name, inv_model_num:inv_model_num, inv_part_name:inv_part_name, inv_part_number:inv_part_number, inv_part_desc:inv_part_desc, inv_type:inv_type}, function(e)
+				$.post('php/create_inventory.php', {inv_brand:inv_brand, inv_model_name:inv_model_name, inv_model_num:inv_model_num, inv_hsn_code:inv_hsn_code, inv_desc:inv_desc, inv_type:inv_type}, function(e)
 				{
 					if(e == 1)
 					{

@@ -20,6 +20,7 @@
 
 	<select id="admin_select_branch">
 		<option value=""></option>
+		<option value="*">All Branch</option>
 		<?php			
 			$get_brand_query = "SELECT * FROM branch";
 			$get_brand_query_run = mysqli_query($connect_link, $get_brand_query);
@@ -81,11 +82,6 @@
 
 					echo "<span>Showing results from <b>$date_lower_limit</b> to <b>$date_uper_limit</b></span>";
 				}
-				else
-				{
-					//echo 'hello';
-				}
-
 			?>
 		</div>
 		<br>
@@ -94,6 +90,20 @@
 		<table id="table_export" class="list_inventory_table">				
 			<tr>
 				<th>Quotation Number</th>
+				<?php
+					if(isset($selected_branch))
+					{
+						if($selected_branch == '*')
+						{
+							echo "<th>Branch Code</th>";
+						}
+					}
+					else
+					{
+						echo "<th>Branch Code</th>";
+					}
+				?>
+
 				<th>Customer Number</th>
 				<th>Date of Generation</th>
 				<th>Total Amount</th>
@@ -152,7 +162,17 @@
 					$user_username = $_COOKIE['logged_username'];
 					$creator_branch_code = $_COOKIE['logged_username_branch_code'];
 
-					$manage_customer_query = "SELECT * FROM quotation WHERE creator_branch_code ='$selected_branch' AND payment_method !='' AND date >= '$date_lower_limit' AND date <= '$date_uper_limit' GROUP BY quotation_num ORDER BY quotation_num DESC LIMIT " . $lower_limit . ", " . $uper_limit;
+					if($selected_branch == '*')
+					{
+						$manage_customer_query = "SELECT * FROM quotation WHERE payment_method !='' AND date >= '$date_lower_limit' AND date <= '$date_uper_limit' GROUP BY quotation_num ORDER BY quotation_num DESC LIMIT " . $lower_limit . ", " . $uper_limit;
+					}
+					else
+					{
+						$manage_customer_query = "SELECT * FROM quotation WHERE creator_branch_code ='$selected_branch' AND payment_method !='' AND date >= '$date_lower_limit' AND date <= '$date_uper_limit' GROUP BY quotation_num ORDER BY quotation_num DESC LIMIT " . $lower_limit . ", " . $uper_limit;
+					}
+
+					// $manage_customer_query = "SELECT * FROM quotation WHERE creator_branch_code ='$selected_branch' AND payment_method !='' AND date >= '$date_lower_limit' AND date <= '$date_uper_limit' GROUP BY quotation_num ORDER BY quotation_num DESC LIMIT " . $lower_limit . ", " . $uper_limit;
+
 					$manage_customer_query_run = mysqli_query($connect_link, $manage_customer_query);
 
 					while($manage_customer_result = mysqli_fetch_assoc($manage_customer_query_run))
@@ -197,6 +217,11 @@
 
 						echo "<tr>";
 							echo "<td>$quotation_code</td>";
+							if($selected_branch == '*')
+							{
+								echo "<td>" .$creator_branch_code . "</td>";
+							}
+
 							echo "<td>$customer</td>";
 							echo "<td>$date</td>";
 							echo "<td>$final_price</td>";
@@ -217,6 +242,130 @@
 					$lower_limit = 0;
 					$uper_limit = 25;
 					$count_quotation_num = 0;
+
+					$selected_branch = '*';
+						
+				//getting total count of quotation num at that branch
+					if($selected_branch == '*')
+					{
+						$count_quotation_num_query = "SELECT quotation_num FROM quotation WHERE payment_method !='' GROUP BY quotation_num ";
+					}
+					else
+					{
+						$count_quotation_num_query = "SELECT quotation_num FROM quotation WHERE creator_branch_code = '$selected_branch' AND payment_method !='' GROUP BY quotation_num ";
+					}
+
+					if($count_quotation_num_query_run = mysqli_query($connect_link, $count_quotation_num_query))
+					{
+						$count_quotation_num =  mysqli_num_rows($count_quotation_num_query_run);
+					}
+					else
+					{
+						$count_quotation_num = 0;
+					}
+
+				//setting limits of shown results	
+					$gap = 25;
+
+					if(isset($_SESSION['lower_limit']) && isset($_SESSION['uper_limit']))
+					{
+						$lower_limit = $_SESSION['lower_limit'];
+						$uper_limit = $_SESSION['uper_limit'];
+					}
+					else
+					{
+						$lower_limit = 0;
+						$uper_limit = 25;
+					}
+
+				//setting limits of shown results	
+					if(isset($_SESSION['date_lower_limit']) && isset($_SESSION['date_uper_limit']))
+					{
+						$date_lower_limit = $_SESSION['date_lower_limit'];
+						$date_uper_limit = $_SESSION['date_uper_limit'];
+					}
+					else
+					{
+						$date_lower_limit = "0-0-0";
+						$date_uper_limit = date('Y-m-d');
+					}
+
+				//showing result
+					$user_username = $_COOKIE['logged_username'];
+					$creator_branch_code = $_COOKIE['logged_username_branch_code'];
+
+					if($selected_branch == '*')
+					{
+						$manage_customer_query = "SELECT * FROM quotation WHERE payment_method !='' AND date >= '$date_lower_limit' AND date <= '$date_uper_limit' GROUP BY quotation_num ORDER BY quotation_num DESC LIMIT " . $lower_limit . ", " . $uper_limit;
+					}
+					else
+					{
+						$manage_customer_query = "SELECT * FROM quotation WHERE creator_branch_code ='$selected_branch' AND payment_method !='' AND date >= '$date_lower_limit' AND date <= '$date_uper_limit' GROUP BY quotation_num ORDER BY quotation_num DESC LIMIT " . $lower_limit . ", " . $uper_limit;
+					}
+
+					// $manage_customer_query = "SELECT * FROM quotation WHERE creator_branch_code ='$selected_branch' AND payment_method !='' AND date >= '$date_lower_limit' AND date <= '$date_uper_limit' GROUP BY quotation_num ORDER BY quotation_num DESC LIMIT " . $lower_limit . ", " . $uper_limit;
+
+					$manage_customer_query_run = mysqli_query($connect_link, $manage_customer_query);
+
+					while($manage_customer_result = mysqli_fetch_assoc($manage_customer_query_run))
+					{
+						$quotation_id = $manage_customer_result['id'];
+
+						$quotation_num = $manage_customer_result['quotation_num'];
+						$customer = $manage_customer_result['customer'];
+						$date = $manage_customer_result['date'];
+						$type = $manage_customer_result['type'];
+
+						$payment_method = $manage_customer_result['payment_method'];
+						$date_of_payment = $manage_customer_result['date_of_payment'];
+
+						$creator_username = $manage_customer_result['creator_username'];
+
+					//gettting date of generation of quoatation
+						$date = str_replace('/', '-', $date);
+						$date = date('d M Y', strtotime($date));
+
+					//gettting date of payment of quoatation
+						$date_of_payment = str_replace('/', '-', $date_of_payment);
+						$date_of_payment = date('d M Y', strtotime($date_of_payment));
+
+					//for getting quotation code
+						$this_year = date('y');
+						$next_year = $this_year +1;
+						$quotation_code = "VOLTA/" . $this_year . "-" . $next_year . "/" . $quotation_num;
+
+					//for getting total price of the quotation
+						$final_price = 0;
+
+						$get_element_price_query = "SELECT total_price FROM quotation WHERE quotation_num='$quotation_num'";
+						$get_element_price_query_run = mysqli_query($connect_link, $get_element_price_query);
+
+						while($get_element_price_assoc = mysqli_fetch_assoc($get_element_price_query_run))
+						{
+							$element_price = $get_element_price_assoc['total_price'];
+
+							$final_price = $final_price + $element_price;
+						}
+
+						echo "<tr>";
+							echo "<td>$quotation_code</td>";
+							if($selected_branch == '*')
+							{
+								echo "<td>" .$creator_branch_code . "</td>";
+							}
+
+							echo "<td>$customer</td>";
+							echo "<td>$date</td>";
+							echo "<td>$final_price</td>";
+							echo "<td>$type</td>";
+							echo "<td>$payment_method</td>";
+							echo "<td>$date_of_payment</td>";
+							echo "<td>$creator_username</td>";
+							echo "<td>";
+								echo "<img quotation_num=\"$quotation_num\" class=\"user_view_icon\" src=\"img/view.png\"/>";
+							echo "</td>";
+						echo "</tr>";				
+					}
 				}
 			?>
 

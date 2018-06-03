@@ -10,6 +10,7 @@
 
 	$customer_id = $list_user_assoc['id'];
 	$name = $list_user_assoc['name'];
+	$company_name = $list_user_assoc['company_name'];
 	$email = $list_user_assoc['email'];
 	$mobile = $list_user_assoc['mobile'];
 	$address = $list_user_assoc['address'];
@@ -24,6 +25,11 @@
 		Name:
 		<br>
 		<input id="user_entry_username" type="text" value="<?php echo $name; ?>">
+		<br>
+
+		Company Name:
+		<br>
+		<input id="user_entry_company_name" type="text" value="<?php echo $company_name; ?>">
 		<br>
 
 		Email:
@@ -72,6 +78,7 @@
 			
 			var customer_id = "<?php echo $customer_id;?>";
 			var name = $('#user_edit_form #user_entry_username').val();
+			var company_name = $('#user_edit_form #user_entry_company_name').val();
 			var email = $('#user_edit_form #user_entry_email').val();
 			var mobile = $('#user_edit_form #user_entry_mobile').val();
 			var address = $('#user_edit_form #user_entry_address').val();
@@ -81,7 +88,7 @@
 
 			if(name!= "" && mobile!= "" && address!="")
 			{
-				var query_recieved = "UPDATE customers SET name ='" + name + "', email ='" + email + "', mobile = '" + mobile + "', pan = '" + pan + "', address = '" + address + "', gst = '" + gst + "', shipping_address = '" + shipping_address + "' WHERE id = '" + customer_id + "'";
+				var query_recieved = "UPDATE customers SET name ='" + name + "', email ='" + email + "', mobile = '" + mobile + "', pan = '" + pan + "', address = '" + address + "', gst = '" + gst + "', shipping_address = '" + shipping_address + "', company_name = '" + company_name + "' WHERE id = '" + customer_id + "'";
 				// alert(query_recieved);
 
 				$.post('php/query_runner.php', {query_recieved:query_recieved}, function(e)

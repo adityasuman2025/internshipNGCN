@@ -12,11 +12,9 @@
 	$brand = $list_user_assoc['brand'];
 	$model_name = $list_user_assoc['model_name'];
 	$model_number = $list_user_assoc['model_number'];
-	$part_name = $list_user_assoc['part_name'];
-	$part_number = $list_user_assoc['part_number'];
-	$part_desc = $list_user_assoc['part_desc'];
+	$hsn_code = $list_user_assoc['hsn_code'];
+	$description = $list_user_assoc['description'];
 	$type = $list_user_assoc['type'];
-	
 ?>
 
 <!-----edit user form------->
@@ -26,40 +24,25 @@
 		<input id="user_entry_brand" type="text" value="<?php echo $brand; ?>">
 		<br><br>
 		
-		Model Name:
+		Product/Part:
 		<br>
 		<input type="text" value="<?php echo $model_name; ?>" id="user_entry_model_name">
 		<br><br>
 
-		Model Number:
+		Product/Part Code:
 		<br>
 		<input type="text" value="<?php echo $model_number; ?>" id="user_entry_model_number">
 		<br><br>
 
-		<?php
-			if($type =="whole")
-			{
+		HSN Code:
+		<br>
+		<input type="text" value="<?php echo $hsn_code; ?>" id="user_entry_hsn_code">
+		<br><br>
 
-			}
-			else if($type = "part")
-			{
-				echo "	Part Name:
-						<br>
-						<input id=\"user_entry_part_name\" type=\"text\" value=\"$part_name\">
-						<br><br>
-						
-						Part Number:
-						<br>
-						<input type=\"text\" value=\"$part_number\" id=\"user_entry_part_number\">
-						<br><br>
-
-						Part Description:
-						<br>
-						<input type=\"text\" value=\"$part_desc\" id=\"user_entry_part_desc\">
-						<br><br>";
-			}
-
-		?>
+		Description:
+		<br>
+		<input type="text" value="<?php echo $description; ?>" id="user_entry_description">
+		<br><br>
 		
 		<input type="button" value="Save" id="user_save_edit_button">
 		<br>
@@ -78,13 +61,12 @@
 			var brand = $('#user_edit_form #user_entry_brand').val();
 			var model_name = $('#user_edit_form #user_entry_model_name').val();
 			var model_number = $('#user_edit_form #user_entry_model_number').val();
-			var part_name = $('#user_edit_form #user_entry_part_name').val();
-			var part_number = $('#user_edit_form #user_entry_part_number').val();
-			var part_desc = $('#user_edit_form #user_entry_part_desc').val();
+			var hsn_code = $('#user_edit_form #user_entry_hsn_code').val();
+			var description = $('#user_edit_form #user_entry_description').val();
 								
 			if(brand!= "" && model_name!= "" && model_number!= "")
 			{
-				var query_recieved = "UPDATE inventory SET brand ='" + brand + "', model_name ='" + model_name + "', model_number = '" + model_number + "', part_name = '" + part_name + "', part_number = '" + part_number + "', part_desc = '" + part_desc + "' WHERE id = '" + user_id + "'";
+				var query_recieved = "UPDATE inventory SET brand ='" + brand + "', model_name ='" + model_name + "', model_number = '" + model_number + "', hsn_code = '" + hsn_code + "', description = '" + description + "' WHERE id = '" + user_id + "'";
 			
 				$.post('php/query_runner.php', {query_recieved:query_recieved}, function(e)
 				{

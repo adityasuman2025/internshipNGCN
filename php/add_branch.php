@@ -32,12 +32,12 @@
 		<input id="branch_entry_branch_bank" type="text" placeholder="Bank Account">
 		<br>
 		<br>
-		<input type="button" value="Create Customer" id="user_entry_create_button">
+		<input type="button" value="Create Branch" id="user_entry_create_button">
 	</div>
 	
 	<span class="user_entry_span"></span>
 	<br><br>
-	<input type="submit" value="Create New Customer" id="create_new_user_button">
+	<input type="submit" value="Create New Branch" id="create_new_user_button">
 	<br><br>
 
 <!--------script-------->

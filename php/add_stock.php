@@ -1,5 +1,6 @@
 <?php
 	include('connect_db.php');
+	$creator_branch_code = $_COOKIE['logged_username_branch_code'];
 ?>
 
 <!-------inventory area----->
@@ -157,7 +158,7 @@
 			$(this).attr('disabled', 'disabled').css('border', '1px solid lightgrey');
 		});
 
-	//on clicking on inventory add button
+	//on clicking on stock add button
 		$('#inv_add_button').click(function()
 		{
 			$('.inventory_feed').html("<img class=\"gif_loader\" src=\"img/loaders1.gif\">");
@@ -187,18 +188,32 @@
 			}
 
 			if(inv_brand !="" && inv_model_name !="" && inv_model_num !="" && inv_quantity !="")
-			{			
-				$.post('php/create_stock.php', {inv_brand:inv_brand, inv_model_name:inv_model_name, inv_model_num:inv_model_num, inv_part_name:inv_part_name, inv_part_number:inv_part_number, inv_quantity:inv_quantity, inv_type:inv_type, inv_sales_price:inv_sales_price, inv_supplier_price:inv_supplier_price, inv_hsn_code:inv_hsn_code}, function(e)
+			{		
+				var creator_branch_code = "<?php echo $creator_branch_code; ?>";
+				var query_recieved = "SELECT id FROM stock WHERE brand = '" + inv_brand + "' && model_name = '" + inv_model_name + "' && model_number = '" + inv_model_num + "' AND part_name ='" + inv_part_name + "' AND creator_branch_code = '" + creator_branch_code + "'";
+
+				$.post('php/query_result_counter.php', {query_recieved: query_recieved}, function(e)
 				{
-					if(e == 1)
+					//alert(e);
+					if(e == 0)
 					{
-						$('.inventory_feed').text('Stock has been successfully added').css('color', 'green');
-						$('.inventory_form').html("<img class=\"gif_loader\" src=\"img/loaders1.gif\">").fadeOut(0);
-						$('#inv_add_new_button').fadeIn(0);
+						$.post('php/create_stock.php', {inv_brand:inv_brand, inv_model_name:inv_model_name, inv_model_num:inv_model_num, inv_part_name:inv_part_name, inv_part_number:inv_part_number, inv_quantity:inv_quantity, inv_type:inv_type, inv_sales_price:inv_sales_price, inv_supplier_price:inv_supplier_price, inv_hsn_code:inv_hsn_code}, function(e)
+						{
+							if(e == 1)
+							{
+								$('.inventory_feed').text('Stock has been successfully added').css('color', 'green');
+								$('.inventory_form').html("<img class=\"gif_loader\" src=\"img/loaders1.gif\">").fadeOut(0);
+								$('#inv_add_new_button').fadeIn(0);
+							}
+							else
+							{
+								$('.inventory_feed').text('Something went wrong while adding stock').css('color', 'red');
+							}
+						});
 					}
 					else
 					{
-						$('.inventory_feed').text('Something went wrong while adding stock').css('color', 'red');
+						$('.inventory_feed').text('This item has already been added in the stock at this branch. For editing the item go to manage stock tab.').css('color', 'red');
 					}
 				});
 			}

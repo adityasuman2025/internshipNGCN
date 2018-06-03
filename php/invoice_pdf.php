@@ -47,6 +47,58 @@
 			$branch_gst_number = $get_branch_info_assoc['gst_number'];
 			$branch_bank = $get_branch_info_assoc['bank'];
 
+			//breaking branch address
+				$branch_address_broken = explode("#", $branch_address);
+				$hash_count = substr_count($branch_address,"#");
+				if($hash_count == 4)
+				{
+					$branch_address_array[0] = $branch_address_broken[0];
+					$branch_address_array[1] = $branch_address_broken[1];
+					$branch_address_array[2] = $branch_address_broken[2];
+					$branch_address_array[3] = $branch_address_broken[3];
+					$branch_address_array[4] = $branch_address_broken[4];
+				}
+				else if($hash_count == 3)
+				{
+					$branch_address_array[0] = $branch_address_broken[0];
+					$branch_address_array[1] = $branch_address_broken[1];
+					$branch_address_array[2] = $branch_address_broken[2];
+					$branch_address_array[3] = $branch_address_broken[3];
+					$branch_address_array[4] = "";
+				}
+				else if($hash_count == 2)
+				{
+					$branch_address_array[0] = $branch_address_broken[0];
+					$branch_address_array[1] = $branch_address_broken[1];
+					$branch_address_array[2] = $branch_address_broken[2];
+					$branch_address_array[3] = "";
+					$branch_address_array[4] = "";
+				}
+				else if($hash_count == 1)
+				{
+					$branch_address_array[0] = $branch_address_broken[0];
+					$branch_address_array[1] = $branch_address_broken[1];
+					$branch_address_array[2] = "";
+					$branch_address_array[3] = "";
+					$branch_address_array[4] = "";
+				}
+				else if($hash_count == 0)
+				{
+					$branch_address_array[0] = $branch_address_broken[0];
+					$branch_address_array[1] = "";
+					$branch_address_array[2] = "";
+					$branch_address_array[3] = "";
+					$branch_address_array[4] = "";
+				}
+				else
+				{
+					$branch_address_array[0] = $branch_address_broken[0];
+					$branch_address_array[1] = "";
+					$branch_address_array[2] = "";
+					$branch_address_array[3] = "";
+					$branch_address_array[4] = "";
+				}
+
 		//getting customer info
 			$get_customer_info_query = "SELECT * FROM customers WHERE name = '$customer_name'";
 			$get_customer_info_query_run = mysqli_query($connect_link, $get_customer_info_query);
@@ -55,8 +107,112 @@
 			$customer_company_name = $get_customer_info_assoc['company_name'];
 			$customer_address = $get_customer_info_assoc['address'];
 			$customer_mobile = $get_customer_info_assoc['mobile'];
-			$customer_email = $get_customer_info_assoc['email'];;
-			$customer_shipping_address = $get_customer_info_assoc['shipping_address'];;
+			$customer_email = $get_customer_info_assoc['email'];
+			$customer_shipping_address = $get_customer_info_assoc['shipping_address'];
+
+			//breaking customer address
+				$customer_address_broken = explode("#", $customer_address);
+				$hash_count = substr_count($customer_address,"#");
+				if($hash_count == 4)
+				{
+					$customer_address_array[0] = $customer_address_broken[0];
+					$customer_address_array[1] = $customer_address_broken[1];
+					$customer_address_array[2] = $customer_address_broken[2];
+					$customer_address_array[3] = $customer_address_broken[3];
+					$customer_address_array[4] = $customer_address_broken[4];
+				}
+				else if($hash_count == 3)
+				{
+					$customer_address_array[0] = $customer_address_broken[0];
+					$customer_address_array[1] = $customer_address_broken[1];
+					$customer_address_array[2] = $customer_address_broken[2];
+					$customer_address_array[3] = $customer_address_broken[3];
+					$customer_address_array[4] = "";
+				}
+				else if($hash_count == 2)
+				{
+					$customer_address_array[0] = $customer_address_broken[0];
+					$customer_address_array[1] = $customer_address_broken[1];
+					$customer_address_array[2] = $customer_address_broken[2];
+					$customer_address_array[3] = "";
+					$customer_address_array[4] = "";
+				}
+				else if($hash_count == 1)
+				{
+					$customer_address_array[0] = $customer_address_broken[0];
+					$customer_address_array[1] = $customer_address_broken[1];
+					$customer_address_array[2] = "";
+					$customer_address_array[3] = "";
+					$customer_address_array[4] = "";
+				}
+				else if($hash_count == 0)
+				{
+					$customer_address_array[0] = $customer_address_broken[0];
+					$customer_address_array[1] = "";
+					$customer_address_array[2] = "";
+					$customer_address_array[3] = "";
+					$customer_address_array[4] = "";
+				}
+				else
+				{
+					$customer_address_array[0] = $customer_address_broken[0];
+					$customer_address_array[1] = "";
+					$customer_address_array[2] = "";
+					$customer_address_array[3] = "";
+					$customer_address_array[4] = "";
+				}
+
+			//breaking customer shipping address
+				$customer_shipping_address_broken = explode("#", $customer_shipping_address);
+				$hash_count = substr_count($customer_shipping_address,"#");
+				if($hash_count == 4)
+				{
+					$customer_shipping_address_array[0] = $customer_shipping_address_broken[0];
+					$customer_shipping_address_array[1] = $customer_shipping_address_broken[1];
+					$customer_shipping_address_array[2] = $customer_shipping_address_broken[2];
+					$customer_shipping_address_array[3] = $customer_shipping_address_broken[3];
+					$customer_shipping_address_array[4] = $customer_shipping_address_broken[4];
+				}
+				else if($hash_count == 3)
+				{
+					$customer_shipping_address_array[0] = $customer_shipping_address_broken[0];
+					$customer_shipping_address_array[1] = $customer_shipping_address_broken[1];
+					$customer_shipping_address_array[2] = $customer_shipping_address_broken[2];
+					$customer_shipping_address_array[3] = $customer_shipping_address_broken[3];
+					$customer_shipping_address_array[4] = "";
+				}
+				else if($hash_count == 2)
+				{
+					$customer_shipping_address_array[0] = $customer_shipping_address_broken[0];
+					$customer_shipping_address_array[1] = $customer_shipping_address_broken[1];
+					$customer_shipping_address_array[2] = $customer_shipping_address_broken[2];
+					$customer_shipping_address_array[3] = "";
+					$customer_shipping_address_array[4] = "";
+				}
+				else if($hash_count == 1)
+				{
+					$customer_shipping_address_array[0] = $customer_shipping_address_broken[0];
+					$customer_shipping_address_array[1] = $customer_shipping_address_broken[1];
+					$customer_shipping_address_array[2] = "";
+					$customer_shipping_address_array[3] = "";
+					$customer_shipping_address_array[4] = "";
+				}
+				else if($hash_count == 0)
+				{
+					$customer_shipping_address_array[0] = $customer_shipping_address_broken[0];
+					$customer_shipping_address_array[1] = "";
+					$customer_shipping_address_array[2] = "";
+					$customer_shipping_address_array[3] = "";
+					$customer_shipping_address_array[4] = "";
+				}
+				else
+				{
+					$customer_shipping_address_array[0] = $customer_address_broken[0];
+					$customer_shipping_address_array[1] = "";
+					$customer_shipping_address_array[2] = "";
+					$customer_shipping_address_array[3] = "";
+					$customer_shipping_address_array[4] = "";
+				}
 		}
 		else
 		{
@@ -115,33 +271,50 @@
 	//second line (address)
 		$pdf->SetTextColor(0,0,0); //text color //black
 
-		$pdf->SetFont('Arial', 'B', 16); //font
-		$pdf->Cell(120, 8, 'Billing From', 0, 0);
+		$pdf->SetFont('Arial', 'B', 15); //font
+		$pdf->Cell(120, 7, 'Billing From', 0, 0);
 		
-		$pdf->Cell(30, 8, 'Billing To', 0, 1);
+		$pdf->Cell(30, 7, 'Billing To', 0, 1);
 
 	//third line (address)
 		$pdf->SetFont('Arial', '', 12); //font
 		$pdf->SetTextColor(50, 50, 50); //text color //grey
 		
 		$pdf->Cell(120, 5, $branch_company_name, 0, 0);
-		$pdf->Cell(69, 5, $customer_name . ' (' . $customer_company_name . ')' , 0, 1);
+		$pdf->Cell(69, 5, $customer_name, 0, 1);
 
 	//4th line (address)
-		$pdf->Cell(120, 5, substr($branch_address, 0, 50), 0, 0);
-		$pdf->Cell(69, 5, substr($customer_address, 0, 30), 0, 1); //end of line
+		$pdf->Cell(120, 5, $branch_address_array[0], 0, 0);
+		$pdf->Cell(69, 5, $customer_company_name, 0, 1); //end of line
 
 	//4th line (address)
-		$pdf->Cell(120, 5, substr($branch_address, 50, 500), 0, 0);
-		$pdf->Cell(69, 5, substr($customer_address, 30, 300), 0, 1); //end of line
+		$pdf->Cell(120, 5, $branch_address_array[1], 0, 0);
+		$pdf->Cell(69, 5, $customer_address_array[0], 0, 1); //end of line
+
+	//4th line (address)
+		$pdf->Cell(120, 5, $branch_address_array[2], 0, 0);
+		$pdf->Cell(69, 5, $customer_address_array[1], 0, 1); //end of line
+
+	//4th line (address)
+		$pdf->Cell(120, 5, $branch_address_array[3], 0, 0);
+		$pdf->Cell(69, 5, $customer_address_array[2], 0, 1); //end of line
+
+	//4th line (address)
+		$pdf->Cell(120, 5, $branch_address_array[4] , 0, 0);
+		$pdf->Cell(69, 5, $customer_address_array[3], 0, 1); //end of line
+
+	//4th line (address)
+		$pdf->Cell(120, 5, '' , 0, 0);
+		$pdf->Cell(69, 5, $customer_address_array[4], 0, 1); //end of line
+
 
 	//5th line
-		$pdf->Cell(120, 5, $branch_phone_number, 0, 0);
-		$pdf->Cell(69, 5, $customer_mobile, 0, 1); //end of line
+		$pdf->Cell(120, 5, "Ph: " . $branch_phone_number, 0, 0);
+		$pdf->Cell(69, 5,"Ph: " .  $customer_mobile, 0, 1); //end of line
 
 	//6th line
-		$pdf->Cell(120, 5, $branch_email, 0, 0);
-		$pdf->Cell(69, 5, $customer_email, 0, 1); //end of line
+		$pdf->Cell(120, 5,"Email: " . $branch_email, 0, 0);
+		$pdf->Cell(69, 5,"Email: " . $customer_email, 0, 1); //end of line
 
 	//(gst of branch) 7th line 
 		$pdf->Cell(120, 5, "GST Number: ". $branch_gst_number, 0, 0);
@@ -161,15 +334,14 @@
 			$item_serial_number = $get_item_info_assoc['serial_num'];
 			$item_service_id = $get_item_info_assoc['service_id'];
 
-
 		//8th line
-			$pdf->SetFont('Arial', 'B', 16); //font
+			$pdf->SetFont('Arial', 'B', 15); //font
 			$pdf->SetTextColor(0,0,0); //text color //black
 
 			//$pdf->Cell(120, 8, '', 0, 0);
-			$pdf->Cell(120, 5, 'Quotation Created By', 0, 0);
+			$pdf->Cell(120, 7, 'Quotation Created By', 0, 0);
 
-			$pdf->Cell(69, 8, 'Product Details', 0, 1); //end of line
+			$pdf->Cell(69, 7, 'Product Details', 0, 1); //end of line
 			$pdf->SetFont('Arial', '', 12); //font
 
 		//9th line
@@ -227,36 +399,55 @@
 			$pdf->Cell(69, 5, $customer_name, 0, 1);//end of line
 
 		//10th line	
+			
 			if($customer_shipping_address == '')
 			{
 				$pdf->Cell(20, 5, 'Branch: ', 0, 0);
 				$pdf->Cell(100, 5, $creator_branch_code, 0, 0);
 
-				$pdf->Cell(69, 5, substr($customer_address, 0, 30), 0, 1); //end of line
+				$pdf->Cell(69, 5, $customer_address_array[0], 0, 1); //end of line
 
 				$pdf->Cell(120, 5, '', 0, 0);
-				$pdf->Cell(69, 5, substr($customer_address, 30, 300), 0, 1); //end of line
+				$pdf->Cell(69, 5, $customer_address_array[1], 0, 1); //end of line
+
+				$pdf->Cell(120, 5, '', 0, 0);
+				$pdf->Cell(69, 5, $customer_address_array[2], 0, 1); //end of line
+
+				$pdf->Cell(120, 5, '', 0, 0);
+				$pdf->Cell(69, 5, $customer_address_array[3], 0, 1); //end of line
+
+				$pdf->Cell(120, 5, '', 0, 0);
+				$pdf->Cell(69, 5, $customer_address_array[4], 0, 1); //end of line
 			}
 			else
 			{
 				$pdf->Cell(20, 5, 'Branch: ', 0, 0);
 				$pdf->Cell(100, 5, $creator_branch_code, 0, 0);
 				
-				$pdf->Cell(69, 5, substr($customer_shipping_address, 0, 30), 0, 1); //end of line
+				$pdf->Cell(69, 5, $customer_shipping_address_array[0], 0, 1); //end of line
 
 				$pdf->Cell(120, 5, '', 0, 0);
-				$pdf->Cell(69, 5, substr($customer_shipping_address, 30, 300), 0, 1); //end of line
+				$pdf->Cell(69, 5, $customer_shipping_address_array[1], 0, 1); //end of line
+
+				$pdf->Cell(120, 5, '', 0, 0);
+				$pdf->Cell(69, 5, $customer_shipping_address_array[2], 0, 1); //end of line
+
+				$pdf->Cell(120, 5, '', 0, 0);
+				$pdf->Cell(69, 5, $customer_shipping_address_array[3], 0, 1); //end of line
+
+				$pdf->Cell(120, 5, '', 0, 0);
+				$pdf->Cell(69, 5, $customer_shipping_address_array[4], 0, 1); //end of line
 			}
 			
 		//11th line
 			$pdf->Cell(120, 5, '', 0, 0); 
 
-			$pdf->Cell(69, 5, $customer_mobile, 0, 1);//end of line
+			$pdf->Cell(69, 5, "Ph: " . $customer_mobile, 0, 1);//end of line
 		
 		//12th line
 			$pdf->Cell(120, 5, '', 0, 0); 
 
-			$pdf->Cell(69, 5, $customer_email, 0, 1);//end of line
+			$pdf->Cell(69, 5, "Email: " . $customer_email, 0, 1);//end of line
 		}
 
 	//leaving blank space
@@ -331,7 +522,7 @@
 		//description area
 			$pdf->Cell(8, 5, '', 'LRB', 0);
 			$pdf->SetFont('Arial', 'B', 11); //font
-			$pdf->Cell(82, 5, "DESC: " . $item_description, 'B', 0);
+			$pdf->Cell(82, 5, substr("DESC: " . $item_description, 0,34), 'B', 0);
 
 			$pdf->Cell(13, 5, '' ,'LB', 0);	
 			$pdf->Cell(13, 5, '' , 'LB', 0);
@@ -351,18 +542,18 @@
 		$digits_1 = strlen($no);
 		$i = 0;
 		$str = array();
-		$words = array('0' => '', '1' => 'one', '2' => 'two',
-		'3' => 'three', '4' => 'four', '5' => 'five', '6' => 'six',
-		'7' => 'seven', '8' => 'eight', '9' => 'nine',
-		'10' => 'ten', '11' => 'eleven', '12' => 'twelve',
-		'13' => 'thirteen', '14' => 'fourteen',
-		'15' => 'fifteen', '16' => 'sixteen', '17' => 'seventeen',
-		'18' => 'eighteen', '19' =>'nineteen', '20' => 'twenty',
-		'30' => 'thirty', '40' => 'forty', '50' => 'fifty',
-		'60' => 'sixty', '70' => 'seventy',
-		'80' => 'eighty', '90' => 'ninety');
+		$words = array('0' => '', '1' => 'One', '2' => 'Two',
+		'3' => 'Three', '4' => 'Four', '5' => 'Five', '6' => 'Six',
+		'7' => 'Seven', '8' => 'Eight', '9' => 'Nine',
+		'10' => 'Ten', '11' => 'Eleven', '12' => 'Twelve',
+		'13' => 'Thirteen', '14' => 'Fourteen',
+		'15' => 'Fifteen', '16' => 'Sixteen', '17' => 'Seventeen',
+		'18' => 'Eighteen', '19' =>'Nineteen', '20' => 'Twenty',
+		'30' => 'Thirty', '40' => 'Forty', '50' => 'Fifty',
+		'60' => 'Sixty', '70' => 'Seventy',
+		'80' => 'Eighty', '90' => 'Ninety');
 
-		$digits = array('', 'hundred', 'thousand', 'lakh', 'crore');
+		$digits = array('', 'Hundred', 'Thousand', 'Lakh', 'Crore');
 
 		while ($i < $digits_1) 
 		{
@@ -372,25 +563,26 @@
 			$i += ($divider == 10) ? 1 : 2;
 			if ($number) 
 			{
-				$plural = (($counter = count($str)) && $number > 9) ? 's' : null;
+				$plural = (($counter = count($str)) && $number > 9) ? '' : null;
 				$hundred = ($counter == 1 && $str[0]) ? ' and ' : null;
 				$str [] = ($number < 21) ? $words[$number] .
 				    " " . $digits[$counter] . $plural . " " . $hundred
 				    :
 				    $words[floor($number / 10) * 10]
 				    . " " . $words[$number % 10] . " "
-				    . $digits[$counter] . $plural . " " . $hundred;
+				    . $digits[$counter] . $plural . "" . $hundred;
 			} else $str[] = null;
 		}
+
 		$str = array_reverse($str);
 		$result = implode('', $str);
-		$points = ($point) ?
-		"." . $words[$point / 10] . " " . 
-		  $words[$point = $point % 10] : '';
-		$in_words =  $result . "Rupees";
 
+		// $points = ($point) ?
+		// "." . $words[$point / 10] . " " . 
+		//   $words[$point = $point % 10] : '';
 
-		$pdf->SetTextColor(204,0,0); //text color //red
+		$in_words = "Rupees " . $result . "Only";
+
 		$pdf->SetFont('Arial', '', 11); //font
 		$pdf->Cell(144, 8, $in_words, 1, 0);
 
@@ -434,6 +626,8 @@
 		$pdf->Cell(189, 5, 'Bank Details:', 0, 1);
 
 	$pdf->Output();
-	//$pdf->Output('D','Invoice-' . $quotation_num. '.pdf');	
+	
+	$filename = "../invoice/Invoice-" . $quotation_num . ".pdf";
+	$pdf->Output($filename, 'F');	
 
 ?>

@@ -18,6 +18,12 @@
 	$serial_num = $query_assoc['serial_num'];
 	$service_id = $query_assoc['service_id'];
 
+//getting the email id of the customer
+	$get_customer_email_query = "SELECT email FROM customers WHERE name ='$customer'";
+	$get_customer_email_query_run = mysqli_query($connect_link, $get_customer_email_query);
+	$get_customer_email_assoc = mysqli_fetch_assoc($get_customer_email_query_run);
+	$get_customer_email = $get_customer_email_assoc['email'];
+
 ?>
 <!----add customer form------>
 	<div class="user_entry_form add_quotation_form">
@@ -27,20 +33,21 @@
 			<b>Customer:</b>
 			<br>
 			<select id="quotation_customer">
-				<option value="<?php echo $customer; ?>"><?php echo $customer; ?></option>
+				<option value="<?php echo $customer; ?>" email="<?php echo $get_customer_email; ?>"><?php echo $customer; ?></option>
 				<?php
-					$get_brand_query = "SELECT name FROM customers WHERE creator_branch_code = '$creator_branch_code' AND name !='$customer'";
+					$get_brand_query = "SELECT * FROM customers WHERE creator_branch_code = '$creator_branch_code' AND name !='$customer'";
 					$get_brand_query_run = mysqli_query($connect_link, $get_brand_query);
 
 					while($get_brand_result = mysqli_fetch_assoc($get_brand_query_run))
 					{
-						echo "<option>";
+						$email = $get_brand_result['email'];
+						echo "<option email=\"$email\">";
 							echo $get_brand_result['name'];
 						echo "</option>";
 					}
 				?>	
 			</select>
-			<button id="quotation_add_customer">Add Customer</button>
+			<button id="quotation_add_customer">New Customer</button>
 		</div>
 		
 		<div>
@@ -146,7 +153,7 @@
 
 					echo "<tr id=\"$quotation_id\">";
 						echo "	
-								<td><input id=\"quotation_description\" type=\"text\" value=\"$description\"/></td>
+								<td><input id=\"quotation_description\" maxlength=\"28\" type=\"text\" value=\"$description\"/></td>
 								<td>
 									<select id=\"quotation_part_name\">
 										<option value=\"$part_name\">$part_name</option>					
@@ -353,6 +360,25 @@
 			$(this).parent().parent().find('#quotation_part_total_price').val('calculate');
 		});
 
+	//on entering quantity
+		$('.quotation_entry_table tr td #quotation_part_quantity').keyup(function()
+		{
+			var quantity = parseInt($(this).val());
+			this_thing = $(this); 
+			var in_stock = parseInt(this_thing.parent().parent().find('#quotation_part_in_stock').val());
+
+			if(quantity > in_stock)
+			{
+				$('.gen_quotation_span').html("You have entered more quantity than available in-stock at your branch. You can check its availability by clicking on availability tab.").css('color', 'red');
+				$('.warn_box').text("Quantity is more than the available in-stock at the branch.");
+				$('.warn_box').fadeIn(200).delay(3000).fadeOut(200);
+			}
+			else
+			{
+				$('.gen_quotation_span').html("");
+			}
+		});
+		
 	//on clicking on delete part button
 		$('.quotation_entry_table tr td .item_delete_icon').click(function()
 		{
@@ -431,7 +457,7 @@
 			var quotation_serial_num = $.trim($('#quotation_serial_num').val());
 			var quotation_service_id = $.trim($('#quotation_service_id').val());
 
-			if(quotation_customer !="" && quotation_date !="" && quotation_num !="" && quotation_brand !="" && quotation_model_name !="" && quotation_model_number !="" && quotation_serial_num !="" && quotation_service_id !="")
+			if(quotation_customer !="" && quotation_date !="" && quotation_num !="" && quotation_brand !="" && quotation_model_name !="" && quotation_model_number !="")
 			{
 			//for getting inputs of each of the row
 				var count = $(".quotation_entry_table tr").length;
@@ -473,16 +499,54 @@
 				
 					$.post('php/query_runner.php', {query_recieved:query_recieved}, function(e)
 					{
-						//alert(e);
 						if(e==1)
 						{
-							$('.user_edit_span').text('Successfully edited').css('color','green');
-							$('#user_edit_form').fadeOut(0);
-							$('.user_module_content').html("<img class=\"gif_loader\" src=\"img/loaders1.gif\">").load('php/manage_quotation.php');
+						//for getting pdf of the quotation
+							var session_of = quotation_num;
+							var session_name = "pdf_quotation_of";
+								
+							$.post('php/session_creator.php', {session_of: session_of, session_name: session_name}, function(e)
+							{
+								if(e ==1)
+								{
+								//mailing to the customer
+									var customer_email = $('#quotation_customer option:selected').attr('email');
+									var website = window.location.hostname;
+
+									var mail_email = customer_email;
+									var mail_subject = "Quotation from Voltatech";
+									var mail_header = "From: voltatech@pnds.in";
+									var mail_body = "Dear Customer \nQuotation generated from our online resource is linked with this mail. Please find your quotation by following the link: http://" + website + "/quotation/Quotation-" + quotation_num + ".pdf \n \nRegards \nVoltatech \nhttp://" + website;
+
+									$.post('php/mailing.php', {mail_email: mail_email, mail_subject: mail_subject, mail_header:mail_header, mail_body:mail_body}, function(e)
+									{
+										if(e == 1)
+										{
+											$('.gen_quotation_span').text('Successfully edited').css('color','green');
+										}
+										else
+										{
+											$('.gen_quotation_span').text('something went wrong while mailing the customer.').css('color','red');
+										}
+									});
+
+									window.open('php/quotation_pdf.php', '_blank');	
+								}
+								else
+								{
+									$('.warn_box').text("Something went wrong while generating pdf file of the quotation.");
+									$('.warn_box').fadeIn(200).delay(3000).fadeOut(200);
+								}
+							});
+
+						//disappearing the user entry form
+							
+							$('.user_entry_form').fadeOut(0);
+							//$('.user_module_content').text('Successfully edited');
 						}
 						else
 						{
-							$('.user_edit_span').text('Something went wrong while editing the quotation').css('color','red');
+							$('.gen_quotation_span').text('Something went wrong while editing the quotation').css('color','red');
 						}
 					});
 				}

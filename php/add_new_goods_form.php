@@ -225,6 +225,26 @@
 			$(this).parent().parent().find('#quotation_part_total_price').val('calculate');
 		});
 
+	//on entering quantity
+		$('tr:last #quotation_part_quantity').keyup(function()
+		{
+			var quantity = parseInt($(this).val());
+			this_thing = $(this);
+
+			var in_stock = parseInt(this_thing.parent().parent().find('#quotation_part_in_stock').val());
+
+			if(quantity > in_stock)
+			{
+				$('.gen_quotation_span').html("You have entered more quantity than available in-stock at your branch. You can check its availability by clicking on availability tab.").css('color', 'red');
+				$('.warn_box').text("Quantity is more than the available in-stock at the branch.");
+				$('.warn_box').fadeIn(200).delay(3000).fadeOut(200);
+			}
+			else
+			{
+				$('.gen_quotation_span').html("");
+			}
+		});
+
 	//on clicking on delete item button
 		$('.item_delete_icon').click(function()
 		{

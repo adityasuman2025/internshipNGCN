@@ -40,40 +40,40 @@
 
 			<li id="dashboard_button">Dashboard</li>
 
-			<li>Branch
+			<li title="Branch">Branch
 				<ul>
 					<li work="add_branch">Add Branch</li>
 					<li work="manage_branch">Manage Branch</li>
 				</ul>
 			</li>
 
-			<li>User
+			<li title="User">User
 				<ul>
 					<li work="add_user">Add User</li>
 					<li work="manage_user">Manage User</li>
 				</ul>
 			</li>
 
-			<li>Inventory
+			<li title="Inventory">Inventory
 				<ul>
 					<li work="add_inventory">Add Inventory</li>
 					<li work="manage_inventory">Manage Inventory</li>
 				</ul>
 			</li>
 
-			<li work="admin_manage_customer">Manage Customer</li>
+			<li title="Manage Customer" work="admin_manage_customer">Manage Customer</li>
 
-			<li work="admin_manage_supplier">Manage Supplier</li>
+			<li title="Manage Supplier" work="admin_manage_supplier">Manage Supplier</li>
 
-			<li work="admin_manage_purchase">Manage Purchase</li>
+			<li title="Manage Purchase" work="admin_manage_purchase">Manage Purchase</li>
 
-			<li work="admin_manage_return">Manage Return</li>
+			<li title="Manage Return" work="admin_manage_return">Manage Return</li>
 
-			<li work="admin_manage_quotation">Manage Quotation</li>
-			<li work="admin_manage_invoice">Manage Invoice</li>
-			<li work="admin_manage_stock">Manage Stock</li>
+			<li title="Manage Quotation" work="admin_manage_quotation">Manage Quotation</li>
+			<li title="Manage Invoice" work="admin_manage_invoice">Manage Invoice</li>
+			<li title="Manage Stock" work="admin_manage_stock">Manage Stock</li>
 
-			<li>Report
+			<li title="Report">Report
 				<ul>
 					<li work="admin_quotation_report">Quotation Report</li>
 					<li work="admin_invoice_report">Invoice Report</li>
@@ -170,7 +170,8 @@
 	//to generate heading of the content
 		$('.user_menu li').click(function()
 		{
-			var heading = $(this).text();
+			var heading = $.trim($(this).attr('title'));
+			
 			$('.user_module_heading').text(heading);
 		});
 

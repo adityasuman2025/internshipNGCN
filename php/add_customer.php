@@ -9,7 +9,7 @@
 		<input type="email" placeholder="Customer Email" id="user_entry_email">
 		<br>
 		<br>
-		<input type="number" placeholder="Mobile Number" id="user_entry_mob">
+		<input type="number" placeholder="Phone or Mobile Number" id="user_entry_mob">
 		<br>
 		<br>
 		<textarea placeholder="Address" id="user_entry_address"></textarea>

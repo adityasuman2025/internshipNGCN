@@ -562,11 +562,6 @@ body, html
 		overflow-x: scroll;
 	}
 
-	.add_purchase_form::-webkit-scrollbar 
-	{ 
-	    display: none;  // Safari and Chrome
-	}
-
 	.purchase_entry_table th
 	{
 		border: 1px grey solid;
@@ -725,6 +720,17 @@ body, html
 	#invoice_gen_button
 	{
 		float: right;
+	}
+
+	.view_quotation_button
+	{
+		width: auto;
+		height: 33px;
+		border-radius: 3px;
+		border: none;
+		padding: 5px;
+		background: #cc0000;
+		color: white;
 	}
 
 /*--------admin quotation area------*/

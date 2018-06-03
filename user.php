@@ -40,12 +40,17 @@
 
 			<li id="dashboard_button">Dashboard</li>
 
+			<li>Inventory
+				<ul>
+					<li work="add_inventory">Add Inventory</li>
+					<li work="manage_inventory">Manage Inventory</li>
+				</ul>
+			</li>
+
 			<li>Customer
 				<ul>
 					<li work="add_customer" id="menu_add_customer">Add Customer</li>
 					<li work="manage_customer">Manage Customer</li>
-					<!-- <li work="paid_customer">Paid Customer</li>
-					<li work="credit_customer">Credit Customer</li> -->
 				</ul>
 			</li>
 
@@ -72,8 +77,8 @@
 
 			<li>Quotation/Invoice
 				<ul>
-					<li work="add_service_quotation">New Service Quotation/Invoice</li>
-					<li work="add_sales_quotation">New Sales Quotation/Invoice</li>
+					<li work="add_service_quotation">New Service Quot/Invoice</li>
+					<li work="add_sales_quotation">New Sales Quot/Invoice</li>
 			
 					<li work="manage_quotation">Manage Quotation</li>
 					<li work="manage_invoice">Manage Invoice</li>
@@ -84,6 +89,12 @@
 				<ul>
 					<li work="add_stock">Add Stock</li>
 					<li work="manage_stock">Manage Stock</li>
+				</ul>
+			</li>
+
+			<li>Availabilty
+				<ul>
+					<li work="search_item_in_branch">Check Availabilty</li>
 				</ul>
 			</li>
 

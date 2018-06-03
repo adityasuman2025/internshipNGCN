@@ -12,18 +12,19 @@
 			<select id="quotation_customer">
 				<option value=""></option>
 				<?php
-					$get_brand_query = "SELECT name FROM customers WHERE creator_branch_code = '$creator_branch_code'";
+					$get_brand_query = "SELECT * FROM customers WHERE creator_branch_code = '$creator_branch_code'";
 					$get_brand_query_run = mysqli_query($connect_link, $get_brand_query);
 
 					while($get_brand_result = mysqli_fetch_assoc($get_brand_query_run))
 					{
-						echo "<option>";
+						$email = $get_brand_result['email'];
+						echo "<option email=\"$email\">";
 							echo $get_brand_result['name'];
 						echo "</option>";
 					}
 				?>	
 			</select>
-			<button id="quotation_add_customer">Add Customer</button>
+			<button id="quotation_add_customer">New Customer</button>
 		</div>
 		
 		<div>
@@ -79,7 +80,7 @@
 				</tr>
 
 				<tr>
-					<td><input type="text" id="quotation_description"></td>
+					<td><input type="text" maxlength="28" id="quotation_description"></td>
 
 					<td>
 						<select id="quotation_brand">
@@ -137,7 +138,7 @@
 			</tbody>
 			
 		</table>
-		<b>For whole unit leave part name and part serial number as blank</b>
+		<b>For whole unit select the empty part name.</b>
 		<br>
 
 		<button id="add_new_goods_button">Add New Item</button>
@@ -162,6 +163,12 @@
 		$('#quotation_add_customer').click(function()
 		{
 			$('.user_module_content').html("<img class=\"gif_loader\" src=\"img/loaders1.gif\">").load('php/add_customer.php');
+		});
+
+	//on selecting a customer
+		$('#quotation_customer').change(function()
+		{
+			customer = $(this).find('option:selected');
 		});
 
 	//on selecting a brand
@@ -312,6 +319,24 @@
 			$(this).parent().parent().find('#quotation_part_total_price').val('calculate');
 		});
 
+	//on entering quantity
+		$('#quotation_part_quantity').keyup(function()
+		{
+			var quantity = parseInt($(this).val());
+			var in_stock = parseInt($('#quotation_part_in_stock').val());
+
+			if(quantity > in_stock)
+			{
+				$('.gen_quotation_span').html("You have entered more quantity than available in-stock at your branch. You can check its availability by clicking on availability tab.").css('color', 'red');
+				$('.warn_box').text("Quantity is more than the available in-stock at the branch.");
+				$('.warn_box').fadeIn(200).delay(3000).fadeOut(200);
+			}
+			else
+			{
+				$('.gen_quotation_span').html("");
+			}
+		});
+
 	//on clicking on delete goods button
 		$('.item_delete_icon').click(function()
 		{
@@ -335,8 +360,7 @@
 		//getting variable values
 			var quotation_customer = $.trim($('#quotation_customer').val());
 			var quotation_date = $.trim($('#quotation_date').val());
-			var quotation_num = $.trim($('#quotation_num').attr('quotation_num'));
-			
+			var quotation_num = $.trim($('#quotation_num').attr('quotation_num'));		
 
 			if(quotation_customer !="" && quotation_date !="" && quotation_num !="")
 			{
@@ -386,10 +410,48 @@
 					{
 						if(e==1)
 						{
+						//for getting pdf of the quotation
+							var session_of = quotation_num;
+							var session_name = "pdf_quotation_of";
+								
+							$.post('php/session_creator.php', {session_of: session_of, session_name: session_name}, function(e)
+							{
+								if(e ==1)
+								{
+								//mailing to the customer
+									var customer_email = customer.attr('email');
+									var website = window.location.hostname;
+
+									var mail_email = customer_email;
+									var mail_subject = "Quotation from Voltatech";
+									var mail_header = "From: voltatech@pnds.in";
+									var mail_body = "Dear Customer \nQuotation generated from our online resource is linked with this mail. Please find your quotation by following the link: http://" + website + "/quotation/Quotation-" + quotation_num + ".pdf \n \nRegards \nVoltatech \nhttp://" + website;
+
+									$.post('php/mailing.php', {mail_email: mail_email, mail_subject: mail_subject, mail_header:mail_header, mail_body:mail_body}, function(e)
+									{
+										if(e == 1)
+										{
+
+										}
+										else
+										{
+											$('.gen_quotation_span').text('something went wrong while mailing the customer.').css('color','red');
+										}
+									});
+
+									window.open('php/quotation_pdf.php', '_blank');	
+								}
+								else
+								{
+									$('.warn_box').text("Something went wrong while generating pdf file of the quotation.");
+									$('.warn_box').fadeIn(200).delay(3000).fadeOut(200);
+								}
+							});
+
 						//disappearing the user entry form
 							$('.user_entry_form').html("<img class=\"gif_loader\" src=\"img/loaders1.gif\">").fadeOut(0);
 							
-							$('.gen_quotation_span').text('Purchase has been successfully created').css('color','green');
+							$('.gen_quotation_span').text('').css('color','green');
 							$('#gen_new_quotation_button').fadeIn(100);
 							$('.view_quotation_button').fadeIn(100);
 						}
@@ -397,8 +459,7 @@
 						{
 							$('.gen_quotation_span').text('Something went wrong while creating purchase').css('color','red');
 						}
-					});
-				
+					});				
 				}
 			}
 			else
@@ -478,7 +539,7 @@
 						//disappearing the user entry form
 							$('.user_entry_form').html("<img class=\"gif_loader\" src=\"img/loaders1.gif\">").fadeOut(0);
 							
-							$('.gen_quotation_span').text('Purchase has been successfully created').css('color','green');
+							$('.gen_quotation_span').text('').css('color','green');
 							$('#gen_new_quotation_button').fadeIn(100);
 							$('.view_quotation_button').fadeIn(100);
 						}

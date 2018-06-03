@@ -34,7 +34,7 @@
 					}
 				?>	
 			</select>
-			<button id="quotation_add_customer">Add Customer</button>
+			<button id="quotation_add_customer">New Customer</button>
 		</div>
 		
 		<div>
@@ -324,6 +324,7 @@
 	//on clicking on calculate
 		$('.quotation_entry_table tr td #quotation_part_total_price').click(function()
 		{
+			var quantity = parseInt($(this).parent().parent().find('#quotation_part_quantity').val());
 			var rate = parseInt($(this).parent().parent().find('#quotation_part_rate').val());
 			var cgst = parseInt($(this).parent().parent().find('#quotation_part_cgst').val());
 			var sgst = parseInt($(this).parent().parent().find('#quotation_part_sgst').val());
@@ -359,6 +360,25 @@
 		$('.quotation_entry_table tr td #quotation_part_igst').keyup(function()
 		{
 			$(this).parent().parent().find('#quotation_part_total_price').val('calculate');
+		});
+
+	//on entering quantity
+		$('.quotation_entry_table tr td #quotation_part_quantity').keyup(function()
+		{
+			var quantity = parseInt($(this).val());
+			this_thing = $(this); 
+			var in_stock = parseInt(this_thing.parent().parent().find('#quotation_part_in_stock').val());
+
+			if(quantity > in_stock)
+			{
+				$('.gen_quotation_span').html("You have entered more quantity than available in-stock at your branch. You can check its availability by clicking on availability tab.").css('color', 'red');
+				$('.warn_box').text("Quantity is more than the available in-stock at the branch.");
+				$('.warn_box').fadeIn(200).delay(3000).fadeOut(200);
+			}
+			else
+			{
+				$('.gen_quotation_span').html("");
+			}
 		});
 
 	//on clicking on delete goods button
