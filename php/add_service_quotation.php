@@ -583,8 +583,6 @@
 					$('.warn_box').fadeIn(200).delay(3000).fadeOut(200);
 				}
 			});
-
-			//window.open('php/quotation_pdf.php', '_blank');	
 		});
 
 	</script>

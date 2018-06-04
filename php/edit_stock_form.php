@@ -1,5 +1,7 @@
 <?php
 	include 'connect_db.php';
+	$creator_branch_code = $_COOKIE['logged_username_branch_code'];
+	$is_admin = $_COOKIE['isadmin'];
 
 	$user_id = mysqli_real_escape_string($connect_link, $_POST['user_id']);
 
@@ -44,11 +46,6 @@
 		<input type="number" value="<?php echo $supplier_price; ?>" id="user_entry_supplier_price">
 		<br><br>
 
-		HSN Code:
-		<br>
-		<input type="text" value="<?php echo $hsn_code; ?>" id="user_entry_hsn_code">
-		<br><br>
-
 		<input type="button" value="Save" id="user_save_edit_button">
 		<br>
 	</div>
@@ -68,11 +65,10 @@
 			var in_stock = $('#user_edit_form #user_entry_in_stock').val();
 			var sales_price = $('#user_edit_form #user_entry_sales_price').val();
 			var supplier_price = $('#user_edit_form #user_entry_supplier_price').val();
-			var hsn_code = $('#user_edit_form #user_entry_hsn_code').val();
 								
 			if(sold!= "" && in_stock!= "")
 			{
-				var query_recieved = "UPDATE stock SET sold ='" + sold + "', in_stock ='" + in_stock + "', sales_price = '" + sales_price + "', supplier_price = '" + supplier_price + "', hsn_code = '" + hsn_code + "' WHERE id = '" + user_id + "'";
+				var query_recieved = "UPDATE stock SET sold ='" + sold + "', in_stock ='" + in_stock + "', sales_price = '" + sales_price + "', supplier_price = '" + supplier_price + "' WHERE id = '" + user_id + "'";
 			
 				$.post('php/query_runner.php', {query_recieved:query_recieved}, function(e)
 				{
@@ -81,7 +77,15 @@
 						$('.user_edit_span').text('Successfully edited').css('color','green');
 						$('#user_edit_form').fadeOut(0);
 
-						$('.user_module_content').html("<img class=\"gif_loader\" src=\"img/loaders1.gif\">").load('php/manage_stock.php');
+						var is_admin = parseInt("<?php echo $is_admin; ?>");
+						if(is_admin == 1)
+						{
+							$('.user_module_content').html("<img class=\"gif_loader\" src=\"img/loaders1.gif\">").load('php/admin_manage_stock.php');
+						}
+						else
+						{
+							$('.user_module_content').html("<img class=\"gif_loader\" src=\"img/loaders1.gif\">").load('php/manage_stock.php');
+						}
 					}
 					else
 					{

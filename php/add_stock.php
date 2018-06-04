@@ -3,13 +3,6 @@
 	$creator_branch_code = $_COOKIE['logged_username_branch_code'];
 ?>
 
-<!-------inventory area----->
-	<!-- <div class="inventory_tab">
-		<button class="whole_unit_button">Whole Unit</button>
-		<button class="parts_only_button">Parts Only</button>
-	</div>
-	<br><br> -->
-
 <!-----inventory form---->
 	<div class="inventory_form">
 		Brand:<br>
@@ -31,31 +24,22 @@
 		</select>
 		<br><br>
 
-		Model Name:<br>
+		Product/Part:<br>
 		<select id="inv_model_name">
 			<option value=""></option>
 		</select>
 		<br><br>
 
-		Model Number:<br>
+		Product/part Code:<br>
 		<select id="inv_model_number">
 			<option value=""></option>
 		</select>
 		<br><br>
 
-		<div class="parts_only_input">	
-			Part Name:<br>		
-			<select id="inv_part_name">
-				<option value=""></option>
-			</select>
-			<br><br>
-			
-			Part Number:<br>
-			<select id="inv_part_number">
-				<option value=""></option>
-			</select>
-			<br><br>
-		</div>
+		<input id="inv_hsn_code" type="text" disabled="disabled" placeholder="HSN Code">
+		<br><br>
+		<input id="inv_description" type="text" disabled="disabled" placeholder="Description">
+		<br><br>
 
 		<input id="inv_quantity" type="number" placeholder="Quantity">
 		<br><br>
@@ -63,9 +47,7 @@
 		<br><br>
 		<input id="inv_supplier_price" type="number" placeholder="Supplier Price">
 		<br><br>
-		<input id="inv_hsn_code" type="text" placeholder="HSN Code">
-		<br><br>
-
+		
 		<input type="submit" id="inv_add_button" value="Add">
 	</div>
 
@@ -76,24 +58,12 @@
 
 <!-----------script------------>
 	<script type="text/javascript">
-		
-	// //switching tab b/w whole unit and parts only
-	// 	$('.whole_unit_button').click(function()
-	// 	{
-	// 		$('.parts_only_input').fadeOut(0);
-	// 	});
-
-	// 	$('.parts_only_button').click(function()
-	// 	{
-	// 		$('.parts_only_input').fadeIn(0);
-	// 	});
-
 	//on selecting a brand
 		$('#inv_brand').change(function()
 		{
 			$(this).attr('disabled', 'disabled').css('border', '1px solid lightgrey');
 
-			var brand = $(this).val();
+			brand = $(this).val();
 			var query = "SELECT model_name FROM inventory WHERE brand ='" + brand + "' GROUP BY model_name";
 			var to_get = "model_name";
 
@@ -123,39 +93,27 @@
 	//on selecting a model_number
 		$('#inv_model_number').change(function()
 		{
-			$(this).attr('disabled', 'disabled').css('border', '1px solid lightgrey');
+			$(this).attr('disabled', 'disabled');
+			this_thing = $(this);
+			model_number = $(this).val();
 
-			model_number = $(this).val(); //making it universal variable to use in, on selecting a part_name
-			var query = "SELECT part_name FROM inventory WHERE model_number ='" + model_number + "' AND model_name = '" + model_name + "' GROUP BY part_name";
-			var to_get = "part_name";
+		//populating hsn code
+			var query = "SELECT hsn_code FROM inventory WHERE model_number ='" + model_number + "' AND model_name = '" + model_name + "' AND brand = '" + brand + "'";
+			var to_get = "hsn_code";
 
-			$.post('php/product_query_runner.php', {query:query , to_get:to_get}, function(data)
+			$.post('php/query_result_viewer.php', {query:query , to_get:to_get}, function(data)
 			{
-				//alert(data);
-				$('#inv_part_name').html(data);
+				$('#inv_hsn_code').val(data);
 			});
-		});
 
-	//on selecting a part_name
-		$('#inv_part_name').change(function()
-		{
-			$(this).attr('disabled', 'disabled').css('border', '1px solid lightgrey');
+		//populating description
+			var query = "SELECT description FROM inventory WHERE model_number ='" + model_number + "' AND model_name = '" + model_name + "' AND brand = '" + brand + "'";
+			var to_get = "description";
 
-			part_name = $(this).val(); //making it universal variable to use in, on selecting a part_name
-			var query = "SELECT part_number FROM inventory WHERE model_number ='" + model_number + "' AND model_name = '" + model_name + "' AND part_name = '" + part_name + "'";
-			var to_get = "part_number";
-
-			$.post('php/product_query_runner.php', {query:query , to_get:to_get}, function(data)
+			$.post('php/query_result_viewer.php', {query:query , to_get:to_get}, function(data)
 			{
-				//alert(data);
-				$('#inv_part_number').html(data);
+				$('#inv_description').val(data);
 			});
-		});
-
-	//on selecting a part_number
-		$('#inv_part_number').change(function()
-		{
-			$(this).attr('disabled', 'disabled').css('border', '1px solid lightgrey');
 		});
 
 	//on clicking on stock add button
@@ -166,31 +124,22 @@
 			var inv_brand = $.trim($('#inv_brand').val());
 			var inv_model_name = $.trim($('#inv_model_name').val());
 			var inv_model_num = $.trim($('#inv_model_number').val());
-
-			var inv_part_name = $.trim($('#inv_part_name').val());
-			var inv_part_number = $.trim($('#inv_part_number').val());
+			var inv_hsn_code = $.trim($('#inv_hsn_code').val());
+			var inv_description = $.trim($('#inv_description').val());
 
 			var inv_quantity = $.trim($('#inv_quantity').val());
 			var inv_sales_price = $.trim($('#inv_sales_price').val());
 			var inv_supplier_price = $.trim($('#inv_supplier_price').val());
-			var inv_hsn_code = $.trim($('#inv_hsn_code').val());
 			
 			var inv_type = "";
-
-		//for choosing b/w whole unit and part only
-			if(inv_part_name =="" && inv_part_number =="")
-			{
-				var inv_type = "whole";
-			}
-			else //for parts only
-			{
-				var inv_type = "part";
-			}
+			var inv_part_name = "";
+			var inv_part_number = "";
 
 			if(inv_brand !="" && inv_model_name !="" && inv_model_num !="" && inv_quantity !="")
-			{		
+			{	
+			//checking if that product or part is already added in the sock or not
 				var creator_branch_code = "<?php echo $creator_branch_code; ?>";
-				var query_recieved = "SELECT id FROM stock WHERE brand = '" + inv_brand + "' && model_name = '" + inv_model_name + "' && model_number = '" + inv_model_num + "' AND part_name ='" + inv_part_name + "' AND creator_branch_code = '" + creator_branch_code + "'";
+				var query_recieved = "SELECT id FROM stock WHERE brand = '" + inv_brand + "' && model_name = '" + inv_model_name + "' && model_number = '" + inv_model_num + "' AND creator_branch_code = '" + creator_branch_code + "'";
 
 				$.post('php/query_result_counter.php', {query_recieved: query_recieved}, function(e)
 				{

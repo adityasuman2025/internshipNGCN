@@ -16,13 +16,12 @@
 				<th>Brand</th>
 				<th>Model Name</th>
 				<th>Model Number</th>
-				<th>Part Name</th>
-				<th>Part Number</th>
+				<th>HSN Code</th>
+
 				<th>Sold Items</th>
 				<th>In-Stock Items</th>
 				<th>Sales Price</th>
 				<th>Supplier Price</th>
-				<th>HSN Code</th>
 			</tr>
 
 			<?php
@@ -39,14 +38,13 @@
 						
 						echo "<td>" . $list_user_assoc['brand'] . "</td>";
 						echo "<td>" . $list_user_assoc['model_name'] . "</td>";
-						echo "<td>" . $list_user_assoc['model_number'] . "</td>";
-						echo "<td>" . $list_user_assoc['part_name'] . "</td>";
-						echo "<td>" . $list_user_assoc['part_number'] . "</td>";
+						echo "<td>" . $list_user_assoc['model_number'] . "</td>";						
+						echo "<td>" . $list_user_assoc['hsn_code'] . "</td>";
+
 						echo "<td>" . $list_user_assoc['sold'] . "</td>";
 						echo "<td>" . $list_user_assoc['in_stock'] . "</td>";
 						echo "<td>" . $list_user_assoc['sales_price'] . "</td>";
 						echo "<td>" . $list_user_assoc['supplier_price'] . "</td>";
-						echo "<td>" . $list_user_assoc['hsn_code'] . "</td>";
 
 					echo "</tr>";
 				}
