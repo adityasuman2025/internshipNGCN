@@ -1,5 +1,6 @@
 <?php
 	include('connect_db.php');
+	$creator_branch_code = $_COOKIE['logged_username_branch_code'];
 
 	$quotation_num = $_POST['quotation_num'];
 
@@ -11,12 +12,11 @@
 		$brand = $get_item_info_assoc['brand'];
 		$model_name = $get_item_info_assoc['model_name'];
 		$model_number = $get_item_info_assoc['model_number'];
-		$part_name = $get_item_info_assoc['part_name'];
 
 		$quantity = $get_item_info_assoc['quantity'];
 
 	//get stock of that particular item
-		$get_stock_query = "SELECT * FROM stock WHERE brand = '$brand' AND model_name = '$model_name' AND model_number = '$model_number' AND part_name = '$part_name'";
+		$get_stock_query = "SELECT * FROM stock WHERE brand = '$brand' AND model_name = '$model_name' AND model_number = '$model_number' AND creator_branch_code = '$creator_branch_code'";
 		$get_stock_query_run = mysqli_query($connect_link, $get_stock_query);
 		
 		while($get_stock_assoc = mysqli_fetch_assoc($get_stock_query_run))
@@ -28,7 +28,7 @@
 			$new_item_sold = $item_sold + $quantity;
 
 		//update stock of that particular item
-			$update_item_stock_query = "UPDATE stock SET sold ='$new_item_sold', in_stock = '$new_item_in_stock' WHERE brand = '$brand' AND model_name = '$model_name' AND model_number = '$model_number' AND part_name = '$part_name'";
+			$update_item_stock_query = "UPDATE stock SET sold ='$new_item_sold', in_stock = '$new_item_in_stock' WHERE brand = '$brand' AND model_name = '$model_name' AND model_number = '$model_number' AND part_name = '$part_name' AND creator_branch_code = '$creator_branch_code'";
 			
 			if($update_item_stock_query_run = mysqli_query($connect_link, $update_item_stock_query))
 			{

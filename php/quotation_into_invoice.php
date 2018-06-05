@@ -1,6 +1,15 @@
 <?php
 	include('connect_db.php');
 
+	if(isset($_POST['generated_from']))
+	{
+		$generated_from = $_POST['generated_from'];
+	}
+	else
+	{
+		$generated_from = "";
+	}
+
 //getting the quotation number
 	$quotation_num = $_POST['quotation_num'];
 	$this_year = date('y');
@@ -62,42 +71,42 @@
 					if(e==1)
 					{
 					//for getting pdf of the quotation
-						var session_of = quotation_num;
-						var session_name = "pdf_invoice_of";
+						// var session_of = quotation_num;
+						// var session_name = "pdf_invoice_of";
 							
-						$.post('php/session_creator.php', {session_of: session_of, session_name: session_name}, function(e)
-						{
-							if(e ==1)
-							{
-							//mailing to the customer
-								var customer_email = "<?php echo $get_customer_email; ?>";
-								var website = window.location.hostname;
+						// $.post('php/session_creator.php', {session_of: session_of, session_name: session_name}, function(e)
+						// {
+						// 	if(e ==1)
+						// 	{
+						// 	//mailing to the customer
+						// 		var customer_email = "<?php echo $get_customer_email; ?>";
+						// 		var website = window.location.hostname;
 
-								var mail_email = customer_email;
-								var mail_subject = "Invoice from Voltatech";
-								var mail_header = "From: voltatech@pnds.in";
-								var mail_body = "Dear Customer \nInvoice generated from our online resource is linked with this mail. Please find your invoice by following the link: http://" + website + "/invoice/Invoice-" + quotation_num + ".pdf \n \nRegards \nVoltatech \nhttp://" + website;
+						// 		var mail_email = customer_email;
+						// 		var mail_subject = "Invoice from Voltatech";
+						// 		var mail_header = "From: voltatech@pnds.in";
+						// 		var mail_body = "Dear Customer \nInvoice generated from our online resource is linked with this mail. Please find your invoice by following the link: http://" + website + "/invoice/Invoice-" + quotation_num + ".pdf \n \nRegards \nVoltatech \nhttp://" + website;
 
-								$.post('php/mailing.php', {mail_email: mail_email, mail_subject: mail_subject, mail_header:mail_header, mail_body:mail_body}, function(e)
-								{
-									if(e == 1)
-									{
+						// 		$.post('php/mailing.php', {mail_email: mail_email, mail_subject: mail_subject, mail_header:mail_header, mail_body:mail_body}, function(e)
+						// 		{
+						// 			if(e == 1)
+						// 			{
 
-									}
-									else
-									{
-										$('.gen_quotation_span').text('something went wrong while mailing the customer.').css('color','red');
-									}
-								});
+						// 			}
+						// 			else
+						// 			{
+						// 				$('.gen_quotation_span').text('something went wrong while mailing the customer.').css('color','red');
+						// 			}
+						// 		});
 
-								window.open('php/invoice_pdf.php', '_blank');	
-							}
-							else
-							{
-								$('.warn_box').text("Something went wrong while generating pdf file of the invoice.");
-								$('.warn_box').fadeIn(200).delay(3000).fadeOut(200);
-							}
-						});
+						// 		window.open('php/invoice_pdf.php', '_blank');	
+						// 	}
+						// 	else
+						// 	{
+						// 		$('.warn_box').text("Something went wrong while generating pdf file of the invoice.");
+						// 		$('.warn_box').fadeIn(200).delay(3000).fadeOut(200);
+						// 	}
+						// });
 
 					//changing the stock of that item in the batabase
 						$.post('php/invoice_changes_stock.php', {quotation_num: quotation_num}, function()

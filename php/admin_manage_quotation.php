@@ -105,9 +105,7 @@
 				<th>Customer Number</th>
 				<th>Date of Generation</th>
 				<th>Total Amount</th>
-				
-				<th>Type</th>
-				
+
 				<th>Created By</th>
 				<th>Actions</th>
 			</tr>
@@ -213,7 +211,6 @@
 							echo "<td>$customer</td>";
 							echo "<td>$date</td>";
 							echo "<td>$final_price</td>";
-							echo "<td>$type</td>";
 							echo "<td>$creator_username</td>";
 							echo "<td>";
 								echo "<img quotation_num=\"$quotation_num\" class=\"user_view_icon\" src=\"img/view.png\"/>";
@@ -338,7 +335,6 @@
 							echo "<td>$customer</td>";
 							echo "<td>$date</td>";
 							echo "<td>$final_price</td>";
-							echo "<td>$type</td>";
 							echo "<td>$creator_username</td>";
 							echo "<td>";
 								echo "<img quotation_num=\"$quotation_num\" class=\"user_view_icon\" src=\"img/view.png\"/>";
@@ -489,20 +485,10 @@
 			var quotation_num =  $.trim($(this).attr('quotation_num'));
 			var type =  $.trim($(this).attr('type'));
 
-			if(type =='service')
+			$.post('php/edit_quotation.php', {quotation_num: quotation_num}, function(data)
 			{
-				$.post('php/admin_edit_service_quotation.php', {quotation_num: quotation_num}, function(data)
-				{
-					$('.user_module_content').html("<img class=\"gif_loader\" src=\"img/loaders1.gif\">").html(data);				
-				});		
-			}
-			else if(type =='sales')
-			{
-				$.post('php/admin_edit_sales_quotation.php', {quotation_num: quotation_num}, function(data)
-				{
-					$('.user_module_content').html("<img class=\"gif_loader\" src=\"img/loaders1.gif\">").html(data);	
-				});	
-			}		
+				$('.user_module_content').html("<img class=\"gif_loader\" src=\"img/loaders1.gif\">").html(data);				
+			});				
 		});
 
 	//on clicking on view icon

@@ -8,65 +8,147 @@
 	<script type="text/javascript" src="js/tableexport.min.js"></script>
 
 	<script type="text/javascript">
-		//$('#table_export').tableExport();
+		$('#table_export').tableExport();
 	</script>
 
-<div class="inventory_tab">
-	<button class="service_quot_list_button">Service Quotation</button>
-	<button class="sales_quot_list_button">Sales Quotation</button>
-</div>
-<br><br>
-
 <div id="table_export1" class="quotation_list_container">
-	<h3></h3>
+	<table id="table_export">
+		<tr>
+			<th>Quotation Number</th>
+			<th>Customer Number</th>
+			<th>Date of Generation</th>
+			<th>Total Amount</th>
+			<!-- <th>Invoice</th> -->
+			<th>Created By</th>
+			<th>Actions</th>
+		</tr>
 
-	<table id="table_export">	
-		
+		<?php
+			$query = "SELECT * FROM quotation WHERE creator_branch_code = '$creator_branch_code' AND payment_method ='' GROUP BY quotation_num ORDER BY quotation_num DESC";
+			$list_quotation_query_run = mysqli_query($connect_link, $query);
+			while($list_quotation_assoc = mysqli_fetch_assoc($list_quotation_query_run))
+			{
+				$quotation_id = $list_quotation_assoc['id'];
+
+				$quotation_num = $list_quotation_assoc['quotation_num'];
+				$customer = $list_quotation_assoc['customer'];
+				$date = $list_quotation_assoc['date'];
+				$type = $list_quotation_assoc['type'];
+				$creator_username = $list_quotation_assoc['creator_username'];
+
+			//gettting date of generation of quoatation
+				$date = str_replace('/', '-', $date);
+				$date = date('d M Y', strtotime($date));
+
+			//for getting quotation code
+				$this_year = date('y');
+				$next_year = $this_year +1;
+				$quotation_code = "VOLTA/" . $this_year . "-" . $next_year . "/" . $quotation_num;
+
+			//for getting total price of the quotation
+				$final_price = 0;
+
+				$get_element_price_query = "SELECT total_price FROM quotation WHERE quotation_num='$quotation_num'";
+				$get_element_price_query_run = mysqli_query($connect_link, $get_element_price_query);
+
+				while($get_element_price_assoc = mysqli_fetch_assoc($get_element_price_query_run))
+				{
+					$element_price = $get_element_price_assoc['total_price'];
+
+					$final_price = $final_price + $element_price;
+				}
+
+				echo "<tr>";
+					echo "<td>$quotation_code</td>";
+					echo "<td>$customer</td>";
+					echo "<td>$date</td>";
+					echo "<td>$final_price</td>";
+					// echo "<td><button quotation_num=\"$quotation_num\" class=\"quot_into_invoice_button\">Generate</button></td>";
+					echo "<td>$creator_username</td>";
+					echo "<td>";
+						echo "<img quotation_num=\"$quotation_num\" class=\"user_view_icon\" src=\"img/view.png\"/>";
+						echo "<img quotation_num=\"$quotation_num\" type=\"$type\" class=\"user_edit_icon\" src=\"img/edit.png\"/>";
+						echo "<img quotation_num=\"$quotation_num\" class=\"user_delete_icon\" src=\"img/delete.png\"/>";
+					echo "</td>";
+				echo "</tr>";
+			}
+		?>
 	</table>
 </div>
 
-<!---script------>
+<!----------script------------>		
 	<script type="text/javascript">
-	//by default service quotation are shown
-		$('.quotation_list_container h3').text('Service Quotations');
-		$('.quotation_list_container table').html("<img class=\"gif_loader\" src=\"img/loaders1.gif\">");
+	//on clicking on user delete icon
+		$('.user_delete_icon').click(function()
+		{
+			//alert('ok');
+			var quotation_num = $.trim($(this).attr('quotation_num'));
+			var query_recieved = "DELETE FROM quotation WHERE quotation_num = '" + quotation_num + "'";
 
-		var creator_branch_code = "<?php echo $creator_branch_code; ?>";
-		var query = "SELECT * FROM quotation WHERE type='service' AND payment_method = '' AND creator_branch_code = '" + creator_branch_code + "' GROUP BY quotation_num ORDER BY quotation_num DESC";
+			$.post('php/query_runner.php', {query_recieved:query_recieved}, function(e)
+			{
+				if(e==1)
+				{
+					$('.user_module_content').html("<img class=\"gif_loader\" src=\"img/loaders1.gif\">").load('php/manage_quotation.php');
+				}
+				else
+				{
+					$('.warn_box').text("Something went wrong while deleting the user");
+					$('.warn_box').fadeIn(200).delay(3000).fadeOut(200);
+				}
+			});
+		});
+
+	//on clicking on user edit icon
+		$('.user_edit_icon').click(function()
+		{
+			var quotation_num =  $.trim($(this).attr('quotation_num'));
+			var type =  $.trim($(this).attr('type'));
+			
+			$.post('php/edit_quotation.php', {quotation_num:quotation_num}, function(data)
+			{
+				$('.user_module_content').html("<img class=\"gif_loader\" src=\"img/loaders1.gif\">").html(data);	
+			});
+					
+		});
+
+	//on clicking on view icon
+		$('.user_view_icon').click(function()
+		{
+			var quotation_num =  $.trim($(this).attr('quotation_num'));
+
+		//for getting pdf of the quotation
+			var session_of = quotation_num;
+			var session_name = "pdf_quotation_of";
+				
+			$.post('php/session_creator.php', {session_of: session_of, session_name: session_name}, function(e)
+			{
+				if(e ==1)
+				{
+					window.open('php/quotation_pdf.php', '_blank');	
+				}
+				else
+				{
+					$('.warn_box').text("Something went wrong while generating pdf file of the quotation.");
+					$('.warn_box').fadeIn(200).delay(3000).fadeOut(200);
+				}
+			});
+
+			//window.open('php/quotation_pdf.php', '_blank');	
+		});
 		
-		$.post('php/list_quotation.php', {query:query}, function(data)
-		{
-			$('#table_export').fadeIn(100).html(data);
-		});
+	//on clicking on convert quotation into invoice button 
+		// $('.quot_into_invoice_button').click(function()
+		// {
+		// 	var quotation_num = $(this).attr('quotation_num');
 
-	//switching tab b/w service quotation and sales quotation
-		$('.service_quot_list_button').click(function()
-		{
-			$('.quotation_list_container h3').text('Service Quotations');
-			$('.quotation_list_container table').html("<img class=\"gif_loader\" src=\"img/loaders1.gif\">");
-
-			var creator_branch_code = "<?php echo $creator_branch_code; ?>";
-			var query = "SELECT * FROM quotation WHERE type='service' AND payment_method = '' AND creator_branch_code = '" + creator_branch_code + "' GROUP BY quotation_num ORDER BY quotation_num DESC";
-			
-			$.post('php/list_quotation.php', {query:query}, function(data)
-			{
-				$('#table_export').fadeIn(100).html(data);
-				//$('#table_export').tableExport();
-			});
-		});
-
-		$('.sales_quot_list_button').click(function()
-		{
-			$('.quotation_list_container h3').text('Sales Quotations');
-			$('.quotation_list_container table').html("<img class=\"gif_loader\" src=\"img/loaders1.gif\">");
-
-			var creator_branch_code = "<?php echo $creator_branch_code; ?>";
-			var query = "SELECT * FROM quotation WHERE type='sales' AND payment_method = '' AND creator_branch_code = '" + creator_branch_code + "' GROUP BY quotation_num ORDER BY quotation_num DESC";
-			
-			$.post('php/list_quotation.php', {query:query}, function(data)
-			{
-				$('#table_export').fadeIn(100).html(data);
-				//$('#table_export').tableExport();
-			});
-		});
+		// 	$('.ajax_loader_bckgrnd').fadeIn(400);
+					
+		// 	$.post('php/quotation_into_invoice.php', {quotation_num:quotation_num}, function(data)
+		// 	{
+		// 		//alert(data);
+		// 		$('.ajax_loader_box').fadeIn(400);
+		// 		$('.ajax_loader_content').html(data);
+		// 	});					
+		// });
 	</script>

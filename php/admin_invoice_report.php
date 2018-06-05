@@ -108,8 +108,6 @@
 				<th>Date of Generation</th>
 				<th>Total Amount</th>
 				
-				<th>Type</th>
-
 				<th>Payment Method</th>
 				<th>Payment Date</th>
 				<th>Created By</th>
@@ -225,7 +223,7 @@
 							echo "<td>$customer</td>";
 							echo "<td>$date</td>";
 							echo "<td>$final_price</td>";
-							echo "<td>$type</td>";
+							// echo "<td>$type</td>";
 							echo "<td>$payment_method</td>";
 							echo "<td>$date_of_payment</td>";
 							echo "<td>$creator_username</td>";

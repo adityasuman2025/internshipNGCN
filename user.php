@@ -77,8 +77,8 @@
 
 			<li>Quotation/Invoice
 				<ul>
-					<li work="add_service_quotation">New Service Quot/Invoice</li>
-					<li work="add_sales_quotation">New Sales Quot/Invoice</li>
+					<li work="add_quotation">New Quotation</li>
+					<li work="add_invoice">New Invoice</li>
 			
 					<li work="manage_quotation">Manage Quotation</li>
 					<li work="manage_invoice">Manage Invoice</li>

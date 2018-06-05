@@ -60,9 +60,6 @@
 				<th>Customer Number</th>
 				<th>Date of Generation</th>
 				<th>Total Amount</th>
-				
-				<th>Type</th>
-				
 				<th>Created By</th>
 				<th>Actions</th>
 			</tr>
@@ -149,7 +146,6 @@
 						echo "<td>$customer</td>";
 						echo "<td>$date</td>";
 						echo "<td>$final_price</td>";
-						echo "<td>$type</td>";
 						echo "<td>$creator_username</td>";
 						echo "<td>";
 							echo "<img quotation_num=\"$quotation_num\" class=\"user_view_icon\" src=\"img/view.png\"/>";
@@ -179,7 +175,6 @@
 			echo "<br>";
 			echo $lower_limit . " - " . $uper_limit ;
 		?>
-
 	</div>
 
 

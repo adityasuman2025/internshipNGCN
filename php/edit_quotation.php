@@ -9,9 +9,16 @@
 	$query_assoc = mysqli_fetch_assoc($query_run);
 
 	$quotation_id = $query_assoc['id'];
+	$date = $query_assoc['date'];
 	
 	$customer = $query_assoc['customer'];
-	$date = $query_assoc['date'];
+
+//getting the email id of the customer
+	$get_customer_email_query = "SELECT email FROM customers WHERE name ='$customer'";
+	$get_customer_email_query_run = mysqli_query($connect_link, $get_customer_email_query);
+	$get_customer_email_assoc = mysqli_fetch_assoc($get_customer_email_query_run);
+	$get_customer_email = $get_customer_email_assoc['email'];
+
 ?>
 <!----add customer form------>
 	<div class="user_entry_form add_quotation_form">
@@ -21,14 +28,15 @@
 			<b>Customer:</b>
 			<br>
 			<select id="quotation_customer">
-				<option value = "<?php echo $customer; ?>"><?php echo $customer; ?></option>
+				<option value = "<?php echo $customer; ?>" email="<?php echo $get_customer_email; ?>"><?php echo $customer; ?></option>
 				<?php
-					$get_brand_query = "SELECT name FROM customers WHERE creator_branch_code = '$creator_branch_code' AND name !='$customer'";
+					$get_brand_query = "SELECT * FROM customers WHERE creator_branch_code = '$creator_branch_code' AND name !='$customer'";
 					$get_brand_query_run = mysqli_query($connect_link, $get_brand_query);
 
 					while($get_brand_result = mysqli_fetch_assoc($get_brand_query_run))
 					{
-						echo "<option>";
+						$email = $get_brand_result['email'];
+						echo "<option email=\"$email\">";
 							echo $get_brand_result['name'];
 						echo "</option>";
 					}
@@ -48,23 +56,26 @@
 		<table class="quotation_entry_table">
 			<tbody>
 				<tr>
-					<th>Description</th>
 					<th>Brand</th>
-					<th>Model Namer</th>
-					<th>Model Number</th>
-					<th>Serial Number</th>
-					<th>Part Name</th>
-					<th>Part Serial No.</th>
-					<th>Available In-Stock</th>
+					<th>Product/Part</th>
+					<th>Product/Part Code</th>
+					<th>HSN Code</th>
+					<th>Description</th>
+					
+					<th>Service ID</th>
 					<th>Quantity</th>
 					<th>Rate</th>
 
-					<th>CGST (in %)</th>
-					<th>SGST (in %)</th>
-					<th>IGST (in %)</th>
+					<th>CGST Rate</th>
+					<th>CGST Amount</th>
 
-					<th>HSN Code</th>
-					<th>Price</th>
+					<th>SGST Rate</th>
+					<th>SGST Amount</th>
+
+					<th>IGST Rate</th>
+					<th>IGST Amount</th>
+
+					<th>Total Amount</th>
 					<th>Action</th>
 				</tr>
 
@@ -76,34 +87,28 @@
 					{
 						$quotation_id = $query_assoc['id'];
 
-						$description = $query_assoc['description'];
 						$brand = $query_assoc['brand'];
 						$model_name = $query_assoc['model_name'];
 						$model_number = $query_assoc['model_number'];
-						$serial_num = $query_assoc['serial_num'];
+						$hsn_code = $query_assoc['hsn_code'];
+						$description = $query_assoc['description'];
+
 						$service_id = $query_assoc['service_id'];
-						$part_name = $query_assoc['part_name'];
-						$part_serial_num = $query_assoc['part_serial_num'];
 						$quantity = $query_assoc['quantity'];
 						$rate = $query_assoc['rate'];
 
 						$cgst = $query_assoc['cgst'];
-						$sgst = $query_assoc['sgst'];
-						$igst = $query_assoc['igst'];
+						$cgst_amount = ($rate*$cgst/100)*$quantity;
 
-						$hsn_code = $query_assoc['hsn_code'];
+						$sgst = $query_assoc['sgst'];
+						$sgst_amount = ($rate*$sgst/100)*$quantity;
+
+						$igst = $query_assoc['igst'];	
+						$igst_amount = ($rate*$igst/100)*$quantity;
+
 						$total_price = $query_assoc['total_price'];
 
-					//for getting availability of that item in stock
-						$check_availability_query = "SELECT in_stock FROM stock WHERE model_name = '$model_name' AND model_number = '$model_number' AND part_name = '$part_name' AND creator_branch_code = '$creator_branch_code'";
-						$check_availability_query_run = mysqli_query($connect_link, $check_availability_query);
-						$check_availability_assoc = mysqli_fetch_assoc($check_availability_query_run);
-
-						$in_stock = $check_availability_assoc['in_stock'];
-
 						echo "<tr id=\"$quotation_id\">";
-
-							echo "<td><input type=\"text\" value=\"$description\" id=\"quotation_description\"></td>";
 
 							echo "<td>
 								<select id=\"quotation_brand\">
@@ -123,48 +128,37 @@
 							echo "</select>	
 								</td>";
 
-							echo "<td>
-									<select id=\"quotation_model_name\">
-										<option value=\"$model_name\">$model_name</option>
-									</select>
-								</td>
+							echo "	<td>
+										<select id=\"quotation_model_name\">
+											<option value=\"$model_name\">$model_name</option>
+										</select>
+									</td>
 
-								<td>
-									<select id=\"quotation_model_number\">
-										<option value=\"$model_number\">$model_number</option>
-									</select>
-								</td>
+									<td>
+										<select id=\"quotation_model_number\">
+											<option value=\"$model_number\">$model_number</option>
+										</select>
+									</td>";
 
-								<td>
-									<input type=\"text\" value=\"$serial_num\" id=\"quotation_serial_num\">
-								</td>
+							echo "	<td><input type=\"text\" value=\"$hsn_code\" disabled=\"disabled\" id=\"quotation_hsn_code\"></td>
+									<td><input type=\"text\" value=\"$description\" disabled=\"disabled\" id=\"quotation_description\"></td>";
 
-								<td>
-									<select id=\"quotation_part_name\">
-										<option value=\"$part_name\">$part_name</option>					
-									</select>
-								</td>
-
-								<td><input type=\"text\" id=\"quotation_part_serial_num\" value=\"$part_serial_num\" ></td>";
-
-								if($in_stock =='0' OR $in_stock =='')
-								{
-									echo "<td><input type=\"button\" value=\"See Availability\" class=\"change_branch_button\" id=\"quotation_part_in_stock\" style=\"background: #cc0000; color: white;\"></td>";
-								}
-								else
-								{
-									echo "<td><input type=\"number\" value=\"$in_stock\" disabled=\"disabled\" id=\"quotation_part_in_stock\"></td>";
-								}
+							echo "<td><input type=\"text\" value=\"$service_id\" id=\"quotation_service_id\"></td>";
 
 							echo "<td><input type=\"number\" value=\"$quantity\" id=\"quotation_part_quantity\"></td>
 								<td><input type=\"number\" value=\"$rate\" id=\"quotation_part_rate\"></td>
 
-								<td><input type=\"number\" value=\"$cgst\" id=\"quotation_part_cgst\"></td>
-								<td><input type=\"number\" value=\"$sgst\" id=\"quotation_part_sgst\"></td>
-								<td><input type=\"number\" value=\"$igst\" id=\"quotation_part_igst\"></td>
+								<td><input type=\"number\" value=\"$cgst\" id=\"quotation_part_cgst\"></td>";
+							
+							echo "<td><input type=\"number\" disabled=\"disabled\" value=\"$cgst_amount\" id=\"quotation_cgst_amount\"></td>";
 
-								<td><input type=\"text\" value=\"$hsn_code\" id=\"quotation_part_hsn_code\"></td>
-								<td><input type=\"button\" style=\"background: #cc0000; color: white; margin: 2px; width: auto;\" value=\"$total_price\" id=\"quotation_part_total_price\"></td>
+							echo"<td><input type=\"number\" value=\"$sgst\" id=\"quotation_part_sgst\"></td>";
+							echo "<td><input type=\"number\" disabled=\"disabled\" value=\"$sgst_amount\" id=\"quotation_sgst_amount\"></td>";
+
+							echo"<td><input type=\"number\" value=\"$igst\" id=\"quotation_part_igst\"></td>";
+							echo "<td><input type=\"number\" disabled=\"disabled\" value=\"$igst_amount\" id=\"quotation_igst_amount\"></td>";
+
+							echo"<td><input type=\"button\" style=\"background: #cc0000; color: white; margin: 2px; width: auto;\" value=\"$total_price\" id=\"quotation_part_total_price\"></td>
 								<td>
 									<img class=\"item_delete_icon\" src=\"img/delete.png\">
 								</td>";
@@ -175,7 +169,6 @@
 			</tbody>
 			
 		</table>
-		<b>For whole unit leave part name and part serial number as blank</b>
 		<br>
 
 		<button id="add_new_goods_button">Add New Item</button>
@@ -185,144 +178,115 @@
 	</div>
 	
 	<span class="gen_quotation_span"></span>
-	<br><br>
-	<input type="submit" value="Save Edit" id="gen_new_quotation_button">
-
+	
 <!--------script-------->
 	<script type="text/javascript">
+	//on clicking on add customer button
 		creator_branch_code = "<?php echo $creator_branch_code; ?>";
 
-	//on clicking on add customer button
 		$('#quotation_add_customer').click(function()
 		{
 			$('.user_module_content').html("<img class=\"gif_loader\" src=\"img/loaders1.gif\">").load('php/add_customer.php');
 		});
 
 	//on selecting a brand
-		$('.quotation_entry_table tr td #quotation_brand').change(function()
+		$('.quotation_entry_table tr #quotation_brand').change(function()
 		{
-			$(this).attr('disabled', 'disabled');
-			var this_thing = $(this).parent().parent();
+			$(this).attr('disabled', 'disabled').css('border', '1px solid lightgrey');
 
-			var brand = $(this).val();
-			var query = "SELECT model_name FROM stock WHERE brand ='" + brand + "' AND creator_branch_code = '" + creator_branch_code + "' GROUP BY model_name";
+			this_thing = $(this);
+			brand = $(this).val();
+			var query = "SELECT model_name FROM inventory WHERE brand ='" + brand + "' GROUP BY model_name";
 			var to_get = "model_name";
 
 			$.post('php/product_query_runner.php', {query:query , to_get:to_get}, function(data)
 			{
 				//alert(data);
-				this_thing.find('#quotation_model_name').html(data);
+				this_thing.parent().parent().find('#quotation_model_name').html(data);
 			});
-
-		//emptying 
-			this_thing.find('#quotation_model_number').html('');
-			this_thing.find('#quotation_part_name').html('');
 		});
 
 	//on selecting a model_name
-		$('.quotation_entry_table tr td #quotation_model_name').change(function()
+		$('.quotation_entry_table tr #quotation_model_name').change(function()
 		{
-			$(this).attr('disabled', 'disabled');
-			var this_thing = $(this).parent().parent();
+			$(this).attr('disabled', 'disabled').css('border', '1px solid lightgrey');
 
+			this_thing = $(this);
 			model_name = $(this).val();
-			var query = "SELECT model_number FROM stock WHERE model_name ='" + model_name + "' AND creator_branch_code = '" + creator_branch_code + "' GROUP BY model_number";
+			var query = "SELECT model_number FROM inventory WHERE model_name ='" + model_name + "' AND brand ='" + brand + "' GROUP BY model_number";
 			var to_get = "model_number";
 
 			$.post('php/product_query_runner.php', {query:query , to_get:to_get}, function(data)
 			{
 				//alert(data);
-				this_thing.find('#quotation_model_number').html(data);
+				this_thing.parent().parent().find('#quotation_model_number').html(data);
 			});
-
-		//emptying 
-			this_thing.find('#quotation_part_name').html('');
 		});
 
 	//on selecting a model_number
-		$('.quotation_entry_table tr td #quotation_model_number').change(function()
+		$('.quotation_entry_table tr #quotation_model_number').change(function()
 		{
-			$('.gen_quotation_span').html("<img class=\"gif_loader\" src=\"img/loaders1.gif\">");
-
 			$(this).attr('disabled', 'disabled');
-			var this_thing = $(this).parent().parent();
+			this_thing = $(this);
+			model_number = $(this).val();
 
-			model_number = $(this).val(); //making it universal variable to use in, on selecting a part_name
-
-		//giving options to choose from part_name
-			var query = "SELECT part_name FROM stock WHERE model_number ='" + model_number + "' AND model_name = '" + model_name + "' AND creator_branch_code = '" + creator_branch_code + "' GROUP BY part_name";
-			var to_get = "part_name";
-
-			$.post('php/product_query_runner.php', {query:query , to_get:to_get}, function(data)
-			{
-				//alert(data);
-				this_thing.find('#quotation_part_name').html(data);
-			});
-
-		//checking the availability of that item in stock			
-			var query = "SELECT in_stock FROM stock WHERE model_number ='" + model_number + "' AND model_name = '" + model_name + "' AND brand = '" + brand + "' AND creator_branch_code = '" + creator_branch_code + "'";
-			var to_get = "in_stock";
+		//populating hsn code
+			var query = "SELECT hsn_code FROM inventory WHERE model_number ='" + model_number + "' AND model_name = '" + model_name + "' AND brand = '" + brand + "'";
+			var to_get = "hsn_code";
 
 			$.post('php/query_result_viewer.php', {query:query , to_get:to_get}, function(data)
 			{
-				if(data == '0') //if the item is not available in stock
-				{
-					$('.gen_quotation_span').html('The item you have selected is not available at your branch. Click on See Availability button to see the availability of that item in different branches').css('color', 'red');
-					
-				//for generating see availability button
-					this_thing.find('#quotation_part_in_stock').attr('type', 'button').attr('value', 'See Availability').attr('disabled', false).addClass('change_branch_button').css('background', '#cc0000').css('color', 'white');
+				this_thing.parent().parent().find('#quotation_hsn_code').val(data);
+			});
 
-					$('.quotation_entry_table tr td .change_branch_button').click(function()
-					{
-						$('.user_module_content').html("<img class=\"gif_loader\" src=\"img/loaders1.gif\">").load('php/search_item_in_branch.php');
-					});
-				}
-				else
-				{
-					this_thing.find('#quotation_part_in_stock').val(data).attr('type', 'text').attr('disabled', true).removeClass('change_branch_button').css('background', 'none').css('color', 'black');
-					$('.gen_quotation_span').html('');
-				}
+		//populating description
+			var query = "SELECT description FROM inventory WHERE model_number ='" + model_number + "' AND model_name = '" + model_name + "' AND brand = '" + brand + "'";
+			var to_get = "description";
+
+			$.post('php/query_result_viewer.php', {query:query , to_get:to_get}, function(data)
+			{
+				this_thing.parent().parent().find('#quotation_description').val(data);
 			});
 		});
 
-	//on selecting a part_name
-		$('.quotation_entry_table tr td #quotation_part_name').change(function()
+	//on entering cgst rate
+		$('.quotation_entry_table tr #quotation_part_cgst').keyup(function()
 		{
-			$('.gen_quotation_span').html("<img class=\"gif_loader\" src=\"img/loaders1.gif\">");
+			var quantity = parseInt($(this).parent().parent().find('#quotation_part_quantity').val());
+			var rate = parseInt($(this).parent().parent().find('#quotation_part_rate').val());
+			var cgst_rate = parseInt($(this).parent().parent().find('#quotation_part_cgst').val());
 
-			$(this).attr('disabled', 'disabled');
-			var this_thing = $(this).parent().parent();
+			var cgst_amount = (rate*cgst_rate/100)*quantity;
 
-			part_name = $(this).val();
+			$(this).parent().parent().find('#quotation_cgst_amount').val(cgst_amount);
+		});
 
-		//checking the availability of that item in stock			
-			var query = "SELECT in_stock FROM stock WHERE model_number ='" + model_number + "' AND model_name = '" + model_name + "' AND brand = '" + brand + "' AND part_name = '" + part_name + "' AND creator_branch_code = '" + creator_branch_code + "'";
-			var to_get = "in_stock";
+	//on entering sgst rate
+		$('.quotation_entry_table tr #quotation_part_sgst').keyup(function()
+		{
+			var quantity = parseInt($(this).parent().parent().find('#quotation_part_quantity').val());
+			var rate = parseInt($(this).parent().parent().find('#quotation_part_rate').val());
+			var sgst_rate = parseInt($(this).parent().parent().find('#quotation_part_sgst').val());
 
-			$.post('php/query_result_viewer.php', {query:query , to_get:to_get}, function(data)
-			{
-				if(data == '0') //if the item is not available in stock
-				{
-					$('.gen_quotation_span').html('The item you have selected is not available at your branch. Click on See Availability button to see the availability of that item in different branches').css('color', 'red');
-					
-				//for generating see availability button
-					this_thing.find('#quotation_part_in_stock').attr('type', 'button').attr('value', 'See Availability').attr('disabled', false).addClass('change_branch_button').css('background', '#cc0000').css('color', 'white');
+			var sgst_amount = (rate*sgst_rate/100)*quantity;
 
-					$('.quotation_entry_table tr td .change_branch_button').click(function()
-					{
-						$('.user_module_content').html("<img class=\"gif_loader\" src=\"img/loaders1.gif\">").load('php/search_item_in_branch.php');
-					});
-				}
-				else
-				{
-					this_thing.find('#quotation_part_in_stock').val(data).attr('type', 'text').attr('disabled', true).removeClass('change_branch_button').css('background', 'none').css('color', 'black');
-					$('.gen_quotation_span').html('');
-				}
-			});
+			$(this).parent().parent().find('#quotation_sgst_amount').val(sgst_amount);
+		});
+
+	//on entering igst rate
+		$('.quotation_entry_table tr #quotation_part_igst').keyup(function()
+		{
+			var quantity = parseInt($(this).parent().parent().find('#quotation_part_quantity').val());
+			var rate = parseInt($(this).parent().parent().find('#quotation_part_rate').val());
+			var igst_rate = parseInt($(this).parent().parent().find('#quotation_part_igst').val());
+
+			var igst_amount = (rate*igst_rate/100)*quantity;
+
+			$(this).parent().parent().find('#quotation_igst_amount').val(igst_amount);
 		});
 
 	//on clicking on calculate
-		$('.quotation_entry_table tr td #quotation_part_total_price').click(function()
+		$('.quotation_entry_table tr #quotation_part_total_price').click(function()
 		{
 			var quantity = parseInt($(this).parent().parent().find('#quotation_part_quantity').val());
 			var rate = parseInt($(this).parent().parent().find('#quotation_part_rate').val());
@@ -337,52 +301,65 @@
 		});
 
 	//on change of quantity, rate or gst after calculation
-		$('.quotation_entry_table tr td #quotation_part_quantity').keyup(function()
+		$('.quotation_entry_table tr #quotation_part_quantity').keyup(function()
+		{
+			$(this).parent().parent().find('#quotation_part_total_price').val('calculate');
+
+		//updating gst amounts
+			var quantity = $(this).val();
+			var rate = parseInt($(this).parent().parent().find('#quotation_part_rate').val());
+
+			var cgst_rate = parseInt($(this).parent().parent().find('#quotation_part_cgst').val());
+			var sgst_rate = parseInt($(this).parent().parent().find('#quotation_part_sgst').val());
+			var igst_rate = parseInt($(this).parent().parent().find('#quotation_part_igst').val());
+
+			var cgst_amount = (rate*cgst_rate/100)*quantity;
+			var sgst_amount = (rate*sgst_rate/100)*quantity;
+			var igst_amount = (rate*igst_rate/100)*quantity;
+
+			$(this).parent().parent().find('#quotation_cgst_amount').val(cgst_amount);
+			$(this).parent().parent().find('#quotation_sgst_amount').val(sgst_amount);
+			$(this).parent().parent().find('#quotation_igst_amount').val(igst_amount);
+		});
+
+		$('.quotation_entry_table tr #quotation_part_rate').keyup(function()
+		{
+			$(this).parent().parent().find('#quotation_part_total_price').val('calculate');
+
+		//updating gst amounts
+			var rate = $(this).val();
+			var quantity = parseInt($(this).parent().parent().find('#quotation_part_quantity').val());
+
+			var cgst_rate = parseInt($(this).parent().parent().find('#quotation_part_cgst').val());
+			var sgst_rate = parseInt($(this).parent().parent().find('#quotation_part_sgst').val());
+			var igst_rate = parseInt($(this).parent().parent().find('#quotation_part_igst').val());
+
+			var cgst_amount = (rate*cgst_rate/100)*quantity;
+			var sgst_amount = (rate*sgst_rate/100)*quantity;
+			var igst_amount = (rate*igst_rate/100)*quantity;
+
+			$(this).parent().parent().find('#quotation_cgst_amount').val(cgst_amount);
+			$(this).parent().parent().find('#quotation_sgst_amount').val(sgst_amount);
+			$(this).parent().parent().find('#quotation_igst_amount').val(igst_amount);
+		});
+
+		$('.quotation_entry_table tr #quotation_part_cgst').keyup(function()
 		{
 			$(this).parent().parent().find('#quotation_part_total_price').val('calculate');
 		});
 
-		$('.quotation_entry_table tr td #quotation_part_rate').keyup(function()
+		$('.quotation_entry_table tr #quotation_part_sgst').keyup(function()
 		{
 			$(this).parent().parent().find('#quotation_part_total_price').val('calculate');
 		});
 
-		$('.quotation_entry_table tr td #quotation_part_cgst').keyup(function()
+		$('.quotation_entry_table tr #quotation_part_igst').keyup(function()
 		{
 			$(this).parent().parent().find('#quotation_part_total_price').val('calculate');
-		});
-
-		$('.quotation_entry_table tr td #quotation_part_sgst').keyup(function()
-		{
-			$(this).parent().parent().find('#quotation_part_total_price').val('calculate');
-		});
-
-		$('.quotation_entry_table tr td #quotation_part_igst').keyup(function()
-		{
-			$(this).parent().parent().find('#quotation_part_total_price').val('calculate');
-		});
-
-	//on entering quantity
-		$('.quotation_entry_table tr td #quotation_part_quantity').keyup(function()
-		{
-			var quantity = parseInt($(this).val());
-			this_thing = $(this); 
-			var in_stock = parseInt(this_thing.parent().parent().find('#quotation_part_in_stock').val());
-
-			if(quantity > in_stock)
-			{
-				$('.gen_quotation_span').html("You have entered more quantity than available in-stock at your branch. You can check its availability by clicking on availability tab.").css('color', 'red');
-				$('.warn_box').text("Quantity is more than the available in-stock at the branch.");
-				$('.warn_box').fadeIn(200).delay(3000).fadeOut(200);
-			}
-			else
-			{
-				$('.gen_quotation_span').html("");
-			}
 		});
 
 	//on clicking on delete goods button
-		$('.quotation_entry_table tr td .item_delete_icon').click(function()
+		$('.quotation_entry_table tr .item_delete_icon').click(function()
 		{
 			$('.gen_quotation_span').html("<img class=\"gif_loader\" src=\"img/loaders1.gif\">");
 
@@ -403,8 +380,6 @@
 					$('.gen_quotation_span').html("Something weant wrong while deleting the row from database").css('color', 'red');
 				}
 			});
-
-			//$(this).parent().parent().remove();
 		});
 	
 	//on clicking on add new goods button
@@ -423,7 +398,7 @@
 			var quotation_serial_num = '';
 			var quotation_service_id = '';
 
-			var type = 'sales';
+			var type = '';
 
 		//creating a new id in database to store this row
 			$.post('php/create_new_quotation_row_db.php', {quotation_customer: quotation_customer, quotation_date: quotation_date, quotation_num:quotation_num, quotation_brand:quotation_brand, quotation_model_name:quotation_model_name, quotation_model_number:quotation_model_number, quotation_serial_num:quotation_serial_num, quotation_service_id:quotation_service_id, type:type}, function(e)
@@ -431,7 +406,7 @@
 				if(e != 0)
 				{
 					var new_id = e;
-					$.post('php/add_new_goods_form.php', {new_id: new_id},function(data)
+					$.post('php/add_new_quotation_item.php', {new_id: new_id},function(data)
 					{
 						$('.quotation_entry_table tbody').append(data);
 						$('.gen_quotation_span').html("Row has been successfully added").css('color', 'green');
@@ -462,7 +437,6 @@
 				var count = $(".quotation_entry_table tr").length;
 				var row_count = count -1;
 
-				//alert(row_count);
 				var i = 1;
 				for(i; i<= row_count; i++)
 				{
@@ -472,31 +446,29 @@
 					var quotation_id = $('.quotation_entry_table tr:nth-child('+ child_no + ')').attr('id');
 					
 					var quotation_serial = child_no - 1;
-					var quotation_description = $.trim($('.quotation_entry_table tr:nth-child('+ child_no + ') #quotation_description').val());
 
 					var quotation_brand = $.trim($('.quotation_entry_table tr:nth-child('+ child_no + ') #quotation_brand').val());
 					var quotation_model_name = $.trim($('.quotation_entry_table tr:nth-child('+ child_no + ') #quotation_model_name').val());
 					var quotation_model_number = $.trim($('.quotation_entry_table tr:nth-child('+ child_no + ') #quotation_model_number').val());
-					var quotation_serial_num = $.trim($('.quotation_entry_table tr:nth-child('+ child_no + ') #quotation_serial_num').val());
-					var quotation_service_id = $.trim($('.quotation_entry_table tr:nth-child('+ child_no + ') #quotation_service_id').val());
+					var quotation_part_hsn_code = $.trim($('.quotation_entry_table tr:nth-child('+ child_no + ') #quotation_hsn_code').val());
+					var quotation_description = $.trim($('.quotation_entry_table tr:nth-child('+ child_no + ') #quotation_description').val());
 
-					var quotation_part_name = $.trim($('.quotation_entry_table tr:nth-child('+ child_no + ') #quotation_part_name').val());
-					var quotation_part_serial_num = $.trim($('.quotation_entry_table tr:nth-child('+ child_no + ') #quotation_part_serial_num').val());
-
+					var quotation_service_id = $('.quotation_entry_table tr:nth-child('+ child_no + ') #quotation_service_id').val();
 					var quotation_part_quantity = parseInt($('.quotation_entry_table tr:nth-child('+ child_no + ') #quotation_part_quantity').val());
 					var quotation_part_rate = parseInt($('.quotation_entry_table tr:nth-child('+ child_no + ') #quotation_part_rate').val());
 					var quotation_part_cgst = parseInt($('.quotation_entry_table tr:nth-child('+ child_no + ') #quotation_part_cgst').val());
 					var quotation_part_sgst = parseInt($('.quotation_entry_table tr:nth-child('+ child_no + ') #quotation_part_sgst').val());
 					var quotation_part_igst = parseInt($('.quotation_entry_table tr:nth-child('+ child_no + ') #quotation_part_igst').val());
-
-					var quotation_part_hsn_code = $.trim($('.quotation_entry_table tr:nth-child('+ child_no + ') #quotation_part_hsn_code').val());
 					var quotation_part_total_price = $.trim($('.quotation_entry_table tr:nth-child('+ child_no + ') #quotation_part_total_price').val());
-					var type = "sales";
+					
+					var type = "";
+					var quotation_serial_num = "";
+					var quotation_part_name = "";
+					var quotation_part_serial_num = "";
 
 				//if user forget to calculate total price
 					if(quotation_part_total_price == "calculate")
 					{
-						//alert('plx calculate');
 						var quotation_part_total_price = (quotation_part_rate + (quotation_part_rate * (quotation_part_cgst+quotation_part_sgst+quotation_part_igst)/100))*quotation_part_quantity;
 					}
 
@@ -507,13 +479,13 @@
 					{
 						if(e==1)
 						{
-							$('.user_edit_span').text('Successfully edited').css('color','green');
-							$('#user_edit_form').fadeOut(0);
-							$('.user_module_content').html("<img class=\"gif_loader\" src=\"img/loaders1.gif\">").load('php/admin_manage_quotation.php');
+						//disappearing the user entry form							
+							$('.user_entry_form').fadeOut(0);
+							$('.gen_quotation_span').text('Successfully edited').css('color','green');
 						}
 						else
 						{
-							$('.user_edit_span').text('Something went wrong while editing the supplier').css('color','red');
+							$('.gen_quotation_span').text('Something went wrong while editing the quotation').css('color','red');
 						}
 					});
 				}
