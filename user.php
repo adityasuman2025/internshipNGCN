@@ -92,12 +92,6 @@
 				</ul>
 			</li>
 
-			<li>Availabilty
-				<ul>
-					<li work="search_item_in_branch">Check Availabilty</li>
-				</ul>
-			</li>
-
 			<li>Report
 				<ul>
 					<li work="quotation_report">Quotation Report</li>
@@ -212,12 +206,12 @@
 		$('#dashboard_button').click(function()
 		{
 			$('.user_module_heading').text('User Dashboard');
-			$('.user_module_content').html("<img class=\"gif_loader\" src=\"img/loaders1.gif\">").load('php/user_dashboard.php');
+			$('.user_module_content').html("<img class=\"gif_loader\" src=\"img/loaders1.gif\">").load('php/dashboard.php');
 		});
 
 	//by default dashboard is opened
 		$('.user_module_heading').text('User Dashboard');
-		$('.user_module_content').html("<img class=\"gif_loader\" src=\"img/loaders1.gif\">").load('php/user_dashboard.php');
+		$('.user_module_content').html("<img class=\"gif_loader\" src=\"img/loaders1.gif\">").load('php/dashboard.php');
 		$('#dashboard_button').css('background', '#3e454c').css('border-left', '5px solid #cc0000');
 		
 	</script>

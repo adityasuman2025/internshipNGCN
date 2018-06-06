@@ -5,22 +5,19 @@
 
 <!-----inventory form---->
 	<div class="inventory_form">
+		Is a Product or Part or Service
+		<br>
+		<select id="inv_type">
+			<option value=""></option>
+			<option value="product">Product</option>
+			<option value="part">Part</option>
+			<option value="service">Service</option>
+		</select>
+		<br><br>
+
 		Brand:<br>
 		<select id="inv_brand">
 			<option value=""></option>
-
-			<?php
-				$get_brand_query = "SELECT brand FROM inventory GROUP BY brand";
-				$get_brand_query_run = mysqli_query($connect_link, $get_brand_query);
-
-				while($get_brand_result = mysqli_fetch_assoc($get_brand_query_run))
-				{
-					$brand = $get_brand_result['brand'];
-					echo "<option value=\"$brand\">";
-						echo $brand;
-					echo "</option>";
-				}
-			?>	
 		</select>
 		<br><br>
 
@@ -58,13 +55,29 @@
 
 <!-----------script------------>
 	<script type="text/javascript">
+	//on selecting a type
+		$('#inv_type').change(function()
+		{
+			type = $(this).val();
+			$(this).attr('disabled', true).css('border', '1px solid lightgrey');
+
+		//populating brand
+			var query = "SELECT brand FROM inventory WHERE type ='" + type + "' GROUP BY brand";
+			var to_get = "brand";
+
+			$.post('php/product_query_runner.php', {query:query , to_get:to_get}, function(data)
+			{
+				$('#inv_brand').html(data);
+			});
+		});
+
 	//on selecting a brand
 		$('#inv_brand').change(function()
 		{
 			$(this).attr('disabled', 'disabled').css('border', '1px solid lightgrey');
 
 			brand = $(this).val();
-			var query = "SELECT model_name FROM inventory WHERE brand ='" + brand + "' GROUP BY model_name";
+			var query = "SELECT model_name FROM inventory WHERE brand ='" + brand + "' AND type = '" + type + "' GROUP BY model_name";
 			var to_get = "model_name";
 
 			$.post('php/product_query_runner.php', {query:query , to_get:to_get}, function(data)
@@ -80,7 +93,7 @@
 			$(this).attr('disabled', 'disabled').css('border', '1px solid lightgrey');
 
 			model_name = $(this).val();
-			var query = "SELECT model_number FROM inventory WHERE model_name ='" + model_name + "' GROUP BY model_number";
+			var query = "SELECT model_number FROM inventory WHERE model_name ='" + model_name + "' AND type = '" + type + "' GROUP BY model_number";
 			var to_get = "model_number";
 
 			$.post('php/product_query_runner.php', {query:query , to_get:to_get}, function(data)
@@ -93,12 +106,12 @@
 	//on selecting a model_number
 		$('#inv_model_number').change(function()
 		{
-			$(this).attr('disabled', 'disabled');
+			$(this).attr('disabled', 'disabled').css('border', '1px solid lightgrey');
 			this_thing = $(this);
 			model_number = $(this).val();
 
 		//populating hsn code
-			var query = "SELECT hsn_code FROM inventory WHERE model_number ='" + model_number + "' AND model_name = '" + model_name + "' AND brand = '" + brand + "'";
+			var query = "SELECT hsn_code FROM inventory WHERE model_number ='" + model_number + "' AND model_name = '" + model_name + "' AND brand = '" + brand + "' AND type = '" + type + "'";
 			var to_get = "hsn_code";
 
 			$.post('php/query_result_viewer.php', {query:query , to_get:to_get}, function(data)
@@ -107,7 +120,7 @@
 			});
 
 		//populating description
-			var query = "SELECT description FROM inventory WHERE model_number ='" + model_number + "' AND model_name = '" + model_name + "' AND brand = '" + brand + "'";
+			var query = "SELECT description FROM inventory WHERE model_number ='" + model_number + "' AND model_name = '" + model_name + "' AND brand = '" + brand + "' AND type = '" + type + "'";
 			var to_get = "description";
 
 			$.post('php/query_result_viewer.php', {query:query , to_get:to_get}, function(data)
@@ -121,6 +134,7 @@
 		{
 			$('.inventory_feed').html("<img class=\"gif_loader\" src=\"img/loaders1.gif\">");
 			
+			var inv_type = $.trim($('#inv_type').val());
 			var inv_brand = $.trim($('#inv_brand').val());
 			var inv_model_name = $.trim($('#inv_model_name').val());
 			var inv_model_num = $.trim($('#inv_model_number').val());
@@ -131,22 +145,20 @@
 			var inv_sales_price = $.trim($('#inv_sales_price').val());
 			var inv_supplier_price = $.trim($('#inv_supplier_price').val());
 			
-			var inv_type = "";
 			var inv_part_name = "";
 			var inv_part_number = "";
 
-			if(inv_brand !="" && inv_model_name !="" && inv_model_num !="" && inv_quantity !="")
+			if(inv_type !="" && inv_brand !="" && inv_model_name !="" && inv_quantity !="")
 			{	
 			//checking if that product or part is already added in the sock or not
 				var creator_branch_code = "<?php echo $creator_branch_code; ?>";
-				var query_recieved = "SELECT id FROM stock WHERE brand = '" + inv_brand + "' && model_name = '" + inv_model_name + "' && model_number = '" + inv_model_num + "' AND creator_branch_code = '" + creator_branch_code + "'";
+				var query_recieved = "SELECT id FROM stock WHERE brand = '" + inv_brand + "' && model_name = '" + inv_model_name + "' && model_number = '" + inv_model_num + "' AND creator_branch_code = '" + creator_branch_code + "' AND type ='" + inv_type + "'";
 
 				$.post('php/query_result_counter.php', {query_recieved: query_recieved}, function(e)
 				{
-					//alert(e);
 					if(e == 0)
 					{
-						$.post('php/create_stock.php', {inv_brand:inv_brand, inv_model_name:inv_model_name, inv_model_num:inv_model_num, inv_part_name:inv_part_name, inv_part_number:inv_part_number, inv_quantity:inv_quantity, inv_type:inv_type, inv_sales_price:inv_sales_price, inv_supplier_price:inv_supplier_price, inv_hsn_code:inv_hsn_code}, function(e)
+						$.post('php/create_stock.php', {inv_type:inv_type, inv_brand:inv_brand, inv_model_name:inv_model_name, inv_model_num:inv_model_num, inv_part_name:inv_part_name, inv_part_number:inv_part_number, inv_quantity:inv_quantity, inv_type:inv_type, inv_sales_price:inv_sales_price, inv_supplier_price:inv_supplier_price, inv_hsn_code:inv_hsn_code}, function(e)
 						{
 							if(e == 1)
 							{

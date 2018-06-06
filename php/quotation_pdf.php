@@ -477,7 +477,7 @@
 
 			$item_description = $get_item_info_assoc['description'];
 			$item_part_name = $get_item_info_assoc['part_name'];
-			$item_part_serial_number = $get_item_info_assoc['part_serial_num'];
+			$purchase_order = $get_item_info_assoc['purchase_order'];
 			$item_hsn_code = $get_item_info_assoc['hsn_code'];
 
 			$item_quantity = $get_item_info_assoc['quantity'];
@@ -502,7 +502,7 @@
 			}
 			else if ($type == 'sales')
 			{
-				$pdf->Cell(82, 5, $item_brand . ' ' . $item_model_name . ' ' . $item_model_number . ' ' . $item_part_name . ' (Serial: ' . $item_part_serial_number . ')', 0, 0);
+				$pdf->Cell(82, 5, $item_brand . ' ' . $item_model_name . ' ' . $item_model_number . ' ' . $item_part_name . ' (Serial: ' . $purchase_order . ')', 0, 0);
 			}
 			
 			$pdf->Cell(13, 5, $item_hsn_code ,'L', 0,'C');	

@@ -143,7 +143,7 @@
 					</td>
 
 					<td><input type="text" disabled="disabled" id="quotation_hsn_code"></td>
-					<td><input type="text" disabled="disabled" id="quotation_description"></td>
+					<td><input type="text" id="quotation_description"></td>
 
 					<td><input type="text" id="quotation_serial_num"></td>					
 					<td><input type="text" id="quotation_service_id"></td>
@@ -498,7 +498,7 @@
 			});
 		});
 
-	//on clicking on add quotation button
+	//on clicking on add invoice button
 		$('#quotation_gen_button').click(function()
 		{
 			$('.gen_quotation_span').html("<img class=\"gif_loader\" src=\"img/loaders1.gif\">");
@@ -631,25 +631,7 @@
 	//on clicking on view quotation button
 		$('.view_quotation_button').click(function()
 		{	
-		//for getting pdf of the quotation
-			var quotation_num = "<?php echo $new_quotation_num?>";
-			var session_of = quotation_num;
-			var session_name = "pdf_quotation_of";
-				
-			$.post('php/session_creator.php', {session_of: session_of, session_name: session_name}, function(e)
-			{
-				if(e ==1)
-				{
-					window.open('php/quotation_pdf.php', '_blank');	
-				}
-				else
-				{
-					$('.warn_box').text("Something went wrong while generating pdf file of the quotation.");
-					$('.warn_box').fadeIn(200).delay(3000).fadeOut(200);
-				}
-			});
-
-			//window.open('php/quotation_pdf.php', '_blank');	
+		
 		});
 	
 	</script>

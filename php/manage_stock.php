@@ -12,8 +12,9 @@
 		<table id="table_export2" class="part_only_table">
 			<tr>
 				<th>Brand</th>
-				<th>Model Name</th>
-				<th>Model Number</th>
+				<th>Type</th>
+				<th>Product/Part</th>
+				<th>Product/Part Code</th>
 				<th>HSN Code</th>
 				
 				<th>Sold Items</th>
@@ -38,6 +39,7 @@
 					echo "<tr>";
 						
 						echo "<td>" . $list_user_assoc['brand'] . "</td>";
+						echo "<td>" . $list_user_assoc['type'] . "</td>";
 						echo "<td>" . $list_user_assoc['model_name'] . "</td>";
 						echo "<td>" . $list_user_assoc['model_number'] . "</td>";
 						echo "<td>" . $list_user_assoc['hsn_code'] . "</td>";

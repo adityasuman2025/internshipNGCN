@@ -49,7 +49,7 @@
 	</td>
 
 	<td><input type="text" disabled="disabled" id="quotation_hsn_code"></td>
-	<td><input type="text" disabled="disabled" id="quotation_description"></td>
+	<td><input type="text" id="quotation_description"></td>
 
 	<td><input type="text" id="quotation_serial_num"></td>					
 	<td><input type="text" id="quotation_service_id"></td>

@@ -39,6 +39,7 @@
 
 		<table class="purchase_entry_table">
 			<tr>
+				<th>Type</th>
 				<th>Brand</th>
 				<th>Product/part</th>
 				<th>Product/part Code</th>
@@ -59,18 +60,17 @@
 
 			<tr>
 				<td>
+					<select id="purchase_type">
+						<option value=""></option>
+						<option value="product">Product</option>
+						<option value="part">Part</option>
+						<option value="service">Service</option>
+					</select>
+				</td>
+
+				<td>
 					<select id="purchase_brand">
 						<option value=""></option>
-						<?php
-							$choose_purchase_brand_query = "SELECT brand FROM inventory GROUP BY brand";
-							$choose_purchase_brand_query_run = mysqli_query($connect_link, $choose_purchase_brand_query);
-
-							while($choose_purchase_brand = mysqli_fetch_assoc($choose_purchase_brand_query_run))
-							{
-								$purchase_brand = $choose_purchase_brand['brand'];
-								echo "<option value=\"$purchase_brand\">$purchase_brand</option>";
-							}
-						?>					
 					</select>
 				</td>
 
@@ -87,7 +87,7 @@
 				</td>
 
 				<td><input type="text" disabled="disabled" id="purchase_hsn_code"></td>
-				<td><input type="text" disabled="disabled" id="purchase_description"></td>
+				<td><input type="text" id="purchase_description"></td>
 
 				<td><input type="number" value="0" placeholder="Quantity" id="purchase_quantity"></td>
 				<td><input type="number" value="0" placeholder="Rate per unit" id="purchase_rate"></td>
@@ -125,15 +125,32 @@
 			$('.user_module_content').html("<img class=\"gif_loader\" src=\"img/loaders1.gif\">").load('php/add_supplier.php');
 		});
 
+	//on selecting a type
+		$('.purchase_entry_table tr #purchase_type').change(function()
+		{
+			type = $(this).val();
+			this_thing = $(this);
+			$(this).attr('disabled', true);
+
+		//populating brand
+			var query = "SELECT brand FROM inventory WHERE type ='" + type + "' GROUP BY brand";
+			var to_get = "brand";
+
+			$.post('php/product_query_runner.php', {query:query , to_get:to_get}, function(data)
+			{
+				this_thing.parent().parent().find('#purchase_brand').html(data);
+			});
+		});
+
 	//on selecting a brand
 		$('.purchase_entry_table tr #purchase_brand').change(function()
 		{
 			brand = $(this).val();
 			this_thing = $(this);
-			$(this).attr('disabled', true)
+			$(this).attr('disabled', true);
 
 		//populating product/part according to the selected brand
-			var query = "SELECT model_name FROM inventory WHERE brand ='" + brand + "' GROUP BY model_name";
+			var query = "SELECT model_name FROM inventory WHERE brand ='" + brand + "' AND type = '" + type + "' GROUP BY model_name";
 			var to_get = "model_name";
 
 			$.post('php/product_query_runner.php', {query:query , to_get:to_get}, function(data)
@@ -151,7 +168,7 @@
 			model_name = $(this).val();
 
 		//populating product/part code according to the selected brand	
-			var query = "SELECT model_number FROM inventory WHERE model_name ='" + model_name + "' AND brand ='" + brand + "' GROUP BY model_number";
+			var query = "SELECT model_number FROM inventory WHERE model_name ='" + model_name + "' AND brand ='" + brand + "' AND type = '" + type + "' GROUP BY model_number";
 			var to_get = "model_number";
 
 			$.post('php/product_query_runner.php', {query:query , to_get:to_get}, function(data)
@@ -168,7 +185,7 @@
 			model_number = $(this).val();
 
 		//populating hsn code
-			var query = "SELECT hsn_code FROM inventory WHERE model_number ='" + model_number + "' AND model_name = '" + model_name + "' AND brand = '" + brand + "'";
+			var query = "SELECT hsn_code FROM inventory WHERE model_number ='" + model_number + "' AND model_name = '" + model_name + "' AND brand = '" + brand + "' AND type = '" + type + "'";
 			var to_get = "hsn_code";
 
 			$.post('php/query_result_viewer.php', {query:query , to_get:to_get}, function(data)
@@ -177,7 +194,7 @@
 			});
 
 		//populating description
-			var query = "SELECT description FROM inventory WHERE model_number ='" + model_number + "' AND model_name = '" + model_name + "' AND brand = '" + brand + "'";
+			var query = "SELECT description FROM inventory WHERE model_number ='" + model_number + "' AND model_name = '" + model_name + "' AND brand = '" + brand + "' AND type = '" + type + "'";
 			var to_get = "description";
 
 			$.post('php/query_result_viewer.php', {query:query , to_get:to_get}, function(data)
@@ -303,6 +320,7 @@
 					var child_no = i + 1;
 
 				//defining variables of each table row
+					var purchase_type = $('.purchase_entry_table tr:nth-child('+ child_no + ') #purchase_type').val();
 					var purchase_brand = $('.purchase_entry_table tr:nth-child('+ child_no + ') #purchase_brand').val();
 					var purchase_model_name = $('.purchase_entry_table tr:nth-child('+ child_no + ') #purchase_model_name').val();
 					var purchase_model_num = $('.purchase_entry_table tr:nth-child('+ child_no + ') #purchase_model_num').val();
@@ -323,7 +341,7 @@
 					}
 				
 				//adding this to database	
-					$.post('php/create_purchase.php', {purchase_supplier: purchase_supplier, purchase_date: purchase_date, purchase_inv_num:purchase_inv_num, purchase_brand:purchase_brand, purchase_model_name:purchase_model_name, purchase_model_num:purchase_model_num, purchase_hsn_code:purchase_hsn_code, purchase_description:purchase_description, purchase_quantity:purchase_quantity, purchase_rate:purchase_rate, purchase_cgst_rate:purchase_cgst_rate, purchase_sgst_rate:purchase_sgst_rate, purchase_igst_rate:purchase_igst_rate, purchase_total_amount:purchase_total_amount}, function(e)
+					$.post('php/create_purchase.php', {purchase_supplier: purchase_supplier, purchase_date: purchase_date, purchase_inv_num:purchase_inv_num, purchase_type:purchase_type, purchase_brand:purchase_brand, purchase_model_name:purchase_model_name, purchase_model_num:purchase_model_num, purchase_hsn_code:purchase_hsn_code, purchase_description:purchase_description, purchase_quantity:purchase_quantity, purchase_rate:purchase_rate, purchase_cgst_rate:purchase_cgst_rate, purchase_sgst_rate:purchase_sgst_rate, purchase_igst_rate:purchase_igst_rate, purchase_total_amount:purchase_total_amount}, function(e)
 					{
 						if(e==1)
 						{

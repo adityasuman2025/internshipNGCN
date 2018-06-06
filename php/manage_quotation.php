@@ -115,40 +115,23 @@
 	//on clicking on view icon
 		$('.user_view_icon').click(function()
 		{
-			var quotation_num =  $.trim($(this).attr('quotation_num'));
+		// 	var quotation_num =  $.trim($(this).attr('quotation_num'));
 
-		//for getting pdf of the quotation
-			var session_of = quotation_num;
-			var session_name = "pdf_quotation_of";
+		// //for getting pdf of the quotation
+		// 	var session_of = quotation_num;
+		// 	var session_name = "pdf_quotation_of";
 				
-			$.post('php/session_creator.php', {session_of: session_of, session_name: session_name}, function(e)
-			{
-				if(e ==1)
-				{
-					window.open('php/quotation_pdf.php', '_blank');	
-				}
-				else
-				{
-					$('.warn_box').text("Something went wrong while generating pdf file of the quotation.");
-					$('.warn_box').fadeIn(200).delay(3000).fadeOut(200);
-				}
-			});
-
-			//window.open('php/quotation_pdf.php', '_blank');	
-		});
-		
-	//on clicking on convert quotation into invoice button 
-		// $('.quot_into_invoice_button').click(function()
-		// {
-		// 	var quotation_num = $(this).attr('quotation_num');
-
-		// 	$('.ajax_loader_bckgrnd').fadeIn(400);
-					
-		// 	$.post('php/quotation_into_invoice.php', {quotation_num:quotation_num}, function(data)
+		// 	$.post('php/session_creator.php', {session_of: session_of, session_name: session_name}, function(e)
 		// 	{
-		// 		//alert(data);
-		// 		$('.ajax_loader_box').fadeIn(400);
-		// 		$('.ajax_loader_content').html(data);
-		// 	});					
-		// });
+		// 		if(e ==1)
+		// 		{
+		// 			window.open('php/quotation_pdf.php', '_blank');	
+		// 		}
+		// 		else
+		// 		{
+		// 			$('.warn_box').text("Something went wrong while generating pdf file of the quotation.");
+		// 			$('.warn_box').fadeIn(200).delay(3000).fadeOut(200);
+		// 		}
+		// 	});
+		});
 	</script>

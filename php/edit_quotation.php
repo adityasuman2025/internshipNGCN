@@ -141,7 +141,7 @@
 									</td>";
 
 							echo "	<td><input type=\"text\" value=\"$hsn_code\" disabled=\"disabled\" id=\"quotation_hsn_code\"></td>
-									<td><input type=\"text\" value=\"$description\" disabled=\"disabled\" id=\"quotation_description\"></td>";
+									<td><input type=\"text\" value=\"$description\" id=\"quotation_description\"></td>";
 
 							echo "<td><input type=\"text\" value=\"$service_id\" id=\"quotation_service_id\"></td>";
 
