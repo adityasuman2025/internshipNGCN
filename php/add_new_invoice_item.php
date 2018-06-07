@@ -22,21 +22,18 @@
 ?>
 
 <tr fo="<?php echo $fo; ?>" id="<?php echo $new_id; ?>">
+		<td>
+		<select id="quotation_item_type">
+			<option value=""></option>
+			<option value="product">Product</option>
+			<option value="part">Part</option>
+			<option value="service">Service</option>
+		</select>
+	</td>
+
 	<td>
 		<select id="quotation_brand">
 			<option value=""></option>
-				<?php
-					$get_brand_query = "SELECT brand FROM stock WHERE creator_branch_code ='$creator_branch_code' GROUP BY brand";
-					$get_brand_query_run = mysqli_query($connect_link, $get_brand_query);
-
-					while($get_brand_result = mysqli_fetch_assoc($get_brand_query_run))
-					{
-						$brand = $get_brand_result['brand'];
-						echo "<option value=\"$brand\">";
-							echo $brand;
-						echo "</option>";
-					}
-				?>	
 		</select>	
 	</td>
 
@@ -76,6 +73,23 @@
 	<script type="text/javascript">
 		creator_branch_code = "<?php echo $creator_branch_code; ?>";
 
+	//on selecting a item type
+		$('.quotation_entry_table tr #quotation_item_type').change(function()
+		{
+			$(this).attr('disabled', 'disabled').css('border', '1px solid lightgrey');
+
+			this_thing = $(this);
+			type = $(this).val();
+			var query = "SELECT brand FROM stock WHERE type= '" + type + "' AND creator_branch_code = '" + creator_branch_code + "' GROUP BY brand";
+			var to_get = "brand";
+
+			$.post('php/product_query_runner.php', {query:query , to_get:to_get}, function(data)
+			{
+				//alert(data);
+				this_thing.parent().parent().find('#quotation_brand').html(data);
+			});
+		});
+
 	//on selecting a brand
 		$('.quotation_entry_table tr #quotation_brand').change(function()
 		{
@@ -83,7 +97,7 @@
 
 			this_thing = $(this);
 			brand = $(this).val();
-			var query = "SELECT model_name FROM stock WHERE brand ='" + brand + "' AND creator_branch_code ='" + creator_branch_code + "' GROUP BY model_name";
+			var query = "SELECT model_name FROM stock WHERE brand ='" + brand + "' AND type ='" + type + "' AND creator_branch_code ='" + creator_branch_code + "' GROUP BY model_name";
 			var to_get = "model_name";
 
 			$.post('php/product_query_runner.php', {query:query , to_get:to_get}, function(data)
@@ -100,7 +114,7 @@
 
 			this_thing = $(this);
 			model_name = $(this).val();
-			var query = "SELECT model_number FROM stock WHERE model_name ='" + model_name + "'AND brand = '" + brand + "' AND creator_branch_code ='" + creator_branch_code + "' GROUP BY model_number";
+			var query = "SELECT model_number FROM stock WHERE model_name ='" + model_name + "'AND brand = '" + brand + "' AND type ='" + type + "' AND creator_branch_code ='" + creator_branch_code + "' GROUP BY model_number";
 			var to_get = "model_number";
 
 			$.post('php/product_query_runner.php', {query:query , to_get:to_get}, function(data)
@@ -118,7 +132,7 @@
 			model_number = $(this).val();
 
 		//populating hsn code
-			var query = "SELECT hsn_code FROM stock WHERE model_number ='" + model_number + "' AND model_name = '" + model_name + "' AND brand = '" + brand + "' AND creator_branch_code ='" + creator_branch_code + "'";
+			var query = "SELECT hsn_code FROM stock WHERE model_number ='" + model_number + "' AND model_name = '" + model_name + "' AND brand = '" + brand + "' AND type ='" + type + "' AND creator_branch_code ='" + creator_branch_code + "'";
 			var to_get = "hsn_code";
 
 			$.post('php/query_result_viewer.php', {query:query , to_get:to_get}, function(data)
@@ -127,7 +141,7 @@
 			});
 
 		//populating description
-			var query = "SELECT description FROM inventory WHERE model_number ='" + model_number + "' AND model_name = '" + model_name + "' AND brand = '" + brand + "'";
+			var query = "SELECT description FROM inventory WHERE model_number ='" + model_number + "' AND model_name = '" + model_name + "' AND brand = '" + brand + "' AND type ='" + type + "'";
 			var to_get = "description";
 
 			$.post('php/query_result_viewer.php', {query:query , to_get:to_get}, function(data)
@@ -136,7 +150,7 @@
 			});
 
 		//populating availability
-			var query = "SELECT in_stock FROM stock WHERE model_number ='" + model_number + "' AND model_name = '" + model_name + "' AND brand = '" + brand + "' AND creator_branch_code ='" + creator_branch_code + "'";
+			var query = "SELECT in_stock FROM stock WHERE model_number ='" + model_number + "' AND model_name = '" + model_name + "' AND brand = '" + brand + "' AND type ='" + type + "' AND creator_branch_code ='" + creator_branch_code + "'";
 			var to_get = "in_stock";
 
 			$.post('php/query_result_viewer.php', {query:query , to_get:to_get}, function(data)

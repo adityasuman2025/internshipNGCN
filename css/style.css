@@ -656,6 +656,49 @@ body, html
 		background: #cc0000;
 	}
 
+	.quotation_search_div
+	{
+		background: #f1f1f1;
+		border-radius: 4px;
+		margin: auto;
+		padding: 5px;
+		display: block;
+		text-align: center;
+		width: 100%;
+	}
+
+	.quotation_search_div div
+	{
+		display: inline-block;
+	}
+
+	#quotation_search_suggestion
+	{
+		position: absolute;
+		height: 200px;
+		overflow-y: scroll;
+		overflow-x: hidden;
+		background: #f1f1f1;
+		text-align: left;
+		box-shadow: 0px 0px 1px grey;
+		display: none;
+	}
+
+	#search_result_span
+	{
+		width: 100%;
+		padding: 4px;
+		margin-top: 1px;
+		margin-bottom: 1px;
+		cursor: pointer;
+	}
+
+	#search_result_span:hover
+	{
+		background: lightgrey;
+	}
+
+
 /*----quotation listing area--------*/
 	.quotation_list_container
 	{

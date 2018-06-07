@@ -97,23 +97,30 @@
 					echo "<tr id=\"$id\">";
 						echo "<td>";
 							echo "<select id=\"purchase_type\">";
-								echo "<option value=\"$type\">$type</option>";
+							
+									echo "<option value=\"$type\">$type</option>";
 
-								if($type == "product")
-								{
-									echo "<option value=\"part\">Part</option>";
-									echo "<option value=\"service\">Service</option>";
-								}
-								else if($type == "part")
-								{
-									echo "<option value=\"product\">Product</option>";
-									echo "<option value=\"service\">Service</option>";
-								}
-								else if($type == "service")
-								{
-									echo "<option value=\"product\">Product</option>";
-									echo "<option value=\"part\">Part</option>";
-								}
+									if($type == "product")
+									{
+										echo "<option value=\"part\">Part</option>";
+										echo "<option value=\"service\">Service</option>";
+									}
+									else if($type == "part")
+									{
+										echo "<option value=\"product\">Product</option>";
+										echo "<option value=\"service\">Service</option>";
+									}
+									else if($type == "service")
+									{
+										echo "<option value=\"product\">Product</option>";
+										echo "<option value=\"part\">Part</option>";
+									}
+									else
+									{
+										echo "<option value=\"product\">Product</option>";
+										echo "<option value=\"part\">Part</option>";
+										echo "<option value=\"service\">Service</option>";
+									}
 
 							echo "</select>";
 						echo "</td>";

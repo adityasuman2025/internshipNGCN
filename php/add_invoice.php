@@ -57,38 +57,48 @@
 		</div>
 		<br>
 
-		<div>
-			<b>Search Product/Part Code</b>
+	<!----------search bar---------->
+		<div class="quotation_search_div">
+			<h4>Search For Product/Part/Service Code</h4>
 			<br>
+			
+			<div>
+				<b>Select Row Number</b>
+				<br>
+				<select id="quotation_search_row_no">
+					<option value=""></option>
+				</select>
+			</div>
 
-			<select id="quotation_search_input">
-				<option value=""></option>
-				<?php
-					$get_code_query = "SELECT model_number FROM stock WHERE creator_branch_code = '$creator_branch_code'";
-					$get_code_query_run = mysqli_query($connect_link, $get_code_query);
-
-					while($get_code_assoc = mysqli_fetch_assoc($get_code_query_run))
-					{
-						$get_model_num = $get_code_assoc['model_number'];
-						echo "<option value=\"$get_model_num\">$get_model_num</option>";
-					}
-				?>
-			</select>
+			<div>
+				<b>Type</b>
+				<br>
+				<select id="quotation_search_type">
+					<option value=""></option>
+					<option value="product">Product</option>
+					<option value="part">Part</option>
+					<option value="service">Service</option>
+				</select>
+			</div>
+			
+			<div>
+				<b>Search Product/Part/Service Code</b>
+				<br>
+				<input type="text" id="quotation_search_input">
+				<br>
+				<div id="quotation_search_suggestion">hello</div>
+			</div>
+			<br>
 
 			<button id="quotation_search_code_button">Go</button>
 		</div>
 		<br><br>
 
-		<!-- <div>
-			<b>If you could not find the product or part. Create the inventory here.
-			<button class="create_inventory_button">Create Inventory</button></b>
-		</div>
-		<br><br> -->
-
 	<!--------goods table------->
 		<table class="quotation_entry_table">
 			<tbody>
 				<tr>
+					<th>Type</th>
 					<th>Brand</th>
 					<th>Product/Part</th>
 					<th>Product/Part Code</th>
@@ -117,20 +127,17 @@
 
 				<tr fo="1">
 					<td>
+						<select id="quotation_item_type">
+							<option value=""></option>
+							<option value="product">Product</option>
+							<option value="part">Part</option>
+							<option value="service">Service</option>
+						</select>
+					</td>
+					
+					<td>
 						<select id="quotation_brand">
 							<option value=""></option>
-								<?php
-									$get_brand_query = "SELECT brand FROM stock WHERE creator_branch_code ='$creator_branch_code' GROUP BY brand";
-									$get_brand_query_run = mysqli_query($connect_link, $get_brand_query);
-
-									while($get_brand_result = mysqli_fetch_assoc($get_brand_query_run))
-									{
-										$brand = $get_brand_result['brand'];
-										echo "<option value=\"$brand\">";
-											echo $brand;
-										echo "</option>";
-									}
-								?>	
 						</select>	
 					</td>
 
@@ -201,65 +208,145 @@
 			customer = $(this).find('option:selected');
 		});
 
-	//on clicking on create inventory button
-		// $('.create_inventory_button').click(function()
-		// {
-		// 	$('.user_module_content').html("<img class=\"gif_loader\" src=\"img/loaders1.gif\">").load('php/add_inventory.php');
-		// });
+	//on choosing a row for search bar
+		$('#quotation_search_row_no').focus(function()
+		{
+			$(this).html("<option value=''></option>");
 
+			var row_count = $('.quotation_entry_table tr').length;
+			var actual_row_count = row_count - 1;
+
+			var i;
+			for (i = 1; i <= actual_row_count; i++) 
+			{ 
+			    $(this).append("<option value='" + i + "'>" + i + "</option>");
+			}
+		});
+
+	//on choosing a search type
+		$('#quotation_search_type').change(function()
+		{
+			 $("#quotation_search_input").val('');
+		});
+
+	//defining the width and position of search suggestion div
+		var search_input_width = $("#quotation_search_input").width();
+		$('#quotation_search_suggestion').css('width', search_input_width + 'px');
+		
+		var search_input_position = $("#quotation_search_input").position();
+		var quotation_search_suggestion_top_position = search_input_position.top + 32;
+		var quotation_search_suggestion_left_position = search_input_position.left;
+
+		$('#quotation_search_suggestion').css('top', quotation_search_suggestion_top_position + 'px').css('left', quotation_search_suggestion_left_position + 'px');
+   		
+	//on typing in the search input field
+		$('#quotation_search_input').keyup(function()
+		{
+			var search_type = $('#quotation_search_type').val();
+			var row_no = $('#quotation_search_row_no').val();
+
+			if(search_type !="" && row_no !="")
+			{
+				var search_input = $(this).val();
+
+				var query = "SELECT model_number FROM stock WHERE type = '" + search_type + "' AND model_number LIKE '" + search_input + "%' AND creator_branch_code ='" + creator_branch_code + "'";
+				var to_get = "model_number";
+
+				$.post('php/query_search_result.php', {query:query, to_get:to_get}, function(data)
+				{
+					$('#quotation_search_suggestion').fadeIn().html(data);
+
+					$('#quotation_search_suggestion div').click(function()
+					{
+						var selected_input = $.trim($(this).text());
+						$('#quotation_search_input').val(selected_input);
+						$('#quotation_search_suggestion').fadeOut();
+					});
+				});
+			}
+			else
+			{
+				$('.warn_box').text("Please select a row number and type.");
+				$('.warn_box').fadeIn(200).delay(2000).fadeOut(200);
+			}
+		});
+	
 	//on clicking on go on search product or part code
 		$('#quotation_search_code_button').click(function()
 		{
+			var row_no = parseInt($('#quotation_search_row_no').val());
+			var search_type = $('#quotation_search_type').val();			
 			var model_number = $('#quotation_search_input').val();
-			$('#quotation_model_number').html("<option value ='"+ model_number + "'>" + model_number + "</option>");
+			var original_row_no = row_no + 1;
+
+		//populating type and model number from the search input
+			$('.quotation_entry_table tr:nth-child('+ original_row_no + ') #quotation_item_type').html("<option value ='"+ search_type + "'>" + search_type + "</option>");
+
+			$('.quotation_entry_table tr:nth-child('+ original_row_no + ') #quotation_model_number').html("<option value ='"+ model_number + "'>" + model_number + "</option>");
 
 		//getting brand
-			var query = "SELECT brand FROM stock WHERE model_number ='" + model_number + "' AND creator_branch_code = '" + creator_branch_code + "'";
+			var query = "SELECT brand FROM stock WHERE model_number ='" + model_number + "' AND type='" + search_type + "' AND creator_branch_code ='" + creator_branch_code + "'";
 			var to_get = "brand";
 
 			$.post('php/inventory_query_runner.php', {query:query , to_get:to_get}, function(data)
 			{
-				//alert(data);
-				$('#quotation_brand').html(data);
+				$('.quotation_entry_table tr:nth-child('+ original_row_no + ') #quotation_brand').html(data);
 			});
 
 		//getting model name
-			var query = "SELECT model_name FROM stock WHERE model_number ='" + model_number + "' AND creator_branch_code = '" + creator_branch_code + "'";
+			var query = "SELECT model_name FROM stock WHERE model_number ='" + model_number + "' AND type='" + search_type + "' AND creator_branch_code ='" + creator_branch_code + "'";
 			var to_get = "model_name";
 
 			$.post('php/inventory_query_runner.php', {query:query , to_get:to_get}, function(data)
 			{
 				//alert(data);
-				$('#quotation_model_name').html(data);
+				$('.quotation_entry_table tr:nth-child('+ original_row_no + ') #quotation_model_name').html(data);
 			});
 
 		//getting hsn code
-			var query = "SELECT hsn_code FROM stock WHERE model_number ='" + model_number + "' AND creator_branch_code = '" + creator_branch_code + "'";
+			var query = "SELECT hsn_code FROM stock WHERE model_number ='" + model_number + "' AND type='" + search_type + "' AND creator_branch_code ='" + creator_branch_code + "'";
 			var to_get = "hsn_code";
 
 			$.post('php/query_result_viewer.php', {query:query , to_get:to_get}, function(data)
 			{
 				//alert(data);
-				$('#quotation_hsn_code').val(data);
+				$('.quotation_entry_table tr:nth-child('+ original_row_no + ') #quotation_hsn_code').val(data);
 			});
 
 		//getting description
-			var query = "SELECT description FROM inventory WHERE model_number ='" + model_number + "'";
+			var query = "SELECT description FROM inventory WHERE model_number ='" + model_number + "' AND type='" + search_type + "'";
 			var to_get = "description";
 
 			$.post('php/query_result_viewer.php', {query:query , to_get:to_get}, function(data)
 			{
 				//alert(data);
-				$('#quotation_description').val(data);
+				$('.quotation_entry_table tr:nth-child('+ original_row_no + ') #quotation_description').val(data);
 			});
 
-		//populating availability
-			var query = "SELECT in_stock FROM stock WHERE model_number ='" + model_number + "' AND creator_branch_code ='" + creator_branch_code + "'";
+		//getting availability
+			var query = "SELECT in_stock FROM stock WHERE model_number ='" + model_number + "' AND type ='" + search_type + "' AND creator_branch_code ='" + creator_branch_code + "'";
 			var to_get = "in_stock";
 
 			$.post('php/query_result_viewer.php', {query:query , to_get:to_get}, function(data)
 			{
-				$('#item_availability').val(data);
+				$('.quotation_entry_table tr:nth-child('+ original_row_no + ') #item_availability').val(data);
+			});
+		});
+
+	//on selecting a item type
+		$('.quotation_entry_table tr #quotation_item_type').change(function()
+		{
+			$(this).attr('disabled', 'disabled').css('border', '1px solid lightgrey');
+
+			this_thing = $(this);
+			type = $(this).val();
+			var query = "SELECT brand FROM stock WHERE type= '" + type + "' AND creator_branch_code = '" + creator_branch_code + "' GROUP BY brand";
+			var to_get = "brand";
+
+			$.post('php/product_query_runner.php', {query:query , to_get:to_get}, function(data)
+			{
+				//alert(data);
+				this_thing.parent().parent().find('#quotation_brand').html(data);
 			});
 		});
 
@@ -270,7 +357,7 @@
 
 			this_thing = $(this);
 			brand = $(this).val();
-			var query = "SELECT model_name FROM stock WHERE brand ='" + brand + "' AND creator_branch_code ='" + creator_branch_code + "' GROUP BY model_name";
+			var query = "SELECT model_name FROM stock WHERE brand ='" + brand + "' AND type ='" + type + "' AND creator_branch_code ='" + creator_branch_code + "' GROUP BY model_name";
 			var to_get = "model_name";
 
 			$.post('php/product_query_runner.php', {query:query , to_get:to_get}, function(data)
@@ -287,7 +374,7 @@
 
 			this_thing = $(this);
 			model_name = $(this).val();
-			var query = "SELECT model_number FROM stock WHERE model_name ='" + model_name + "'AND brand = '" + brand + "' AND creator_branch_code ='" + creator_branch_code + "' GROUP BY model_number";
+			var query = "SELECT model_number FROM stock WHERE model_name ='" + model_name + "'AND brand = '" + brand + "' AND type ='" + type + "' AND creator_branch_code ='" + creator_branch_code + "' GROUP BY model_number";
 			var to_get = "model_number";
 
 			$.post('php/product_query_runner.php', {query:query , to_get:to_get}, function(data)
@@ -305,7 +392,7 @@
 			model_number = $(this).val();
 
 		//populating hsn code
-			var query = "SELECT hsn_code FROM stock WHERE model_number ='" + model_number + "' AND model_name = '" + model_name + "' AND brand = '" + brand + "' AND creator_branch_code ='" + creator_branch_code + "'";
+			var query = "SELECT hsn_code FROM stock WHERE model_number ='" + model_number + "' AND model_name = '" + model_name + "' AND brand = '" + brand + "' AND type ='" + type + "' AND creator_branch_code ='" + creator_branch_code + "'";
 			var to_get = "hsn_code";
 
 			$.post('php/query_result_viewer.php', {query:query , to_get:to_get}, function(data)
@@ -314,7 +401,7 @@
 			});
 
 		//populating description
-			var query = "SELECT description FROM inventory WHERE model_number ='" + model_number + "' AND model_name = '" + model_name + "' AND brand = '" + brand + "'";
+			var query = "SELECT description FROM inventory WHERE model_number ='" + model_number + "' AND model_name = '" + model_name + "' AND brand = '" + brand + "' AND type ='" + type + "'";
 			var to_get = "description";
 
 			$.post('php/query_result_viewer.php', {query:query , to_get:to_get}, function(data)
@@ -323,7 +410,7 @@
 			});
 
 		//populating availability
-			var query = "SELECT in_stock FROM stock WHERE model_number ='" + model_number + "' AND model_name = '" + model_name + "' AND brand = '" + brand + "' AND creator_branch_code ='" + creator_branch_code + "'";
+			var query = "SELECT in_stock FROM stock WHERE model_number ='" + model_number + "' AND model_name = '" + model_name + "' AND brand = '" + brand + "' AND type ='" + type + "' AND creator_branch_code ='" + creator_branch_code + "'";
 			var to_get = "in_stock";
 
 			$.post('php/query_result_viewer.php', {query:query , to_get:to_get}, function(data)
@@ -523,6 +610,7 @@
 				//defining variables of each table row
 					var quotation_serial = child_no - 1;
 
+					var quotation_item_type = $.trim($('.quotation_entry_table tr:nth-child('+ child_no + ') #quotation_item_type').val());
 					var quotation_brand = $.trim($('.quotation_entry_table tr:nth-child('+ child_no + ') #quotation_brand').val());
 					var quotation_model_name = $.trim($('.quotation_entry_table tr:nth-child('+ child_no + ') #quotation_model_name').val());
 					var quotation_model_number = $.trim($('.quotation_entry_table tr:nth-child('+ child_no + ') #quotation_model_number').val());
@@ -540,19 +628,17 @@
 					var quotation_part_igst = parseInt($('.quotation_entry_table tr:nth-child('+ child_no + ') #quotation_part_igst').val());
 
 					var quotation_part_total_price = $.trim($('.quotation_entry_table tr:nth-child('+ child_no + ') #quotation_part_total_price').val());
-					
-					var type = "";				
+								
 					var quotation_part_name = "";
 
 				//if user forget to calculate total price
 					if(quotation_part_total_price == "calculate")
 					{
-						//alert('plx calculate');
 						var quotation_part_total_price = (quotation_part_rate + (quotation_part_rate * (quotation_part_cgst+quotation_part_sgst+quotation_part_igst)/100))*quotation_part_quantity;
 					}
 
 				//adding this to database					
-					$.post('php/create_quotation.php', {quotation_customer: quotation_customer, quotation_date: quotation_date, quotation_num:quotation_num, quotation_serial:quotation_serial, quotation_description:quotation_description, quotation_brand:quotation_brand, quotation_model_name:quotation_model_name, quotation_model_number:quotation_model_number, quotation_serial_num:quotation_serial_num, quotation_service_id:quotation_service_id, quotation_part_name:quotation_part_name, quotation_purchase_order:quotation_purchase_order, quotation_part_quantity:quotation_part_quantity, quotation_part_rate:quotation_part_rate, quotation_part_cgst:quotation_part_cgst, quotation_part_sgst:quotation_part_sgst, quotation_part_igst:quotation_part_igst, quotation_hsn_code:quotation_hsn_code, quotation_part_total_price:quotation_part_total_price, type:type}, function(e)
+					$.post('php/create_quotation.php', {quotation_customer: quotation_customer, quotation_date: quotation_date, quotation_num:quotation_num, quotation_serial:quotation_serial, quotation_description:quotation_description, quotation_brand:quotation_brand, quotation_model_name:quotation_model_name, quotation_model_number:quotation_model_number, quotation_serial_num:quotation_serial_num, quotation_service_id:quotation_service_id, quotation_part_name:quotation_part_name, quotation_purchase_order:quotation_purchase_order, quotation_part_quantity:quotation_part_quantity, quotation_part_rate:quotation_part_rate, quotation_part_cgst:quotation_part_cgst, quotation_part_sgst:quotation_part_sgst, quotation_part_igst:quotation_part_igst, quotation_hsn_code:quotation_hsn_code, quotation_part_total_price:quotation_part_total_price, quotation_item_type:quotation_item_type}, function(e)
 					{
 						if(e==1)
 						{
@@ -596,11 +682,10 @@
 							$('.user_entry_form').html("<img class=\"gif_loader\" src=\"img/loaders1.gif\">").fadeOut(0);
 							
 							$('.gen_quotation_span').text('Invoice has been successfully created.').css('color','green');
-							//$('#gen_new_quotation_button').fadeIn(100);
 							$('.view_quotation_button').fadeIn(100);
 
 						//giving option to create invoice
-							$('.ajax_loader_bckgrnd').fadeIn(400);
+							//$('.ajax_loader_bckgrnd').fadeIn(400);
 
 							var generated_from = "invoice";
 							$.post('php/quotation_into_invoice.php', {quotation_num:quotation_num, generated_from:generated_from}, function(data)
@@ -611,7 +696,7 @@
 						}
 						else
 						{
-							$('.gen_quotation_span').text('Something went wrong while creating purchase').css('color','red');
+							$('.gen_quotation_span').text('Something went wrong while creating invoice').css('color','red');
 						}
 					});				
 				}

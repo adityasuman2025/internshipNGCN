@@ -56,6 +56,7 @@
 		<table class="quotation_entry_table">
 			<tbody>
 				<tr>
+					<th>Type</th>
 					<th>Brand</th>
 					<th>Product/Part</th>
 					<th>Product/Part Code</th>
@@ -87,6 +88,7 @@
 					{
 						$quotation_id = $query_assoc['id'];
 
+						$item_type = $query_assoc['type'];
 						$brand = $query_assoc['brand'];
 						$model_name = $query_assoc['model_name'];
 						$model_number = $query_assoc['model_number'];
@@ -110,22 +112,40 @@
 
 						echo "<tr id=\"$quotation_id\">";
 
+							echo "	<td>
+										<select id=\"quotation_item_type\">";
+											echo "<option value=\"$item_type\">$item_type</option>";
+
+											if($item_type == "product")
+											{
+												echo "<option value=\"part\">Part</option>";
+												echo "<option value=\"service\">Service</option>";
+											}
+											else if($item_type == "part")
+											{
+												echo "<option value=\"product\">Product</option>";
+												echo "<option value=\"service\">Service</option>";
+											}
+											else if($item_type == "service")
+											{
+												echo "<option value=\"product\">Product</option>";
+												echo "<option value=\"part\">Part</option>";
+											}
+											else
+											{
+												echo "<option value=\"product\">Product</option>";
+												echo "<option value=\"part\">Part</option>";
+												echo "<option value=\"service\">Service</option>";
+											}
+
+									echo "</select>
+
+									</td>";
+
 							echo "<td>
-								<select id=\"quotation_brand\">
-									<option value=\"$brand\">$brand</option>";
-
-										$get_brand_query = "SELECT brand FROM stock WHERE brand !='$brand' AND creator_branch_code = '$creator_branch_code' GROUP BY brand";
-										$get_brand_query_run = mysqli_query($connect_link, $get_brand_query);
-
-										while($get_brand_result = mysqli_fetch_assoc($get_brand_query_run))
-										{
-											$brand = $get_brand_result['brand'];
-											echo "<option value=\"$brand\">";
-												echo $brand;
-											echo "</option>";
-										}
-
-							echo "</select>	
+									<select id=\"quotation_brand\">
+										<option value=\"$brand\">$brand</option>";
+							echo "	</select>	
 								</td>";
 
 							echo "	<td>
@@ -189,6 +209,31 @@
 			$('.user_module_content').html("<img class=\"gif_loader\" src=\"img/loaders1.gif\">").load('php/add_customer.php');
 		});
 
+	//on selecting a item type
+		$('.quotation_entry_table tr #quotation_item_type').change(function()
+		{
+			$(this).attr('disabled', 'disabled').css('border', '1px solid lightgrey');
+
+			this_thing = $(this);
+			type = $(this).val();
+			var query = "SELECT brand FROM inventory WHERE type= '" + type + "' GROUP BY brand";
+			var to_get = "brand";
+
+		//emptying all the preceeding fields
+			this_thing.parent().parent().find('#quotation_brand').html("");
+			this_thing.parent().parent().find('#quotation_model_name').html("");
+			this_thing.parent().parent().find('#quotation_model_number').html("");
+			this_thing.parent().parent().find('#quotation_hsn_code').val("");
+			this_thing.parent().parent().find('#quotation_description').val("");
+
+		//populating the brand
+			$.post('php/product_query_runner.php', {query:query , to_get:to_get}, function(data)
+			{
+				//alert(data);
+				this_thing.parent().parent().find('#quotation_brand').html(data);
+			});
+		});
+
 	//on selecting a brand
 		$('.quotation_entry_table tr #quotation_brand').change(function()
 		{
@@ -196,7 +241,7 @@
 
 			this_thing = $(this);
 			brand = $(this).val();
-			var query = "SELECT model_name FROM inventory WHERE brand ='" + brand + "' GROUP BY model_name";
+			var query = "SELECT model_name FROM inventory WHERE brand ='" + brand + "' AND type= '" + type + "' GROUP BY model_name";
 			var to_get = "model_name";
 
 			$.post('php/product_query_runner.php', {query:query , to_get:to_get}, function(data)
@@ -213,7 +258,7 @@
 
 			this_thing = $(this);
 			model_name = $(this).val();
-			var query = "SELECT model_number FROM inventory WHERE model_name ='" + model_name + "' AND brand ='" + brand + "' GROUP BY model_number";
+			var query = "SELECT model_number FROM inventory WHERE model_name ='" + model_name + "' AND brand ='" + brand + "' AND type= '" + type + "'  GROUP BY model_number";
 			var to_get = "model_number";
 
 			$.post('php/product_query_runner.php', {query:query , to_get:to_get}, function(data)
@@ -231,7 +276,7 @@
 			model_number = $(this).val();
 
 		//populating hsn code
-			var query = "SELECT hsn_code FROM inventory WHERE model_number ='" + model_number + "' AND model_name = '" + model_name + "' AND brand = '" + brand + "'";
+			var query = "SELECT hsn_code FROM inventory WHERE model_number ='" + model_number + "' AND model_name = '" + model_name + "' AND brand = '" + brand + "' AND type= '" + type + "' ";
 			var to_get = "hsn_code";
 
 			$.post('php/query_result_viewer.php', {query:query , to_get:to_get}, function(data)
@@ -240,7 +285,7 @@
 			});
 
 		//populating description
-			var query = "SELECT description FROM inventory WHERE model_number ='" + model_number + "' AND model_name = '" + model_name + "' AND brand = '" + brand + "'";
+			var query = "SELECT description FROM inventory WHERE model_number ='" + model_number + "' AND model_name = '" + model_name + "' AND brand = '" + brand + "' AND type= '" + type + "' ";
 			var to_get = "description";
 
 			$.post('php/query_result_viewer.php', {query:query , to_get:to_get}, function(data)
@@ -447,6 +492,7 @@
 					
 					var quotation_serial = child_no - 1;
 
+					var quotation_item_type = $.trim($('.quotation_entry_table tr:nth-child('+ child_no + ') #quotation_item_type').val());
 					var quotation_brand = $.trim($('.quotation_entry_table tr:nth-child('+ child_no + ') #quotation_brand').val());
 					var quotation_model_name = $.trim($('.quotation_entry_table tr:nth-child('+ child_no + ') #quotation_model_name').val());
 					var quotation_model_number = $.trim($('.quotation_entry_table tr:nth-child('+ child_no + ') #quotation_model_number').val());
@@ -461,10 +507,8 @@
 					var quotation_part_igst = parseInt($('.quotation_entry_table tr:nth-child('+ child_no + ') #quotation_part_igst').val());
 					var quotation_part_total_price = $.trim($('.quotation_entry_table tr:nth-child('+ child_no + ') #quotation_part_total_price').val());
 					
-					var type = "";
 					var quotation_serial_num = "";
 					var quotation_part_name = "";
-					var quotation_part_serial_num = "";
 
 				//if user forget to calculate total price
 					if(quotation_part_total_price == "calculate")
@@ -473,7 +517,7 @@
 					}
 
 				//adding this to database	
-					var query_recieved = "UPDATE quotation SET serial = '" + quotation_serial + "', description = '" + quotation_description + "', customer ='" + quotation_customer + "', date ='" + quotation_date + "', brand = '" + quotation_brand + "', model_name = '" + quotation_model_name + "', model_number = '" + quotation_model_number + "', serial_num = '" + quotation_serial_num + "', service_id = '" + quotation_service_id + "', part_name = '" + quotation_part_name + "', part_serial_num = '" + quotation_part_serial_num + "', quantity = '" + quotation_part_quantity + "', rate = '" + quotation_part_rate + "', cgst = '" + quotation_part_cgst + "', sgst = '" + quotation_part_sgst + "', igst = '" + quotation_part_igst + "', hsn_code = '" + quotation_part_hsn_code + "', total_price = '" + quotation_part_total_price + "' WHERE id = '" + quotation_id + "'";
+					var query_recieved = "UPDATE quotation SET type = '" + quotation_item_type + "', serial = '" + quotation_serial + "', description = '" + quotation_description + "', customer ='" + quotation_customer + "', date ='" + quotation_date + "', brand = '" + quotation_brand + "', model_name = '" + quotation_model_name + "', model_number = '" + quotation_model_number + "', serial_num = '" + quotation_serial_num + "', service_id = '" + quotation_service_id + "', part_name = '" + quotation_part_name + "', quantity = '" + quotation_part_quantity + "', rate = '" + quotation_part_rate + "', cgst = '" + quotation_part_cgst + "', sgst = '" + quotation_part_sgst + "', igst = '" + quotation_part_igst + "', hsn_code = '" + quotation_part_hsn_code + "', total_price = '" + quotation_part_total_price + "' WHERE id = '" + quotation_id + "'";
 				
 					$.post('php/query_runner.php', {query_recieved:query_recieved}, function(e)
 					{
