@@ -348,16 +348,17 @@
 						//changing the stock of the particular purchased item
 							var creator_branch_code = "<?php echo $creator_branch_code; ?>";
 
-							var check_stock_query = "SELECT * FROM stock WHERE brand = '" + purchase_brand + "' AND model_name = '" + purchase_model_name + "' AND model_number = '" + purchase_model_num + "' AND creator_branch_code = '" + creator_branch_code + "'";
+							var check_stock_query = "SELECT * FROM stock WHERE brand = '" + purchase_brand + "' AND model_name = '" + purchase_model_name + "' AND model_number = '" + purchase_model_num + "' AND type='" + purchase_type + "' AND creator_branch_code = '" + creator_branch_code + "'";
 							var query_recieved = check_stock_query;
 
+						//checking stock is already added or not
 							$.post('php/check_stock.php', {query_recieved:query_recieved}, function(e)
 							{
-								if(e =='')
+								if(e =='') //if stock is already not added, then adding a new stock
 								{
 									var inv_part_name = '';
 									var inv_part_number = '';
-									var inv_type = '';
+									var inv_type = purchase_type;
 									var inv_sales_price = '';
 
 									$.post('php/create_stock.php', {inv_brand:purchase_brand, inv_model_name:purchase_model_name, inv_model_num:purchase_model_num, inv_part_name:inv_part_name, inv_part_number:inv_part_number, inv_quantity:purchase_quantity, inv_type:inv_type, inv_sales_price:inv_sales_price, inv_supplier_price:purchase_rate, inv_hsn_code:purchase_hsn_code}, function(e)
@@ -372,12 +373,12 @@
 										}
 									});
 								}
-								else
+								else  //if stock is already added, then editting in_stock in that stock
 								{
 									var old_quantity = parseInt(e);
 									var quantity = old_quantity + purchase_quantity;
 
-									var update_stock_query = "UPDATE stock SET in_stock = '" + quantity + "' WHERE brand = '" + purchase_brand + "' AND model_name = '" + purchase_model_name + "' AND model_number = '" + purchase_model_num + "' AND creator_branch_code = '" + creator_branch_code + "'";
+									var update_stock_query = "UPDATE stock SET in_stock = '" + quantity + "' WHERE brand = '" + purchase_brand + "' AND model_name = '" + purchase_model_name + "' AND model_number = '" + purchase_model_num + "' AND type = '" + purchase_type + "' AND creator_branch_code = '" + creator_branch_code + "'";
 									var query_recieved = update_stock_query;
 
 									$.post('php/query_runner.php', {query_recieved:query_recieved}, function(e)

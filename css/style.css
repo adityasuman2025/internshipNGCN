@@ -600,11 +600,6 @@ body, html
 		text-align: left;
 	}
 	
-	/*.add_quotation_form::-webkit-scrollbar 
-	{ 
-	   //display: none;  // Safari and Chrome
-	}*/
-
 	.add_quotation_form div
 	{
 		display: inline-block;
@@ -698,6 +693,20 @@ body, html
 		background: lightgrey;
 	}
 
+	.ask_mailing_div
+	{
+		display: none;
+	}
+
+	.ask_mailing_div input
+	{
+		width: auto;
+		border-radius: 3px;
+		color: white;
+		border: none;
+		padding: 5px;
+		background: #cc0000;
+	}
 
 /*----quotation listing area--------*/
 	.quotation_list_container

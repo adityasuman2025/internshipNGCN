@@ -62,14 +62,14 @@
 			<h4>Search For Product/Part/Service Code</h4>
 			<br>
 			
-			<div>
+			<!-- <div>
 				<b>Select Row Number</b>
 				<br>
 				<select id="quotation_search_row_no">
 					<option value=""></option>
 				</select>
 			</div>
-
+ -->
 			<div>
 				<b>Type</b>
 				<br>
@@ -111,10 +111,11 @@
 					<th>Quantity</th>
 					<th>Availability</th>
 					<th>Rate</th>
+					<th>Discount (%)</th>
 
 					<th>CGST Rate</th>
 					<th>CGST Amount</th>
-
+					
 					<th>SGST Rate</th>
 					<th>SGST Amount</th>
 
@@ -158,6 +159,7 @@
 					<td><input type="number" value="0" id="quotation_part_quantity"></td>
 					<td><input type="number" disabled="disabled" id="item_availability"></td>
 					<td><input type="number" value="0" id="quotation_part_rate"></td>
+					<td><input type="number" value="0" id="quotation_discount"></td>
 
 					<td><input type="number" value="0" id="quotation_part_cgst"></td>
 					<td><input type="number" disabled="disabled" value="0" id="quotation_cgst_amount"></td>
@@ -186,11 +188,14 @@
 	
 	<span class="gen_quotation_span"></span>
 	<br><br>
-
-	<input type="submit" value="Generate New Quotation" id="gen_new_quotation_button">
-	<br><br>
 	
-	<button class="view_quotation_button">View Quotation</button>
+	<div class="ask_mailing_div">
+		<span>Do you want to mail the invoice to the customer</span>
+		<input type="submit" value="Yes" id="mail_yes">
+		<input type="submit" value="No" id="mail_no">
+	</div>
+	
+	<button class="view_quotation_button">View Invoice</button>
 
 <!--------script-------->
 	<script type="text/javascript">
@@ -243,9 +248,9 @@
 		$('#quotation_search_input').keyup(function()
 		{
 			var search_type = $('#quotation_search_type').val();
-			var row_no = $('#quotation_search_row_no').val();
+			// var row_no = $('#quotation_search_row_no').val();
 
-			if(search_type !="" && row_no !="")
+			if(search_type !="")
 			{
 				var search_input = $(this).val();
 
@@ -274,15 +279,19 @@
 	//on clicking on go on search product or part code
 		$('#quotation_search_code_button').click(function()
 		{
-			var row_no = parseInt($('#quotation_search_row_no').val());
+			// var row_no = parseInt($('#quotation_search_row_no').val());
 			var search_type = $('#quotation_search_type').val();			
 			var model_number = $('#quotation_search_input').val();
-			var original_row_no = row_no + 1;
+			// var original_row_no = row_no + 1;
 
 		//populating type and model number from the search input
-			$('.quotation_entry_table tr:nth-child('+ original_row_no + ') #quotation_item_type').html("<option value ='"+ search_type + "'>" + search_type + "</option>");
+			// $('.quotation_entry_table tr:nth-child('+ original_row_no + ') #quotation_item_type').html("<option value ='"+ search_type + "'>" + search_type + "</option>");
 
-			$('.quotation_entry_table tr:nth-child('+ original_row_no + ') #quotation_model_number').html("<option value ='"+ model_number + "'>" + model_number + "</option>");
+			// $('.quotation_entry_table tr:nth-child('+ original_row_no + ') #quotation_model_number').html("<option value ='"+ model_number + "'>" + model_number + "</option>");
+
+			$('.quotation_entry_table tr:last #quotation_item_type').html("<option value ='"+ search_type + "'>" + search_type + "</option>");
+
+			$('.quotation_entry_table tr:last #quotation_model_number').html("<option value ='"+ model_number + "'>" + model_number + "</option>");
 
 		//getting brand
 			var query = "SELECT brand FROM stock WHERE model_number ='" + model_number + "' AND type='" + search_type + "' AND creator_branch_code ='" + creator_branch_code + "'";
@@ -290,7 +299,7 @@
 
 			$.post('php/inventory_query_runner.php', {query:query , to_get:to_get}, function(data)
 			{
-				$('.quotation_entry_table tr:nth-child('+ original_row_no + ') #quotation_brand').html(data);
+				$('.quotation_entry_table tr:last #quotation_brand').html(data);
 			});
 
 		//getting model name
@@ -300,7 +309,7 @@
 			$.post('php/inventory_query_runner.php', {query:query , to_get:to_get}, function(data)
 			{
 				//alert(data);
-				$('.quotation_entry_table tr:nth-child('+ original_row_no + ') #quotation_model_name').html(data);
+				$('.quotation_entry_table tr:last #quotation_model_name').html(data);
 			});
 
 		//getting hsn code
@@ -310,7 +319,7 @@
 			$.post('php/query_result_viewer.php', {query:query , to_get:to_get}, function(data)
 			{
 				//alert(data);
-				$('.quotation_entry_table tr:nth-child('+ original_row_no + ') #quotation_hsn_code').val(data);
+				$('.quotation_entry_table tr:last #quotation_hsn_code').val(data);
 			});
 
 		//getting description
@@ -320,7 +329,7 @@
 			$.post('php/query_result_viewer.php', {query:query , to_get:to_get}, function(data)
 			{
 				//alert(data);
-				$('.quotation_entry_table tr:nth-child('+ original_row_no + ') #quotation_description').val(data);
+				$('.quotation_entry_table tr:last #quotation_description').val(data);
 			});
 
 		//getting availability
@@ -329,7 +338,7 @@
 
 			$.post('php/query_result_viewer.php', {query:query , to_get:to_get}, function(data)
 			{
-				$('.quotation_entry_table tr:nth-child('+ original_row_no + ') #item_availability').val(data);
+				$('.quotation_entry_table tr:last #item_availability').val(data);
 			});
 		});
 
@@ -424,9 +433,12 @@
 		{
 			var quantity = parseInt($(this).parent().parent().find('#quotation_part_quantity').val());
 			var rate = parseInt($(this).parent().parent().find('#quotation_part_rate').val());
-			var cgst_rate = parseInt($(this).parent().parent().find('#quotation_part_cgst').val());
+			var discount = parseInt($(this).parent().parent().find('#quotation_discount').val());
 
-			var cgst_amount = (rate*cgst_rate/100)*quantity;
+			var cgst_rate = parseInt($(this).parent().parent().find('#quotation_part_cgst').val());
+			var discount_amount = discount*quantity*rate/100;
+
+			var cgst_amount = (rate*quantity - discount_amount)*cgst_rate/100;
 
 			$(this).parent().parent().find('#quotation_cgst_amount').val(cgst_amount);
 		});
@@ -436,9 +448,12 @@
 		{
 			var quantity = parseInt($(this).parent().parent().find('#quotation_part_quantity').val());
 			var rate = parseInt($(this).parent().parent().find('#quotation_part_rate').val());
-			var sgst_rate = parseInt($(this).parent().parent().find('#quotation_part_sgst').val());
+			var discount = parseInt($(this).parent().parent().find('#quotation_discount').val());
 
-			var sgst_amount = (rate*sgst_rate/100)*quantity;
+			var sgst_rate = parseInt($(this).parent().parent().find('#quotation_part_sgst').val());
+			var discount_amount = discount*quantity*rate/100;
+
+			var sgst_amount = (rate*quantity - discount_amount)*sgst_rate/100;
 
 			$(this).parent().parent().find('#quotation_sgst_amount').val(sgst_amount);
 		});
@@ -448,9 +463,12 @@
 		{
 			var quantity = parseInt($(this).parent().parent().find('#quotation_part_quantity').val());
 			var rate = parseInt($(this).parent().parent().find('#quotation_part_rate').val());
-			var igst_rate = parseInt($(this).parent().parent().find('#quotation_part_igst').val());
+			var discount = parseInt($(this).parent().parent().find('#quotation_discount').val());
 
-			var igst_amount = (rate*igst_rate/100)*quantity;
+			var igst_rate = parseInt($(this).parent().parent().find('#quotation_part_igst').val());
+			var discount_amount = discount*quantity*rate/100;
+
+			var igst_amount = (rate*quantity - discount_amount)*igst_rate/100;
 
 			$(this).parent().parent().find('#quotation_igst_amount').val(igst_amount);
 		});
@@ -460,17 +478,46 @@
 		{
 			var quantity = parseInt($(this).parent().parent().find('#quotation_part_quantity').val());
 			var rate = parseInt($(this).parent().parent().find('#quotation_part_rate').val());
-			var cgst = parseInt($(this).parent().parent().find('#quotation_part_cgst').val());
-			var sgst = parseInt($(this).parent().parent().find('#quotation_part_sgst').val());
-			var igst = parseInt($(this).parent().parent().find('#quotation_part_igst').val());
+			var discount = parseInt($(this).parent().parent().find('#quotation_discount').val());
 
-			var total_price = (rate + (rate * (cgst+sgst+igst)/100))*quantity;
+			var cgst_amount = parseFloat($(this).parent().parent().find('#quotation_cgst_amount').val());
+			var sgst_amount = parseFloat($(this).parent().parent().find('#quotation_sgst_amount').val());
+			var igst_amount =parseFloat( $(this).parent().parent().find('#quotation_igst_amount').val());
+
+			var discount_amount = discount*quantity*rate/100;
+			var price = quantity*rate;
+			var total_price = quantity*rate - discount_amount +  cgst_amount + sgst_amount + igst_amount;
+
+			//alert(price + ' ' + discount_amount  + ' ' +  cgst_amount + ' ' +  sgst_amount  + ' ' + igst_amount);
 
 			$(this).val(total_price);
-			//alert(total_price);
 		});
 
 	//on change of quantity, rate or gst after calculation
+		$('.quotation_entry_table tr #quotation_discount').keyup(function()
+		{
+			$(this).parent().parent().find('#quotation_part_total_price').val('calculate');
+
+		//updating gst amounts
+			var rate = parseInt($(this).parent().parent().find('#quotation_part_rate').val());
+			var quantity = parseInt($(this).parent().parent().find('#quotation_part_quantity').val());
+			var discount = $(this).val();
+
+			var cgst_rate = parseInt($(this).parent().parent().find('#quotation_part_cgst').val());
+			var sgst_rate = parseInt($(this).parent().parent().find('#quotation_part_sgst').val());
+			var igst_rate = parseInt($(this).parent().parent().find('#quotation_part_igst').val());
+
+			var discount_amount = discount*quantity*rate/100;
+
+			var cgst_amount = (rate*quantity - discount_amount)*cgst_rate/100;
+			var sgst_amount = (rate*quantity - discount_amount)*sgst_rate/100;
+			var igst_amount = (rate*quantity - discount_amount)*igst_rate/100;
+
+			$(this).parent().parent().find('#quotation_cgst_amount').val(cgst_amount);
+			$(this).parent().parent().find('#quotation_sgst_amount').val(sgst_amount);
+			$(this).parent().parent().find('#quotation_igst_amount').val(igst_amount);
+		});
+
 		$('.quotation_entry_table tr #quotation_part_quantity').keyup(function()
 		{
 			$(this).parent().parent().find('#quotation_part_total_price').val('calculate');
@@ -478,14 +525,17 @@
 		//updating gst amounts
 			var quantity = $(this).val();
 			var rate = parseInt($(this).parent().parent().find('#quotation_part_rate').val());
+			var discount = parseInt($(this).parent().parent().find('#quotation_discount').val());
 
 			var cgst_rate = parseInt($(this).parent().parent().find('#quotation_part_cgst').val());
 			var sgst_rate = parseInt($(this).parent().parent().find('#quotation_part_sgst').val());
 			var igst_rate = parseInt($(this).parent().parent().find('#quotation_part_igst').val());
 
-			var cgst_amount = (rate*cgst_rate/100)*quantity;
-			var sgst_amount = (rate*sgst_rate/100)*quantity;
-			var igst_amount = (rate*igst_rate/100)*quantity;
+			var discount_amount = discount*quantity*rate/100;
+
+			var cgst_amount = (rate*quantity - discount_amount)*cgst_rate/100;
+			var sgst_amount = (rate*quantity - discount_amount)*sgst_rate/100;
+			var igst_amount = (rate*quantity - discount_amount)*igst_rate/100;
 
 			$(this).parent().parent().find('#quotation_cgst_amount').val(cgst_amount);
 			$(this).parent().parent().find('#quotation_sgst_amount').val(sgst_amount);
@@ -499,14 +549,17 @@
 		//updating gst amounts
 			var rate = $(this).val();
 			var quantity = parseInt($(this).parent().parent().find('#quotation_part_quantity').val());
+			var discount = parseInt($(this).parent().parent().find('#quotation_discount').val());
 
 			var cgst_rate = parseInt($(this).parent().parent().find('#quotation_part_cgst').val());
 			var sgst_rate = parseInt($(this).parent().parent().find('#quotation_part_sgst').val());
 			var igst_rate = parseInt($(this).parent().parent().find('#quotation_part_igst').val());
 
-			var cgst_amount = (rate*cgst_rate/100)*quantity;
-			var sgst_amount = (rate*sgst_rate/100)*quantity;
-			var igst_amount = (rate*igst_rate/100)*quantity;
+			var discount_amount = discount*quantity*rate/100;
+
+			var cgst_amount = (rate*quantity - discount_amount)*cgst_rate/100;
+			var sgst_amount = (rate*quantity - discount_amount)*sgst_rate/100;
+			var igst_amount = (rate*quantity - discount_amount)*igst_rate/100;
 
 			$(this).parent().parent().find('#quotation_cgst_amount').val(cgst_amount);
 			$(this).parent().parent().find('#quotation_sgst_amount').val(sgst_amount);
@@ -593,7 +646,7 @@
 		//getting variable values
 			var quotation_customer = $.trim($('#quotation_customer').val());
 			var quotation_date = $.trim($('#quotation_date').val());
-			var quotation_num = $.trim($('#quotation_num').attr('quotation_num'));		
+			quotation_num = $.trim($('#quotation_num').attr('quotation_num'));		
 
 			if(quotation_customer !="" && quotation_date !="" && quotation_num !="")
 			{
@@ -621,8 +674,9 @@
 					var quotation_service_id =$('.quotation_entry_table tr:nth-child('+ child_no + ') #quotation_service_id').val();
 					var quotation_purchase_order =$('.quotation_entry_table tr:nth-child('+ child_no + ') #quotation_purchase_order').val();
 					var quotation_part_quantity = parseInt($('.quotation_entry_table tr:nth-child('+ child_no + ') #quotation_part_quantity').val());
-					var quotation_part_rate = parseInt($('.quotation_entry_table tr:nth-child('+ child_no + ') #quotation_part_rate').val());
-					
+					var quotation_part_rate = parseInt($('.quotation_entry_table tr:nth-child('+ child_no + ') #quotation_part_rate').val());					
+					var quotation_discount = parseInt($('.quotation_entry_table tr:nth-child('+ child_no + ') #quotation_discount').val());
+
 					var quotation_part_cgst = parseInt($('.quotation_entry_table tr:nth-child('+ child_no + ') #quotation_part_cgst').val());
 					var quotation_part_sgst = parseInt($('.quotation_entry_table tr:nth-child('+ child_no + ') #quotation_part_sgst').val());
 					var quotation_part_igst = parseInt($('.quotation_entry_table tr:nth-child('+ child_no + ') #quotation_part_igst').val());
@@ -638,54 +692,61 @@
 					}
 
 				//adding this to database					
-					$.post('php/create_quotation.php', {quotation_customer: quotation_customer, quotation_date: quotation_date, quotation_num:quotation_num, quotation_serial:quotation_serial, quotation_description:quotation_description, quotation_brand:quotation_brand, quotation_model_name:quotation_model_name, quotation_model_number:quotation_model_number, quotation_serial_num:quotation_serial_num, quotation_service_id:quotation_service_id, quotation_part_name:quotation_part_name, quotation_purchase_order:quotation_purchase_order, quotation_part_quantity:quotation_part_quantity, quotation_part_rate:quotation_part_rate, quotation_part_cgst:quotation_part_cgst, quotation_part_sgst:quotation_part_sgst, quotation_part_igst:quotation_part_igst, quotation_hsn_code:quotation_hsn_code, quotation_part_total_price:quotation_part_total_price, quotation_item_type:quotation_item_type}, function(e)
+					$.post('php/create_quotation.php', {quotation_customer: quotation_customer, quotation_date: quotation_date, quotation_num:quotation_num, quotation_serial:quotation_serial, quotation_description:quotation_description, quotation_brand:quotation_brand, quotation_model_name:quotation_model_name, quotation_model_number:quotation_model_number, quotation_serial_num:quotation_serial_num, quotation_service_id:quotation_service_id, quotation_part_name:quotation_part_name, quotation_purchase_order:quotation_purchase_order, quotation_part_quantity:quotation_part_quantity, quotation_part_rate:quotation_part_rate, quotation_discount:quotation_discount, quotation_part_cgst:quotation_part_cgst, quotation_part_sgst:quotation_part_sgst, quotation_part_igst:quotation_part_igst, quotation_hsn_code:quotation_hsn_code, quotation_part_total_price:quotation_part_total_price, quotation_item_type:quotation_item_type}, function(e)
 					{
 						if(e==1)
 						{
-						//for getting pdf of the quotation
-							// var session_of = quotation_num;
-							// var session_name = "pdf_invoice_of";
-								
-							// $.post('php/session_creator.php', {session_of: session_of, session_name: session_name}, function(e)
-							// {
-							// 	if(e ==1)
-							// 	{
-							// 	//mailing to the customer
-							// 		var customer_email = customer.attr('email');
-							// 		var website = window.location.hostname;
-
-							// 		var mail_email = customer_email;
-							// 		var mail_subject = "Quotation from Voltatech";
-							// 		var mail_header = "From: voltatech@pnds.in";
-							// 		var mail_body = "Dear Customer \Invoice generated from our online resource is linked with this mail. Please find your invoice by following the link: http://" + website + "/invoice/Invoice-" + quotation_num + ".pdf \n \nRegards \nVoltatech \nhttp://" + website;
-
-							// 		$.post('php/mailing.php', {mail_email: mail_email, mail_subject: mail_subject, mail_header:mail_header, mail_body:mail_body}, function(e)
-							// 		{
-							// 			if(e == 1)
-							// 			{}
-							// 			else
-							// 			{
-							// 				$('.gen_quotation_span').text('something went wrong while mailing the customer.').css('color','red');
-							// 			}
-							// 		});
-
-							// 		window.open('php/invoice_pdf.php', '_blank');	
-							// 	}
-							// 	else
-							// 	{
-							// 		$('.warn_box').text("Something went wrong while generating pdf file of the quotation.");
-							// 		$('.warn_box').fadeIn(200).delay(3000).fadeOut(200);
-							// 	}
-							// });
-
 						//disappearing the user entry form
 							$('.user_entry_form').html("<img class=\"gif_loader\" src=\"img/loaders1.gif\">").fadeOut(0);
-							
 							$('.gen_quotation_span').text('Invoice has been successfully created.').css('color','green');
-							$('.view_quotation_button').fadeIn(100);
+							
+						//asking to mail or not
+							$('.ask_mailing_div').fadeIn(100);
 
-						//giving option to create invoice
-							//$('.ajax_loader_bckgrnd').fadeIn(400);
+							// //if user click on yes
+							// 	$('#mail_yes').click(function()
+							// 	{
+							// 		$('.ask_mailing_div').fadeOut(0);
+
+							// 	//setting quotation view session
+							// 		var session_of = quotation_num;
+							// 		var session_name = "pdf_invoice_of";
+
+							// 		$.post('php/session_creator.php', {session_of: session_of, session_name: session_name}, function(e)
+							// 		{
+							// 			if(e ==1)
+							// 			{
+							// 			//setting mailing session
+							// 				var session_of = 'yes';
+							// 				var session_name = "mail_pdf_of_" + quotation_num;
+							// 				var visibility = "hide";
+
+							// 				$.post('php/session_creator.php', {session_of: session_of, session_name: session_name}, function(e)
+							// 				{
+							// 					if(e ==1)
+							// 					{
+							// 						window.open('php/invoice_pdf.php', '_blank');	
+							// 					}
+							// 					else
+							// 					{
+							// 						$('.warn_box').text("Something went wrong while mailing the customer.");
+							// 						$('.warn_box').fadeIn(200).delay(3000).fadeOut(200);
+							// 					}
+							// 				});
+							// 			}
+							// 			else
+							// 			{
+							// 				$('.warn_box').text("Something went wrong while generating pdf file of the quotation.");
+							// 				$('.warn_box').fadeIn(200).delay(3000).fadeOut(200);
+							// 			}
+							// 		});
+							// 	});
+
+							// //if user click on no
+							// 	$('#mail_no').click(function()
+							// 	{
+							// 		$('.ask_mailing_div').fadeOut(0);
+							// 	});
 
 							var generated_from = "invoice";
 							$.post('php/quotation_into_invoice.php', {quotation_num:quotation_num, generated_from:generated_from}, function(data)
@@ -707,16 +768,49 @@
 			}
 		});
 
-	//on clicking on add new quotation button
-		// $('#gen_new_quotation_button').click(function()
-		// {
-		// 	$('.user_module_content').html("<img class=\"gif_loader\" src=\"img/loaders1.gif\">").load('php/add_sales_quotation.php');
-		// });
+		//if user click on yes
+			$('#mail_yes').click(function()
+			{
+				$('.ask_mailing_div').fadeOut(0);
 
-	//on clicking on view quotation button
-		$('.view_quotation_button').click(function()
-		{	
-		
-		});
+			//setting quotation view session
+				var session_of = quotation_num;
+				var session_name = "pdf_invoice_of";
+
+				$.post('php/session_creator.php', {session_of: session_of, session_name: session_name}, function(e)
+				{
+					if(e ==1)
+					{
+					//setting mailing session
+						var session_of = 'yes';
+						var session_name = "mail_pdf_of_" + quotation_num;
+						var visibility = "hide";
+
+						$.post('php/session_creator.php', {session_of: session_of, session_name: session_name}, function(e)
+						{
+							if(e ==1)
+							{
+								window.open('php/invoice_pdf.php', '_blank');	
+							}
+							else
+							{
+								$('.warn_box').text("Something went wrong while mailing the customer.");
+								$('.warn_box').fadeIn(200).delay(3000).fadeOut(200);
+							}
+						});
+					}
+					else
+					{
+						$('.warn_box').text("Something went wrong while generating pdf file of the quotation.");
+						$('.warn_box').fadeIn(200).delay(3000).fadeOut(200);
+					}
+				});
+			});
+
+		//if user click on no
+			$('#mail_no').click(function()
+			{
+				$('.ask_mailing_div').fadeOut(0);
+			});
 	
 	</script>

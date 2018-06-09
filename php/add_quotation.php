@@ -68,13 +68,13 @@
 			<h4>Search For Product/Part/Service Code</h4>
 			<br>
 			
-			<div>
+			<!-- <div>
 				<b>Select Row Number</b>
 				<br>
 				<select id="quotation_search_row_no">
 					<option value=""></option>
 				</select>
-			</div>
+			</div> -->
 
 			<div>
 				<b>Type</b>
@@ -187,7 +187,12 @@
 	
 	<span class="gen_quotation_span"></span>
 	<br><br>
-	<input type="submit" value="Generate New Quotation" id="gen_new_quotation_button">
+
+	<div class="ask_mailing_div">
+		<span>Do you want to mail the quotation to the customer</span>
+		<input type="submit" value="Yes" id="mail_yes">
+		<input type="submit" value="No" id="mail_no">
+	</div>
 
 	<br><br>
 	<button class="view_quotation_button">View Quotation</button>
@@ -215,19 +220,19 @@
 		});
 
 	//on choosing a row for search bar
-		$('#quotation_search_row_no').focus(function()
-		{
-			$(this).html("<option value=''></option>");
+		// $('#quotation_search_row_no').focus(function()
+		// {
+		// 	$(this).html("<option value=''></option>");
 
-			var row_count = $('.quotation_entry_table tr').length;
-			var actual_row_count = row_count - 1;
+		// 	var row_count = $('.quotation_entry_table tr').length;
+		// 	var actual_row_count = row_count - 1;
 
-			var i;
-			for (i = 1; i <= actual_row_count; i++) 
-			{ 
-			    $(this).append("<option value='" + i + "'>" + i + "</option>");
-			}
-		});
+		// 	var i;
+		// 	for (i = 1; i <= actual_row_count; i++) 
+		// 	{ 
+		// 	    $(this).append("<option value='" + i + "'>" + i + "</option>");
+		// 	}
+		// });
 
 	//on choosing a search type
 		$('#quotation_search_type').change(function()
@@ -249,9 +254,9 @@
 		$('#quotation_search_input').keyup(function()
 		{
 			var search_type = $('#quotation_search_type').val();
-			var row_no = $('#quotation_search_row_no').val();
+			// var row_no = $('#quotation_search_row_no').val();
 
-			if(search_type !="" && row_no !="")
+			if(search_type !="")
 			{
 				var search_input = $(this).val();
 
@@ -280,15 +285,19 @@
 	//on clicking on go on search product or part code
 		$('#quotation_search_code_button').click(function()
 		{
-			var row_no = parseInt($('#quotation_search_row_no').val());
+			// var row_no = parseInt($('#quotation_search_row_no').val());
 			var search_type = $('#quotation_search_type').val();			
 			var model_number = $('#quotation_search_input').val();
-			var original_row_no = row_no + 1;
+			// var original_row_no = row_no + 1;
 
 		//populating type and model number from the search input
-			$('.quotation_entry_table tr:nth-child('+ original_row_no + ') #quotation_item_type').html("<option value ='"+ search_type + "'>" + search_type + "</option>");
+			// $('.quotation_entry_table tr:nth-child('+ original_row_no + ') #quotation_item_type').html("<option value ='"+ search_type + "'>" + search_type + "</option>");
 
-			$('.quotation_entry_table tr:nth-child('+ original_row_no + ') #quotation_model_number').html("<option value ='"+ model_number + "'>" + model_number + "</option>");
+			// $('.quotation_entry_table tr:nth-child('+ original_row_no + ') #quotation_model_number').html("<option value ='"+ model_number + "'>" + model_number + "</option>");
+
+			$('.quotation_entry_table tr:last #quotation_item_type').html("<option value ='"+ search_type + "'>" + search_type + "</option>");
+
+			$('.quotation_entry_table tr:last #quotation_model_number').html("<option value ='"+ model_number + "'>" + model_number + "</option>");
 
 		//getting brand
 			var query = "SELECT brand FROM inventory WHERE model_number ='" + model_number + "' AND type='" + search_type + "'";
@@ -296,7 +305,7 @@
 
 			$.post('php/inventory_query_runner.php', {query:query , to_get:to_get}, function(data)
 			{
-				$('.quotation_entry_table tr:nth-child('+ original_row_no + ') #quotation_brand').html(data);
+				$('.quotation_entry_table tr:last #quotation_brand').html(data);
 			});
 
 		//getting model name
@@ -306,7 +315,7 @@
 			$.post('php/inventory_query_runner.php', {query:query , to_get:to_get}, function(data)
 			{
 				//alert(data);
-				$('.quotation_entry_table tr:nth-child('+ original_row_no + ') #quotation_model_name').html(data);
+				$('.quotation_entry_table tr:last #quotation_model_name').html(data);
 			});
 
 		//getting hsn code
@@ -316,7 +325,7 @@
 			$.post('php/query_result_viewer.php', {query:query , to_get:to_get}, function(data)
 			{
 				//alert(data);
-				$('.quotation_entry_table tr:nth-child('+ original_row_no + ') #quotation_hsn_code').val(data);
+				$('.quotation_entry_table tr:last #quotation_hsn_code').val(data);
 			});
 
 		//getting description
@@ -326,7 +335,7 @@
 			$.post('php/query_result_viewer.php', {query:query , to_get:to_get}, function(data)
 			{
 				//alert(data);
-				$('.quotation_entry_table tr:nth-child('+ original_row_no + ') #quotation_description').val(data);
+				$('.quotation_entry_table tr:last #quotation_description').val(data);
 			});
 		});
 
@@ -540,7 +549,7 @@
 		//getting variable values
 			var quotation_customer = $.trim($('#quotation_customer').val());
 			var quotation_date = $.trim($('#quotation_date').val());
-			var quotation_num = $.trim($('#quotation_num').attr('quotation_num'));		
+			quotation_num = $.trim($('#quotation_num').attr('quotation_num'));		
 
 			if(quotation_customer !="" && quotation_date !="" && quotation_num !="")
 			{
@@ -591,50 +600,57 @@
 					{
 						if(e==1)
 						{
-						//for getting pdf of the quotation
-							// var session_of = quotation_num;
-							// var session_name = "pdf_quotation_of";
-								
-							// $.post('php/session_creator.php', {session_of: session_of, session_name: session_name}, function(e)
-							// {
-							// 	if(e ==1)
+						//disappearing the user entry form
+							$('.user_entry_form').html("<img class=\"gif_loader\" src=\"img/loaders1.gif\">").fadeOut(0);	
+							$('.gen_quotation_span').text('Quotation has been successfully created.').css('color','green');
+							
+						//asking to mail or not
+							$('.ask_mailing_div').fadeIn(100);
+
+							// //if user click on yes
+							// 	$('#mail_yes').click(function()
 							// 	{
-							// 	//mailing to the customer
-							// 		var customer_email = customer.attr('email');
-							// 		var website = window.location.hostname;
+							// 		$('.ask_mailing_div').fadeOut(0);
 
-							// 		var mail_email = customer_email;
-							// 		var mail_subject = "Quotation from Voltatech";
-							// 		var mail_header = "From: voltatech@pnds.in";
-							// 		var mail_body = "Dear Customer \nQuotation generated from our online resource is linked with this mail. Please find your quotation by following the link: http://" + website + "/quotation/Quotation-" + quotation_num + ".pdf \n \nRegards \nVoltatech \nhttp://" + website;
+							// 	//setting quotation view session
+							// 		var session_of = quotation_num;
+							// 		var session_name = "pdf_quotation_of";
 
-							// 		$.post('php/mailing.php', {mail_email: mail_email, mail_subject: mail_subject, mail_header:mail_header, mail_body:mail_body}, function(e)
+							// 		$.post('php/session_creator.php', {session_of: session_of, session_name: session_name}, function(e)
 							// 		{
-							// 			if(e == 1)
+							// 			if(e ==1)
 							// 			{
+							// 			//setting mailing session
+							// 				var session_of = 'yes';
+							// 				var session_name = "mail_pdf_of_" + quotation_num;
+							// 				var visibility = "hide";
 
+							// 				$.post('php/session_creator.php', {session_of: session_of, session_name: session_name}, function(e)
+							// 				{
+							// 					if(e ==1)
+							// 					{
+							// 						window.open('php/quotation_pdf.php', '_blank');	
+							// 					}
+							// 					else
+							// 					{
+							// 						$('.warn_box').text("Something went wrong while mailing the customer.");
+							// 						$('.warn_box').fadeIn(200).delay(3000).fadeOut(200);
+							// 					}
+							// 				});
 							// 			}
 							// 			else
 							// 			{
-							// 				$('.gen_quotation_span').text('something went wrong while mailing the customer.').css('color','red');
+							// 				$('.warn_box').text("Something went wrong while generating pdf file of the quotation.");
+							// 				$('.warn_box').fadeIn(200).delay(3000).fadeOut(200);
 							// 			}
 							// 		});
+							// 	});
 
-							// 		window.open('php/quotation_pdf.php', '_blank');	
-							// 	}
-							// 	else
+							// //if user click on no
+							// 	$('#mail_no').click(function()
 							// 	{
-							// 		$('.warn_box').text("Something went wrong while generating pdf file of the quotation.");
-							// 		$('.warn_box').fadeIn(200).delay(3000).fadeOut(200);
-							// 	}
-							// });
-
-						//disappearing the user entry form
-							$('.user_entry_form').html("<img class=\"gif_loader\" src=\"img/loaders1.gif\">").fadeOut(0);
-							
-							$('.gen_quotation_span').text('Quotation has been successfully created.').css('color','green');
-							//$('#gen_new_quotation_button').fadeIn(100);
-							$('.view_quotation_button').fadeIn(100);
+							// 		$('.ask_mailing_div').fadeOut(0);
+							// 	});
 						}
 						else
 						{
@@ -649,16 +665,69 @@
 			}
 		});
 
-	//on clicking on add new quotation button
-		// $('#gen_new_quotation_button').click(function()
-		// {
-		// 	$('.user_module_content').html("<img class=\"gif_loader\" src=\"img/loaders1.gif\">").load('php/add_sales_quotation.php');
-		// });
+	//if user click on yes
+		$('#mail_yes').click(function()
+		{
+			$('.ask_mailing_div').fadeOut(0);
+
+		//setting quotation view session
+			var session_of = quotation_num;
+			var session_name = "pdf_quotation_of";
+
+			$.post('php/session_creator.php', {session_of: session_of, session_name: session_name}, function(e)
+			{
+				if(e ==1)
+				{
+				//setting mailing session
+					var session_of = 'yes';
+					var session_name = "mail_pdf_of_" + quotation_num;
+					var visibility = "hide";
+
+					$.post('php/session_creator.php', {session_of: session_of, session_name: session_name}, function(e)
+					{
+						if(e ==1)
+						{
+							window.open('php/quotation_pdf.php', '_blank');	
+						}
+						else
+						{
+							$('.warn_box').text("Something went wrong while mailing the customer.");
+							$('.warn_box').fadeIn(200).delay(3000).fadeOut(200);
+						}
+					});
+				}
+				else
+				{
+					$('.warn_box').text("Something went wrong while generating pdf file of the quotation.");
+					$('.warn_box').fadeIn(200).delay(3000).fadeOut(200);
+				}
+			});
+		});
+
+	//if user click on no
+		$('#mail_no').click(function()
+		{
+			$('.ask_mailing_div').fadeOut(0);
+		});
 
 	//on clicking on view quotation button
 		$('.view_quotation_button').click(function()
 		{	
-		
+			var session_of = quotation_num;
+			var session_name = "pdf_quotation_of";
+
+			$.post('php/session_creator.php', {session_of: session_of, session_name: session_name}, function(e)
+			{
+				if(e ==1)
+				{
+					window.open('php/quotation_pdf.php', '_blank');	
+				}
+				else
+				{
+					$('.warn_box').text("Something went wrong while generating pdf file of the quotation.");
+					$('.warn_box').fadeIn(200).delay(3000).fadeOut(200);
+				}
+			});
 		});
 	
 	</script>
