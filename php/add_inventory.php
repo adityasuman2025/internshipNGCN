@@ -2,10 +2,7 @@
 	<h3>Add Inventory</h3>
 	
 <!-----inventory form---->
-	<div class="inventory_form">
-		<input id="inv_brand" type="text" placeholder="Brand">
-		<br><br>
-
+	<div class="inventory_form">		
 		Is a Product or Part or Service
 		<br>
 		<select id="inv_type">
@@ -13,6 +10,9 @@
 			<option value="part">Part</option>
 			<option value="service">Service</option>
 		</select>
+		<br><br>
+
+		<input id="inv_brand" type="text" placeholder="Brand">
 		<br><br>
 
 		<input id="inv_model_name" type="text" placeholder="Product/Part">
@@ -47,7 +47,7 @@
 			var inv_desc = $.trim($('#inv_desc').val());
 			var inv_type = $.trim($('#inv_type').val());
 
-			if(inv_brand !="" && inv_model_name !="")
+			if(inv_type !="" && inv_model_name !="")
 			{
 			
 				$.post('php/create_inventory.php', {inv_brand:inv_brand, inv_model_name:inv_model_name, inv_model_num:inv_model_num, inv_hsn_code:inv_hsn_code, inv_desc:inv_desc, inv_type:inv_type}, function(e)

@@ -11,9 +11,13 @@
 	$phone_number = htmlentities(mysqli_real_escape_string($connect_link, $_POST['phone_number']));
 	$registration_number = htmlentities(mysqli_real_escape_string($connect_link, $_POST['registration_number']));
 	$gst_number = htmlentities(mysqli_real_escape_string($connect_link, $_POST['gst_number']));
-	$bank = htmlentities(mysqli_real_escape_string($connect_link, $_POST['bank']));
+	
+	$bank_accnt_name = htmlentities(mysqli_real_escape_string($connect_link, $_POST['bank_accnt_name']));
+	$bank_accnt_no = htmlentities(mysqli_real_escape_string($connect_link, $_POST['bank_accnt_no']));
+	$bank_name = htmlentities(mysqli_real_escape_string($connect_link, $_POST['bank_name']));
+	$bank_ifsc = htmlentities(mysqli_real_escape_string($connect_link, $_POST['bank_ifsc']));
 
-	$create_user_query = "INSERT INTO branch VALUES('', '$user_username', '$company_name', '$branch_name', '$branch_code', '$city', '$address', '$email', '$phone_number', '$registration_number', '$gst_number', '$bank')";
+	$create_user_query = "INSERT INTO branch VALUES('', '$user_username', '$company_name', '$branch_name', '$branch_code', '$city', '$address', '$email', '$phone_number', '$registration_number', '$gst_number', '$bank_accnt_name', '$bank_accnt_no', '$bank_name', '$bank_ifsc')";
 	if($create_user_query_run = mysqli_query($connect_link, $create_user_query))
 	{
 		echo 1;

@@ -708,6 +708,11 @@ body, html
 		background: #cc0000;
 	}
 
+	#invoice_gen_edit_button
+	{
+		display: none;
+	}
+
 /*----quotation listing area--------*/
 	.quotation_list_container
 	{

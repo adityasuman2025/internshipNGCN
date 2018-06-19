@@ -19,8 +19,11 @@
 	$phone_number = $list_user_assoc['phone_number'];
 	$registration_number = $list_user_assoc['registration_number'];
 	$gst_number = $list_user_assoc['gst_number'];
-	$bank = $list_user_assoc['bank'];
-
+	
+	$bank_accnt_name = $list_user_assoc['bank_accnt_name'];
+	$bank_accnt_no = $list_user_assoc['bank_accnt_no'];
+	$bank_name = $list_user_assoc['bank_name'];
+	$bank_ifsc = $list_user_assoc['bank_ifsc'];
 ?>
 
 <!-----edit customer form------->
@@ -70,9 +73,25 @@
 		<input type="text" value="<?php echo $gst_number; ?>" id="branch_entry_branch_gst">
 		<br>
 
-		Bank Account:
+		Bank Account Name:
 		<br>
-		<input type="text" value="<?php echo $city; ?>" id="branch_entry_branch_bank">
+		<input id="branch_entry_bank_accnt_name" type="text" value="<?php echo $bank_accnt_name; ?>">
+		<br>
+
+		Bank Account Number:
+		<br>
+		<input id="branch_entry_bank_accnt_no" type="text" value="<?php echo $bank_accnt_no; ?>">
+		<br>
+		<br>
+
+		Bank Name:
+		<br>
+		<input id="branch_entry_bank_name" type="text" value="<?php echo $bank_name; ?>">
+		<br>
+		
+		Bank IFS Code:
+		<br>
+		<input id="branch_entry_bank_ifsc" type="text" value="<?php echo $bank_ifsc; ?>">
 		<br>
 
 		<br>
@@ -100,11 +119,15 @@
 			var phone_number = $('#branch_entry_branch_phone').val();
 			var registration_number = $('#branch_entry_branch_registration').val();
 			var gst_number = $('#branch_entry_branch_gst').val();
-			var bank = $('#branch_entry_branch_bank').val();
+			
+			var bank_accnt_name = $('#branch_entry_bank_accnt_name').val();
+			var bank_accnt_no = $('#branch_entry_bank_accnt_no').val();
+			var bank_name = $('#branch_entry_bank_name').val();
+			var bank_ifsc = $('#branch_entry_bank_ifsc').val();
 
-			if(company_name!= "" && branch_name!= "" && branch_code!= "" & city!= "" && address!="" && phone_number!= "" && bank!= "")
+			if(company_name!= "" && branch_name!= "" && branch_code!= "" & city!= "" && address!="" && phone_number!= "" && bank_accnt_no!= "")
 			{
-				var query_recieved = "UPDATE branch SET company_name ='" + company_name + "', branch_name ='" + branch_name + "', branch_code = '" + branch_code + "', city = '" + city + "', address = '" + address + "', email = '" + email + "', phone_number = '" + phone_number + "', registration_number = '" + registration_number + "', gst_number = '" + gst_number + "', bank = '" + bank + "' WHERE id = '" + branch_id + "'";
+				var query_recieved = "UPDATE branch SET company_name ='" + company_name + "', branch_name ='" + branch_name + "', branch_code = '" + branch_code + "', city = '" + city + "', address = '" + address + "', email = '" + email + "', phone_number = '" + phone_number + "', registration_number = '" + registration_number + "', gst_number = '" + gst_number + "', bank_accnt_name = '" + bank_accnt_name + "', bank_accnt_no = '" + bank_accnt_no + "', bank_name = '" + bank_name + "', bank_ifsc = '" + bank_ifsc + "' WHERE id = '" + branch_id + "'";
 				// alert(query_recieved);
 
 				$.post('php/query_runner.php', {query_recieved:query_recieved}, function(e)

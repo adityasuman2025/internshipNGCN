@@ -10,6 +10,15 @@
 	{
 		$new_id ="";
 	}
+
+	if(isset($_POST['way']))
+	{
+		$way = $_POST['way'];
+	}
+	else
+	{
+		$way ="";
+	}
 ?>
 
 <tr id="<?php echo $new_id; ?>">
@@ -39,9 +48,31 @@
 	<td><input type="text" disabled="disabled" id="quotation_hsn_code"></td>
 	<td><input type="text" id="quotation_description"></td>
 
+	<?php
+		if($way == "edit")
+		{
+			echo "<td><input type=\"text\" id=\"quotation_serial_num\"></td>	";
+		}
+	?>
+
 	<td><input type="text" id="quotation_service_id"></td>
 
+	<?php
+		if($way == "edit")
+		{
+			echo "<td><input type=\"text\" id=\"quotation_purchase_order\"></td>	";
+		}
+	?>
+
 	<td><input type="number" value="0" id="quotation_part_quantity"></td>
+
+	<?php
+		if($way == "edit")
+		{
+			echo "<td><input type=\"number\" disabled=\"disabled\" id=\"item_availability\"></td>";
+		}
+	?>
+
 	<td><input type="number" value="0" id="quotation_part_rate"></td>
 
 	<td><input type="number" value="0" id="quotation_part_cgst"></td>
@@ -135,6 +166,20 @@
 			$.post('php/query_result_viewer.php', {query:query , to_get:to_get}, function(data)
 			{
 				this_thing.parent().parent().find('#quotation_description').val(data);
+			});
+
+		//populating availability
+			var query = "SELECT in_stock FROM stock WHERE model_number ='" + model_number + "' AND model_name = '" + model_name + "' AND brand = '" + brand + "' AND type ='" + type + "' AND creator_branch_code ='" + creator_branch_code + "'";
+			var to_get = "in_stock";
+
+			$.post('php/query_result_viewer.php', {query:query , to_get:to_get}, function(data)
+			{
+				if(data == '')
+				{
+					data = 0;
+				}
+				
+				this_thing.parent().parent().find('#item_availability').val(data);
 			});
 		});
 
@@ -245,6 +290,27 @@
 		$('.quotation_entry_table tr #quotation_part_igst').keyup(function()
 		{
 			$(this).parent().parent().find('#quotation_part_total_price').val('calculate');
+		});
+
+	//checking the availability of that product or part in stock
+		$('.quotation_entry_table tr #quotation_part_quantity').keyup(function()
+		{
+			$('.gen_quotation_span').html("<img class=\"gif_loader\" src=\"img/loaders1.gif\">");
+
+			this_thing = $(this);			
+			var quantity = parseInt($(this).val());
+			var in_stock = parseInt(this_thing.parent().parent().find('#item_availability').val());
+
+			if(quantity > in_stock)
+			{
+				this_thing.css('border', 'red 1px solid');
+				$('.gen_quotation_span').text("You have entered a quantity greater than its avavilability in stock. You are not able to generate invoice.").css('color', 'red');
+			}
+			else
+			{
+				this_thing.css('border', 'red 0px solid');
+				$('.gen_quotation_span').text("").css('color', 'black');
+			}	
 		});
 
 	//on clicking on delete goods button

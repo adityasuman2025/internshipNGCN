@@ -703,51 +703,6 @@
 						//asking to mail or not
 							$('.ask_mailing_div').fadeIn(100);
 
-							// //if user click on yes
-							// 	$('#mail_yes').click(function()
-							// 	{
-							// 		$('.ask_mailing_div').fadeOut(0);
-
-							// 	//setting quotation view session
-							// 		var session_of = quotation_num;
-							// 		var session_name = "pdf_invoice_of";
-
-							// 		$.post('php/session_creator.php', {session_of: session_of, session_name: session_name}, function(e)
-							// 		{
-							// 			if(e ==1)
-							// 			{
-							// 			//setting mailing session
-							// 				var session_of = 'yes';
-							// 				var session_name = "mail_pdf_of_" + quotation_num;
-							// 				var visibility = "hide";
-
-							// 				$.post('php/session_creator.php', {session_of: session_of, session_name: session_name}, function(e)
-							// 				{
-							// 					if(e ==1)
-							// 					{
-							// 						window.open('php/invoice_pdf.php', '_blank');	
-							// 					}
-							// 					else
-							// 					{
-							// 						$('.warn_box').text("Something went wrong while mailing the customer.");
-							// 						$('.warn_box').fadeIn(200).delay(3000).fadeOut(200);
-							// 					}
-							// 				});
-							// 			}
-							// 			else
-							// 			{
-							// 				$('.warn_box').text("Something went wrong while generating pdf file of the quotation.");
-							// 				$('.warn_box').fadeIn(200).delay(3000).fadeOut(200);
-							// 			}
-							// 		});
-							// 	});
-
-							// //if user click on no
-							// 	$('#mail_no').click(function()
-							// 	{
-							// 		$('.ask_mailing_div').fadeOut(0);
-							// 	});
-
 							var generated_from = "invoice";
 							$.post('php/quotation_into_invoice.php', {quotation_num:quotation_num, generated_from:generated_from}, function(data)
 							{
@@ -768,49 +723,49 @@
 			}
 		});
 
-		//if user click on yes
-			$('#mail_yes').click(function()
+	//if user click on yes
+		$('#mail_yes').click(function()
+		{
+			$('.ask_mailing_div').fadeOut(0);
+
+		//setting quotation view session
+			var session_of = quotation_num;
+			var session_name = "pdf_invoice_of";
+
+			$.post('php/session_creator.php', {session_of: session_of, session_name: session_name}, function(e)
 			{
-				$('.ask_mailing_div').fadeOut(0);
-
-			//setting quotation view session
-				var session_of = quotation_num;
-				var session_name = "pdf_invoice_of";
-
-				$.post('php/session_creator.php', {session_of: session_of, session_name: session_name}, function(e)
+				if(e ==1)
 				{
-					if(e ==1)
-					{
-					//setting mailing session
-						var session_of = 'yes';
-						var session_name = "mail_pdf_of_" + quotation_num;
-						var visibility = "hide";
+				//setting mailing session
+					var session_of = 'yes';
+					var session_name = "mail_pdf_of_" + quotation_num;
+					var visibility = "hide";
 
-						$.post('php/session_creator.php', {session_of: session_of, session_name: session_name}, function(e)
+					$.post('php/session_creator.php', {session_of: session_of, session_name: session_name}, function(e)
+					{
+						if(e ==1)
 						{
-							if(e ==1)
-							{
-								window.open('php/invoice_pdf.php', '_blank');	
-							}
-							else
-							{
-								$('.warn_box').text("Something went wrong while mailing the customer.");
-								$('.warn_box').fadeIn(200).delay(3000).fadeOut(200);
-							}
-						});
-					}
-					else
-					{
-						$('.warn_box').text("Something went wrong while generating pdf file of the quotation.");
-						$('.warn_box').fadeIn(200).delay(3000).fadeOut(200);
-					}
-				});
+							window.open('php/invoice_pdf.php', '_blank');	
+						}
+						else
+						{
+							$('.warn_box').text("Something went wrong while mailing the customer.");
+							$('.warn_box').fadeIn(200).delay(3000).fadeOut(200);
+						}
+					});
+				}
+				else
+				{
+					$('.warn_box').text("Something went wrong while generating pdf file of the quotation.");
+					$('.warn_box').fadeIn(200).delay(3000).fadeOut(200);
+				}
 			});
+		});
 
-		//if user click on no
-			$('#mail_no').click(function()
-			{
-				$('.ask_mailing_div').fadeOut(0);
-			});
+	//if user click on no
+		$('#mail_no').click(function()
+		{
+			$('.ask_mailing_div').fadeOut(0);
+		});
 	
 	</script>

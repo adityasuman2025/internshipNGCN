@@ -18,7 +18,6 @@
 			<th>Customer Number</th>
 			<th>Date of Generation</th>
 			<th>Total Amount</th>
-			<!-- <th>Invoice</th> -->
 			<th>Created By</th>
 			<th>Actions</th>
 		</tr>

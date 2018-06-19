@@ -20,6 +20,8 @@
 			$creator_username = $query_assoc['creator_username'];
 			$creator_branch_code = $query_assoc['creator_branch_code'];
 			$customer_name = $query_assoc['customer'];
+			$purchase_order = $query_assoc['purchase_order'];
+
 			$type = $query_assoc['type'];
 		
 		//gettting date of generation of quotation
@@ -38,7 +40,11 @@
 			$branch_email = $get_branch_info_assoc['email'];
 			$branch_phone_number = $get_branch_info_assoc['phone_number'];
 			$branch_gst_number = $get_branch_info_assoc['gst_number'];
-			$branch_bank = $get_branch_info_assoc['bank'];
+			
+			$bank_accnt_name = $get_branch_info_assoc['bank_accnt_name'];
+			$bank_accnt_no = $get_branch_info_assoc['bank_accnt_no'];
+			$bank_name = $get_branch_info_assoc['bank_name'];
+			$bank_ifsc = $get_branch_info_assoc['bank_ifsc'];
 
 			//breaking branch address
 				$branch_address_broken = explode("#", $branch_address);
@@ -245,16 +251,22 @@
 
 		$pdf  = new FPDF('p', 'mm', 'A4');
 		$pdf -> AddPage();
-		
-	//cell(width, height, text, border, endline, [align])
-		
+			
+	//heading
+		$pdf->SetTextColor(204,0,0); //text color //red		
+		$pdf->SetFont('Arial', 'B', 16); //font
+		$pdf->Cell(110, 6, 'Quotation', 0, 0, 'R');
+
+		$pdf->SetTextColor(0,0,0); //text color //black		
+		$pdf->SetFont('Arial', '', 8); //font
+		$pdf->Cell(79, 6, '', 0, 1, 'R'); //end of line
+
 	//first line(logo and quotation text)
-		$pdf->SetFont('Arial', '', 12); //font
-
+		$pdf->SetTextColor(0,0,0); //text color //black	
+		
 		$image1 = "../img/logo.jpg";
-		$pdf->Cell( 120, 25, $pdf->Image($image1, 10, 10, 35, 25), 0, 0, 'L', false );
-		//$pdf->Image("../img/logo.jpg", 10, 10, 40, 30, "JPG");
-
+		$pdf->Cell(120, 25, $pdf->Image($image1, 15, 15, 35, 25), 0, 0, 'L', false );
+		
 		$pdf->SetFont('Arial', 'B', 11); //font
 		$pdf->Cell(69, 4,  $branch_company_name, 0, 1); //end of line
 
@@ -284,42 +296,38 @@
 		$pdf->Cell(69, 4,"GST Number: ". $branch_gst_number, 0, 1);
 
 	//black space and line
-		$pdf -> Line(0, 47, 70, 47);
-		$pdf -> Line(109, 47, 219, 47);
-
-		$pdf->Cell(189, 1, '', 0, 1);
+		$pdf -> Line(0, 53, 219, 53);
+		$pdf -> Line(0, 59, 219, 59);
+		$pdf->Cell(189, 1, '', 0, 1); //end of line
 
 	//quotation number and date line
 		$pdf->SetFont('Arial', '', 12); //font
 		$pdf->SetTextColor(0,0,0); //text color //black
-		$pdf->Cell(20, 6, 'Date: ', 0, 0);
+		$pdf->Cell(20, 7, 'Date: ', 0, 0);
 		
 		$pdf->SetTextColor(204,0,0); //text color //red
-		$pdf->Cell(44, 6, $date_of_generation, 0, 0);
+		$pdf->Cell(35, 7, $date_of_generation, 0, 0);
 
-		$pdf->SetFont('Arial', 'B', 16); //font
-		$pdf->Cell(55, 6, 'Quotation', 0, 0);
+		$pdf->SetFont('Arial', '', 11); //font
+		$pdf->SetTextColor(0,0,0); //text color //black
+		$pdf->Cell(67, 7, '', 0, 0);
 
 		$pdf->SetFont('Arial', '', 12); //font
 		$pdf->SetTextColor(0,0,0); //text color //black
-		$pdf->Cell(35, 6, 'Quotation No: ', 0, 0);
+		$pdf->Cell(35, 7, 'Quotation No: ', 0, 0);
 
 		$pdf->SetTextColor(204,0,0); //text color //red
-		$pdf->Cell(39, 6, $quotation_code, 0, 1);//end of line
+		$pdf->Cell(39, 7, $quotation_code, 0, 1);//end of line
 
-	//black space and line
-		$pdf -> Line(0, 53, 70, 53);
-		$pdf -> Line(109, 53, 219, 53);
-
-		$pdf->Cell(189, 3, '', 0, 1);
+		$pdf->Cell(189, 1, '', 0, 1); //end of line
 
 	//second line (address)
 		$pdf->SetTextColor(0,0,0); //text color //black
 
 		$pdf->SetFont('Arial', 'B', 12); //font
-		$pdf->Cell(120, 4, 'Billing To', 0, 0);
+		$pdf->Cell(120, 5, 'Billing To', 0, 0);
 		
-		$pdf->Cell(30, 4, 'Shipping To', 0, 1);
+		$pdf->Cell(30, 5, 'Shipping To', 0, 1);
 
 	//third line (address)
 		$pdf->SetFont('Arial', '', 10); //font
@@ -364,20 +372,32 @@
 		$pdf->Cell(189, 3, '', 0, 1);
 
 	//13th line (Purchased Item heading)
-		$pdf->SetFont('Arial', 'B', 11); //font
+		$pdf->SetFont('Arial', 'B', 10); //font
 		$pdf->SetTextColor(0,0,0); //text color //black
 
-		$pdf->Cell(11, 5, 'S. No', 1, 0, 'C');
-		$pdf->Cell(62, 5, 'ITEM', 1, 0, 'C');
+		$pdf->Cell(8, 5, 'SL', 'LRT', 0, 'C');
+		$pdf->Cell(80, 5, 'Item', 'LRT', 0, 'C');
+		
+		$pdf->Cell(14, 5, 'Unit', 'LRT', 0, 'C');
+		$pdf->Cell(8, 5, 'Qty','LRT', 0, 'C');
+		$pdf->Cell(13, 5, 'Net', 'LRT', 0, 'C');
 
-		$pdf->Cell(13, 5, 'Type', 1, 0, 'C');
-		$pdf->Cell(11, 5, 'HSN', 1, 0, 'C');	
-		$pdf->Cell(11, 5, 'Qty', 1, 0, 'C');
-		$pdf->Cell(15, 5, 'Rate', 1, 0, 'C');
-		$pdf->Cell(15, 5, 'CGST', 1, 0, 'C');
-		$pdf->Cell(15, 5, 'SGST', 1, 0, 'C');
-		$pdf->Cell(15, 5, 'IGST', 1, 0, 'C');
-		$pdf->Cell(20, 5, 'Price', 1, 1, 'C'); //end of line
+		$pdf->Cell(11, 5, 'TAX', 'LRT', 0, 'C');
+		$pdf->Cell(11, 5, 'TAX', 'LRT',  0, 'C');
+		$pdf->Cell(16, 5, 'TAX', 'LRT', 0, 'C');
+		$pdf->Cell(17, 5, 'Total', 'LRT', 1, 'C');
+		
+		$pdf->Cell(8, 5, '','LRB', 0, 'C');
+		$pdf->Cell(80, 5, '','LRB', 0, 'C');
+
+		$pdf->Cell(14, 5, 'Price','LRB', 0, 'C');
+		$pdf->Cell(8, 5, '','LRB', 0, 'C');
+		$pdf->Cell(13, 5, 'Price','LRB', 0, 'C');
+
+		$pdf->Cell(11, 5, 'Rate','LRB', 0, 'C');
+		$pdf->Cell(11, 5, 'Type', 'LRB', 0, 'C');
+		$pdf->Cell(16, 5, 'Amount', 'LRB', 0, 'C');
+		$pdf->Cell(17, 5, 'Amount', 'LRB', 1, 'C');
 
 	//get item infos
 		$total_amount = 0;
@@ -402,9 +422,15 @@
 			$item_quantity = $get_item_info_assoc['quantity'];
 			$item_rate = round($get_item_info_assoc['rate'], 2);
 
+			$net_price = $item_quantity*$item_rate;
+
 			$item_cgst = $get_item_info_assoc['cgst'];
 			$item_sgst = $get_item_info_assoc['sgst'];
 			$item_igst = $get_item_info_assoc['igst'];
+
+			$cgst_amount = ($item_rate*$item_quantity)*$item_cgst/100;
+			$sgst_amount = ($item_rate*$item_quantity)*$item_sgst/100;
+			$igst_amount = ($item_rate*$item_quantity)*$item_igst/100;
 
 			$item_total_price = round($get_item_info_assoc['total_price'],2);
 			$total_amount = $total_amount + $item_total_price;
@@ -413,32 +439,79 @@
 			$pdf->SetFont('Arial', '', 10); //font
 			$pdf->SetTextColor(30, 30, 30); //text color //black
 
-			$pdf->Cell(11, 5, $item_serial, 'LR', 0, 'C');
+		//item line
+				$pdf->Cell(8, 5, $item_serial, 'LR', 0, 'C');
+				$pdf->Cell(80, 5, $item_brand . ' ' . $item_model_name . ' ' . $item_model_number, 0, 0);
+				
+				$pdf->Cell(14, 5, $item_rate ,  'L', 0,'C');
+				$pdf->Cell(8, 5, $item_quantity ,  'L', 0,'C');
+				$pdf->Cell(13, 5, $net_price ,  'L', 0,'C');
+				$pdf->Cell(11, 5, $item_cgst . "%" ,  'L', 0,'C');
+				$pdf->Cell(11, 5, 'CGST' ,  'L', 0,'C');
+				$pdf->Cell(16, 5, $cgst_amount, 'L', 0, 'C');
+				$pdf->Cell(17, 5, '', 'LR', 1,'C'); //end of line
 
-			$pdf->Cell(62, 5, $item_brand . ' ' . $item_model_name . ' ' . $item_model_number, 0, 0);
-			
-			$pdf->Cell(13, 5, $type ,'L', 0,'C');
-			$pdf->Cell(11, 5, $item_hsn_code ,'L', 0,'C');	
-			$pdf->Cell(11, 5, $item_quantity , 'L', 0,'C');
-			$pdf->Cell(15, 5, $item_rate ,  'L', 0,'C');
-			$pdf->Cell(15, 5, $item_cgst*$item_quantity*$item_rate/100,  'L', 0,'C');
-			$pdf->Cell(15, 5, $item_sgst*$item_quantity*$item_rate/100, 'L', 0,'C');
-			$pdf->Cell(15, 5, $item_igst*$item_quantity*$item_rate/100, 'L', 0,'C');
-			$pdf->Cell(20, 5, $item_total_price, 'LR', 1,'C'); //end of line
+			//type line
+				$pdf->Cell(8, 5, '', 'LR', 0, 'C');
+				$pdf->Cell(80, 5, 'Type:' . $type, 0, 0);
+				
+				$pdf->Cell(14, 5, '' ,  'L', 0,'C');
+				$pdf->Cell(8, 5, '' ,  'L', 0,'C');
+				$pdf->Cell(13, 5, '' ,  'L', 0,'C');
+				$pdf->Cell(11, 5, '' ,  'L', 0,'C');
+				$pdf->Cell(11, 5, '' ,  'L', 0,'C');
+				$pdf->Cell(16, 5, '', 'L', 0, 'C');
+				$pdf->Cell(17, 5, '', 'LR', 1,'C'); //end of line
 
-		//description area
-			$pdf->Cell(11, 5, '', 'LRB', 0);
-			$pdf->SetFont('Arial', 'B', 10); //font
-			$pdf->Cell(62, 5, substr("DESC: " . $item_description, 0, 34), 'B', 0);
+			//serial line
+				$pdf->Cell(8, 5, '', 'LR', 0, 'C');
+				$pdf->Cell(80, 5, 'SL:' . $item_serial_number, 0, 0);
+				
+				$pdf->Cell(14, 5, '' ,  'L', 0,'C');
+				$pdf->Cell(8, 5, '' ,  'L', 0,'C');
+				$pdf->Cell(13, 5, '' ,  'L', 0,'C');
+				$pdf->Cell(11, 5, $item_sgst . "%" , 'L', 0,'C');
+				$pdf->Cell(11, 5, 'SGST' ,  'L', 0,'C');
+				$pdf->Cell(16, 5, $sgst_amount, 'L', 0, 'C');
+				$pdf->Cell(17, 5, '', 'LR', 1,'C'); //end of line
 
-			$pdf->Cell(13, 5, '' ,'LB', 0);	
-			$pdf->Cell(11, 5, '' , 'LB', 0);
-			$pdf->Cell(11, 5, '' , 'LB', 0);
-			$pdf->Cell(15, 5, '' ,  'LB', 0);
-			$pdf->Cell(15, 5, '',  'LB', 0);
-			$pdf->Cell(15, 5, '', 'LB', 0);
-			$pdf->Cell(15, 5, '', 'LB', 0);
-			$pdf->Cell(20, 5, '', 'LRB', 1); //end of line
+			//hsn line
+				$pdf->Cell(8, 5, '', 'LR', 0, 'C');
+				$pdf->Cell(80, 5, 'HSN:' . $item_hsn_code, 0, 0);
+				
+				$pdf->Cell(14, 5, '' ,  'L', 0,'C');
+				$pdf->Cell(8, 5, '' ,  'L', 0,'C');
+				$pdf->Cell(13, 5, '' ,  'L', 0,'C');
+				$pdf->Cell(11, 5, '' ,  'L', 0,'C');
+				$pdf->Cell(11, 5, '' ,  'L', 0,'C');
+				$pdf->Cell(16, 5, '', 'L', 0, 'C');
+				$pdf->Cell(17, 5, '', 'LR', 1,'C'); //end of line
+
+			//desc line
+				$pdf->Cell(8, 5, '', 'LR', 0, 'C');
+				$pdf->Cell(80, 5, 'Desc:' . $item_description, 0, 0);
+				
+				$pdf->Cell(14, 5, '' ,  'L', 0,'C');
+				$pdf->Cell(8, 5, '' ,  'L', 0,'C');
+				$pdf->Cell(13, 5, '' ,  'L', 0,'C');
+				$pdf->Cell(11, 5, $item_igst . "%" , 'L', 0,'C');
+				$pdf->Cell(11, 5, 'IGST' ,  'L', 0,'C');
+				$pdf->Cell(16, 5, $igst_amount, 'L', 0, 'C');
+				$pdf->Cell(17, 5, '', 'LR', 1,'C'); //end of line
+
+			//total amount line
+				$pdf->Cell(8, 5, '', 'LB', 0, 'C');
+				$pdf->Cell(80, 5, '', 'LB', 0);
+				
+				$pdf->Cell(14, 5, '' ,  'LB', 0,'C');
+				$pdf->Cell(8, 5, '' ,  'LB', 0,'C');
+				$pdf->Cell(13, 5, '' ,  'LB', 0,'C');
+				$pdf->Cell(11, 5, '' ,  'LB', 0,'C');
+				$pdf->Cell(11, 5, '' ,  'LB', 0,'C');
+				$pdf->Cell(16, 5, '', 'LB', 0, 'C');
+
+				$pdf->SetFont('Arial', 'B', 10); //font
+				$pdf->Cell(17, 5, $item_total_price, 'LRB', 1,'C'); //end of line
 		}
 
 	//Totaling up line (Purchased Item heading)
@@ -491,39 +564,36 @@
 		$in_words = "Rupees " . $result . "Only";
 
 		$pdf->SetFont('Arial', '', 11); //font
-		$pdf->Cell(133, 7, $in_words, 1, 0);
+		$pdf->Cell(128, 6, $in_words, 1, 0);
 
 		$pdf->SetFont('Arial', 'B', 12); //font
 		$pdf->SetTextColor(0, 0, 0); //text color //black
-		$pdf->Cell(30, 7, 'Total Amount', 1, 0);
-		$pdf->Cell(25, 7, $total_amount, 1, 1); //end of line
+		$pdf->Cell(30, 6, 'Total Amount', 1, 0);
+		$pdf->Cell(20, 6, $total_amount, 1, 1); //end of line
 
 	//leaving blank space
-		$pdf->Cell(200, 5, '', 0, 1);
+		$pdf->Cell(200, 3, '', 0, 1);
 
 	//branch bank details
-		$pdf->SetFont('Arial', 'B', 12); //font
+		$pdf->SetFont('Arial', 'B', 11); //font
 		$pdf->Cell(189, 5, 'Bank Details:', 0, 1);
 
-		$pdf->SetFont('Arial', '', 11); //font
-		$pdf->MultiCell(189, 5, $branch_bank, 0,1);
+		$pdf->SetFont('Arial', '', 10); //font
+		$pdf->Cell(189, 5, 'A/C Name: ' . $bank_accnt_name , 0,1);
+		$pdf->Cell(189, 5, 'A/C Number: ' . $bank_accnt_no , 0,1);
+		$pdf->Cell(189, 5, 'Bank Name: ' . $bank_name , 0,1);
+		$pdf->Cell(150, 5, 'IFS Code: ' . $bank_ifsc , 0,0);
 
+		$pdf->Cell(39, 5, 'Authorized Signatory', 0,1);
 
 	//another page for terms and conditions
 		$pdf -> AddPage();
 		$pdf->SetTextColor(0, 0, 0); //text color //black
-		$pdf->Cell(189, 5, 'Terms & Condition', 0, 1);
+		$pdf->Cell(189, 5, 'Terms & Conditions', 0, 1);
 
 	//getting output of the pdf in a file if mailing is to be done
-		if(isset($_SESSION[$session_name]))
-		{
-			$filename = "../quotation/Quotation-" . $quotation_num . ".pdf";
-			$pdf->Output($filename, 'F');
-
-			$pdf->Output();	
-		}
-		else
-		{
-			$pdf->Output();
-		}
+		$pdf->Output();
+		
+		$filename = "../invoice/Invoice-" . $quotation_num . ".pdf";
+		$pdf->Output($filename, 'F');	
 ?>

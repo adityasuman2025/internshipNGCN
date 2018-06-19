@@ -27,7 +27,7 @@
 		</tr>
 
 		<?php
-			$query = "SELECT * FROM quotation WHERE creator_branch_code = '$creator_branch_code' AND payment_method !='' GROUP BY quotation_num ORDER BY quotation_num DESC";
+			$query = "SELECT * FROM quotation WHERE creator_branch_code = '$creator_branch_code' AND payment_method !='' GROUP BY quotation_num ORDER BY date_of_payment DESC";
 			$list_quotation_query_run = mysqli_query($connect_link, $query);
 
 			while($list_quotation_assoc = mysqli_fetch_assoc($list_quotation_query_run))
@@ -80,6 +80,9 @@
 					echo "<td>";
 						echo "<img quotation_num=\"$quotation_num\" class=\"user_view_icon\" src=\"img/view.png\"/>";
 						echo "<img quotation_num=\"$quotation_num\" class=\"user_delete_icon\" src=\"img/delete.png\"/>";
+						echo "<button class=\"transporter_copy_button\" quotation_num=\"$quotation_num\">Transporter</button>";
+						echo "<br> <br>";
+						echo "<button class=\"supplier_copy_button\" quotation_num=\"$quotation_num\">Supplier</button>";
 					echo "</td>";
 				echo "</tr>";
 			}
@@ -115,6 +118,15 @@
 		{
 			var quotation_num =  $.trim($(this).attr('quotation_num'));
 
+		//for defining type of the invoice
+			var session_of = "normal";
+			var session_name = "invoice_type";
+				
+			$.post('php/session_creator.php', {session_of: session_of, session_name: session_name}, function(e)
+			{
+
+			});
+
 		//for getting pdf of the quotation
 			var session_of = quotation_num;
 			var session_name = "pdf_invoice_of";
@@ -133,4 +145,68 @@
 			});
 		});
 		
+	//on clicking on transporter copy
+		$('.transporter_copy_button').click(function()
+		{
+			var quotation_num =  $.trim($(this).attr('quotation_num'));
+
+		//for defining type of the invoice
+			var session_of = "transporter";
+			var session_name = "invoice_type";
+				
+			$.post('php/session_creator.php', {session_of: session_of, session_name: session_name}, function(e)
+			{
+
+			});
+
+		//for getting pdf of the invoice
+			var session_of = quotation_num;
+			var session_name = "pdf_invoice_of";
+				
+			$.post('php/session_creator.php', {session_of: session_of, session_name: session_name}, function(e)
+			{
+				if(e ==1)
+				{
+					window.open('php/invoice_pdf.php', '_blank');	
+				}
+				else
+				{
+					$('.warn_box').text("Something went wrong while generating pdf file of the invoice.");
+					$('.warn_box').fadeIn(200).delay(3000).fadeOut(200);
+				}
+			});
+		});
+
+	//on clicking on supplier copy
+		$('.supplier_copy_button').click(function()
+		{
+			var quotation_num =  $.trim($(this).attr('quotation_num'));
+
+		//for defining type of the invoice
+			var session_of = "supplier";
+			var session_name = "invoice_type";
+				
+			$.post('php/session_creator.php', {session_of: session_of, session_name: session_name}, function(e)
+			{
+
+			});
+
+		//for getting pdf of the invoice
+			var session_of = quotation_num;
+			var session_name = "pdf_invoice_of";
+				
+			$.post('php/session_creator.php', {session_of: session_of, session_name: session_name}, function(e)
+			{
+				if(e ==1)
+				{
+					window.open('php/invoice_pdf.php', '_blank');	
+				}
+				else
+				{
+					$('.warn_box').text("Something went wrong while generating pdf file of the invoice.");
+					$('.warn_box').fadeIn(200).delay(3000).fadeOut(200);
+				}
+			});
+
+		});
 	</script>

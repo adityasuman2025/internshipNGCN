@@ -534,7 +534,9 @@
 	//on clicking on add new goods button
 		$('#add_new_goods_button').click(function()
 		{
-			$.post('php/add_new_quotation_item.php', {},function(data)
+			var way = "add";
+			
+			$.post('php/add_new_quotation_item.php', {way:way},function(data)
 			{
 				//alert(data);
 				$('.quotation_entry_table tbody').append(data);
@@ -606,51 +608,6 @@
 							
 						//asking to mail or not
 							$('.ask_mailing_div').fadeIn(100);
-
-							// //if user click on yes
-							// 	$('#mail_yes').click(function()
-							// 	{
-							// 		$('.ask_mailing_div').fadeOut(0);
-
-							// 	//setting quotation view session
-							// 		var session_of = quotation_num;
-							// 		var session_name = "pdf_quotation_of";
-
-							// 		$.post('php/session_creator.php', {session_of: session_of, session_name: session_name}, function(e)
-							// 		{
-							// 			if(e ==1)
-							// 			{
-							// 			//setting mailing session
-							// 				var session_of = 'yes';
-							// 				var session_name = "mail_pdf_of_" + quotation_num;
-							// 				var visibility = "hide";
-
-							// 				$.post('php/session_creator.php', {session_of: session_of, session_name: session_name}, function(e)
-							// 				{
-							// 					if(e ==1)
-							// 					{
-							// 						window.open('php/quotation_pdf.php', '_blank');	
-							// 					}
-							// 					else
-							// 					{
-							// 						$('.warn_box').text("Something went wrong while mailing the customer.");
-							// 						$('.warn_box').fadeIn(200).delay(3000).fadeOut(200);
-							// 					}
-							// 				});
-							// 			}
-							// 			else
-							// 			{
-							// 				$('.warn_box').text("Something went wrong while generating pdf file of the quotation.");
-							// 				$('.warn_box').fadeIn(200).delay(3000).fadeOut(200);
-							// 			}
-							// 		});
-							// 	});
-
-							// //if user click on no
-							// 	$('#mail_no').click(function()
-							// 	{
-							// 		$('.ask_mailing_div').fadeOut(0);
-							// 	});
 						}
 						else
 						{
