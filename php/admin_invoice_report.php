@@ -355,7 +355,7 @@
 							echo "<td>$customer</td>";
 							echo "<td>$date</td>";
 							echo "<td>$final_price</td>";
-							echo "<td>$type</td>";
+							// echo "<td>$type</td>";
 							echo "<td>$payment_method</td>";
 							echo "<td>$date_of_payment</td>";
 							echo "<td>$creator_username</td>";

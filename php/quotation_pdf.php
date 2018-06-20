@@ -283,8 +283,8 @@
 		$pdf->Cell(120, 4, '', 0, 0);
 		$pdf->Cell(69, 4, $branch_address_array[3], 0, 1);
 
-		$pdf->Cell(120, 4, '', 0, 0);
-		$pdf->Cell(69, 4, $branch_address_array[4], 0, 1);
+		// $pdf->Cell(120, 4, '', 0, 0);
+		// $pdf->Cell(69, 4, $branch_address_array[4], 0, 1);
 
 		$pdf->Cell(120, 4, '', 0, 0);
 		$pdf->Cell(69, 4, "Ph: " . $branch_phone_number, 0, 1);
@@ -296,8 +296,8 @@
 		$pdf->Cell(69, 4,"GST Number: ". $branch_gst_number, 0, 1);
 
 	//black space and line
-		$pdf -> Line(0, 53, 219, 53);
-		$pdf -> Line(0, 59, 219, 59);
+		$pdf -> Line(0, 49, 219, 49);
+		$pdf -> Line(0, 55, 219, 55);
 		$pdf->Cell(189, 1, '', 0, 1); //end of line
 
 	//quotation number and date line
@@ -356,9 +356,9 @@
 		$pdf->Cell(120, 4, $customer_address_array[3] , 0, 0);
 		$pdf->Cell(69, 4, $customer_shipping_address_array[3], 0, 1); //end of line
 
-	//4th line (address)
-		$pdf->Cell(120, 4, $customer_address_array[4] , 0, 0);
-		$pdf->Cell(69, 4, $customer_shipping_address_array[4], 0, 1); //end of line
+	// //4th line (address)
+	// 	$pdf->Cell(120, 4, $customer_address_array[4] , 0, 0);
+	// 	$pdf->Cell(69, 4, $customer_shipping_address_array[4], 0, 1); //end of line
 
 	//5th line
 		$pdf->Cell(120, 4, "GST Number: " . $customer_gst, 0, 0);
