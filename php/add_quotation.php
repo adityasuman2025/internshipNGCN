@@ -106,7 +106,7 @@
 				<tr>		
 					<th>Type</th>
 					<th>Brand</th>
-					<th>Product/Part</th>
+					<th>Product/Part Name</th>
 					<th>Product/Part Code</th>
 					<th>HSN Code</th>
 					<th>Description</th>

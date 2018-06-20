@@ -1,5 +1,5 @@
 <!-------inventory area----->
-	<h3>Add Inventory</h3>
+	<h3>Add Product/Part/Service</h3>
 	
 <!-----inventory form---->
 	<div class="inventory_form">		
@@ -15,7 +15,7 @@
 		<input id="inv_brand" type="text" placeholder="Brand">
 		<br><br>
 
-		<input id="inv_model_name" type="text" placeholder="Product/Part">
+		<input id="inv_model_name" type="text" placeholder="Product/Part Name">
 		<br><br>
 		<input id="inv_model_num" type="text" placeholder="Product/Part Code">
 		<br><br>

@@ -8,7 +8,7 @@
 	</script>
 
 <!---------user list container------>
-	<h3>Manage Inventory</h3>
+	<h3>Manage Product/Service</h3>
 	
 	<div id="table_export" class="inventory_list_container">
 

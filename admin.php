@@ -54,10 +54,10 @@
 				</ul>
 			</li>
 
-			<li title="Inventory">Inventory
+			<li title="Product/Service">Product/Service
 				<ul>
-					<li work="add_inventory">Add Inventory</li>
-					<li work="manage_inventory">Manage Inventory</li>
+					<li work="add_inventory">Add Product/Service</li>
+					<li work="manage_inventory">Manage Product/Service</li>
 				</ul>
 			</li>
 

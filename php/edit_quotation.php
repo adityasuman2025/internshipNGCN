@@ -180,28 +180,40 @@
 							echo "<td><input type=\"text\" value=\"$purchase_order\" id=\"quotation_purchase_order\"></td>";
 
 							//for getting availability of the item in the stock
-								$query = "SELECT in_stock FROM stock WHERE model_number ='" . $model_number . "' AND model_name = '" . $model_name . "' AND brand = '" . $brand . "' AND type ='" . $item_type . "' AND creator_branch_code ='" . $creator_branch_code . "'";
-								
-								$query_run = mysqli_query($connect_link, $query);
-								$query_fetch_assoc = mysqli_fetch_assoc($query_run);
-								$in_stock = $query_fetch_assoc['in_stock'];
-
-								if($in_stock == '')
+								if($item_type == 'service') //the that item is service then neglecting the availability if that item
 								{
 									$in_stock = 0;
-								}
 
-								if($quantity <= $in_stock)
-								{
+								//keeping the normal border
 									$avail_class = "border: grey 0px solid";
 									$fo = "1";
 								}
 								else
 								{
-									$avail_class = "border: red 1px solid";
-									$fo = "0";
-								}
+									$query = "SELECT in_stock FROM stock WHERE model_number ='" . $model_number . "' AND model_name = '" . $model_name . "' AND brand = '" . $brand . "' AND type ='" . $item_type . "' AND creator_branch_code ='" . $creator_branch_code . "'";
+								
+									$query_run = mysqli_query($connect_link, $query);
+									$query_fetch_assoc = mysqli_fetch_assoc($query_run);
+									$in_stock = $query_fetch_assoc['in_stock'];
 
+									if($in_stock == '')
+									{
+										$in_stock = 0;
+									}
+
+									if($quantity <= $in_stock)
+									{
+										$avail_class = "border: grey 0px solid";
+										$fo = "1";
+									}
+									else
+									{
+										$avail_class = "border: red 1px solid";
+										$fo = "0";
+									}
+
+								}
+								
 							echo "<td><input type=\"number\" fo=\"$fo\" style=\"$avail_class\" value=\"$quantity\" id=\"quotation_part_quantity\"></td>";
 							echo "<td><input type=\"number\" disabled=\"disabled\" value=\"$in_stock\" id=\"item_availability\"></td>";
 
@@ -536,17 +548,25 @@
 			this_thing = $(this);			
 			var quantity = parseInt($(this).val());
 			var in_stock = parseInt(this_thing.parent().parent().find('#item_availability').val());
-
-			if(quantity > in_stock)
+			var type = this_thing.parent().parent().find('#quotation_item_type').val();
+			
+			if(type == 'service')
 			{
-				this_thing.css('border', 'red 1px solid');
-				$('.gen_quotation_span').text("You have entered a quantity greater than its avavilability in stock. You are not able to generate invoice.").css('color', 'red');
+				$('.gen_quotation_span').text("").css('color', 'black');
 			}
 			else
 			{
-				this_thing.css('border', 'red 0px solid');
-				$('.gen_quotation_span').text("").css('color', 'black');
-			}	
+				if(quantity > in_stock)
+				{
+					this_thing.css('border', 'red 1px solid');
+					$('.gen_quotation_span').text("You have entered a quantity greater than its avavilability in stock. You are not able to generate invoice.").css('color', 'red');
+				}
+				else
+				{
+					this_thing.css('border', 'red 0px solid');
+					$('.gen_quotation_span').text("").css('color', 'black');
+				}	
+			}
 		});
 
 	//on clicking on save edit button

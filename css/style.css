@@ -790,7 +790,19 @@ body, html
 		color: white;
 	}
 
-/*--------admin quotation area------*/
+/*--------report area area------*/
+	.report_type_div
+	{
+		padding: 4px;
+		background: #f1f1f1;
+		border-radius: 4px;
+		display: block;
+		margin: auto;
+		width: 70%;
+		text-align: center;
+		box-shadow: 0px 0px 1px grey;
+	}
+
 	.search_date_div
 	{
 		padding: 7px;
@@ -812,6 +824,14 @@ body, html
 		border: none;
 		padding: 3px;
 		margin: 3px;
+	}
+
+	.sum_of_money_div
+	{
+		text-align: center;
+		background: #f1f1f1;
+		border-radius: 5px;
+		padding: 1px;
 	}
 
 /*---------user dashboard area----------*/

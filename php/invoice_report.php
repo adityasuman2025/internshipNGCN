@@ -14,9 +14,18 @@
 	</script>
 
 <!------------page area---------->
-	<br><br>
-	
 	<div class="inventory_list_container">
+		<br>
+	<!---------get individual report------->
+		<div class="report_type_div">
+			<h4>Get Individual Report For:</h4>
+			<button type="*" class="all_report_button">All</button>
+			<button type="product" class="product_report_button">Product</button>
+			<button type="part" class="part_report_button">Part</button>
+			<button type="service" class="service_report_button">Service</button>
+		</div>
+		<br>
+
 	<!--------search date area--------->
 		<div class="search_date_div">
 			<button class="today_report_button">Today's</button>
@@ -61,7 +70,20 @@
 	<!--------table area--------->
 		<table id="table_export" class="list_inventory_table">				
 			<tr>
-				<th>Quotation Number</th>
+				<th>Invoice Number</th>
+				
+				<?php
+					if(isset($_SESSION['report_type']))
+					{
+						$report_type = $_SESSION['report_type'];
+
+						if($report_type != '*')
+						{
+							echo "<th>Type</th>";
+						}
+					}
+				?>
+
 				<th>Customer Number</th>
 				<th>Date of Generation</th>
 				<th>Total Amount</th>
@@ -69,13 +91,28 @@
 				<th>Payment Method</th>
 				<th>Payment Date</th>
 				<th>Created By</th>
-				<th>Actions</th>
+
+				<?php
+					if(isset($_SESSION['report_type']))
+					{
+						$report_type = $_SESSION['report_type'];
+
+						if($report_type == '*')
+						{
+							echo "<th>Actions</th>";
+						}
+					}
+					else
+					{
+						echo "<th>Actions</th>";
+					}		
+				?>
 			</tr>
 
 			<?php
 
 				//getting total count of quotation num at that branch
-					$count_quotation_num_query = "SELECT quotation_num FROM quotation WHERE creator_branch_code = '$creator_branch_code' AND payment_method !='' GROUP BY quotation_num ";
+					$count_quotation_num_query = "SELECT quotation_num FROM quotation WHERE creator_branch_code = '$creator_branch_code' AND payment_method !=''";
 					if($count_quotation_num_query_run = mysqli_query($connect_link, $count_quotation_num_query))
 					{
 						$count_quotation_num =  mysqli_num_rows($count_quotation_num_query_run);
@@ -85,7 +122,7 @@
 						$count_quotation_num = 0;
 					}
 
-				//setting limits of shown results	
+				//setting quantity limits of shown results	
 					$gap = 25;
 
 					if(isset($_SESSION['lower_limit']) && isset($_SESSION['uper_limit']))
@@ -99,7 +136,7 @@
 						$uper_limit = 25;
 					}
 
-				//setting limits of shown results	
+				//setting time limits of shown results	
 					if(isset($_SESSION['date_lower_limit']) && isset($_SESSION['date_uper_limit']))
 					{
 						$date_lower_limit = $_SESSION['date_lower_limit'];
@@ -115,68 +152,118 @@
 					$user_username = $_COOKIE['logged_username'];
 					$creator_branch_code = $_COOKIE['logged_username_branch_code'];
 
-					$manage_customer_query = "SELECT * FROM quotation WHERE creator_branch_code ='$creator_branch_code' AND payment_method !='' AND date >= '$date_lower_limit' AND date <= '$date_uper_limit' GROUP BY quotation_num ORDER BY quotation_num DESC LIMIT " . $lower_limit . ", " . $uper_limit;
-					$manage_customer_query_run = mysqli_query($connect_link, $manage_customer_query);
+					//checking if to show all reports or for a particular type
+						if(isset($_SESSION['report_type']))
+						{					
+							$report_type = $_SESSION['report_type'];
 
-					while($manage_customer_result = mysqli_fetch_assoc($manage_customer_query_run))
-					{
-						$quotation_id = $manage_customer_result['id'];
+							if($report_type == '*')
+							{
+								//$manage_customer_query = "SELECT * FROM quotation WHERE creator_branch_code ='$creator_branch_code' AND payment_method !='' AND date >= '$date_lower_limit' AND date <= '$date_uper_limit' GROUP BY quotation_num ORDER BY quotation_num DESC LIMIT " . $lower_limit . ", " . $uper_limit;
 
-						$quotation_num = $manage_customer_result['quotation_num'];
-						$customer = $manage_customer_result['customer'];
-						$date = $manage_customer_result['date'];
-						$type = $manage_customer_result['type'];
-
-						$payment_method = $manage_customer_result['payment_method'];
-						$date_of_payment = $manage_customer_result['date_of_payment'];
-
-						$creator_username = $manage_customer_result['creator_username'];
-
-					//gettting date of generation of quoatation
-						$date = str_replace('/', '-', $date);
-						$date = date('d M Y', strtotime($date));
-
-					//gettting date of payment of quoatation
-						$date_of_payment = str_replace('/', '-', $date_of_payment);
-						$date_of_payment = date('d M Y', strtotime($date_of_payment));
-
-					//for getting quotation code
-						$this_year = date('y');
-						$next_year = $this_year +1;
-						$quotation_code = "VOLTA/" . $this_year . "-" . $next_year . "/" . $quotation_num;
-
-					//for getting total price of the quotation
-						$final_price = 0;
-
-						$get_element_price_query = "SELECT total_price FROM quotation WHERE quotation_num='$quotation_num'";
-						$get_element_price_query_run = mysqli_query($connect_link, $get_element_price_query);
-
-						while($get_element_price_assoc = mysqli_fetch_assoc($get_element_price_query_run))
-						{
-							$element_price = $get_element_price_assoc['total_price'];
-
-							$final_price = $final_price + $element_price;
+								$manage_customer_query = "SELECT * FROM quotation WHERE creator_branch_code ='$creator_branch_code' AND payment_method !='' AND date >= '$date_lower_limit' AND date <= '$date_uper_limit' ORDER BY quotation_num DESC LIMIT " . $lower_limit . ", " . $uper_limit;
+							}
+							else
+							{
+								$manage_customer_query = "SELECT * FROM quotation WHERE creator_branch_code ='$creator_branch_code' AND payment_method !='' AND date >= '$date_lower_limit' AND date <= '$date_uper_limit' AND type ='$report_type' ORDER BY quotation_num DESC LIMIT " . $lower_limit . ", " . $uper_limit;
+							}
 						}
+						else
+						{
+							$manage_customer_query = "SELECT * FROM quotation WHERE creator_branch_code ='$creator_branch_code' AND payment_method !='' AND date >= '$date_lower_limit' AND date <= '$date_uper_limit' GROUP BY quotation_num ORDER BY quotation_num DESC LIMIT " . $lower_limit . ", " . $uper_limit;
+						}
+						
+						$manage_customer_query_run = mysqli_query($connect_link, $manage_customer_query);
 
-						echo "<tr>";
-							echo "<td>$quotation_code</td>";
-							echo "<td>$customer</td>";
-							echo "<td>$date</td>";
-							echo "<td>$final_price</td>";
-							// echo "<td>$type</td>";
-							echo "<td>$payment_method</td>";
-							echo "<td>$date_of_payment</td>";
-							echo "<td>$creator_username</td>";
-							echo "<td>";
-								echo "<img quotation_num=\"$quotation_num\" class=\"user_view_icon\" src=\"img/view.png\"/>";
-							echo "</td>";
-						echo "</tr>";				
-					}
+						$sum_of_money = 0;
+
+						while($manage_customer_result = mysqli_fetch_assoc($manage_customer_query_run))
+						{
+							$quotation_id = $manage_customer_result['id'];
+
+							$quotation_num = $manage_customer_result['quotation_num'];
+							$customer = $manage_customer_result['customer'];
+							$date = $manage_customer_result['date'];
+							$type = $manage_customer_result['type'];
+
+							$payment_method = $manage_customer_result['payment_method'];
+							$date_of_payment = $manage_customer_result['date_of_payment'];
+
+							$creator_username = $manage_customer_result['creator_username'];
+
+						//gettting date of generation of quoatation
+							$date = str_replace('/', '-', $date);
+							$date = date('d M Y', strtotime($date));
+
+						//gettting date of payment of quoatation
+							$date_of_payment = str_replace('/', '-', $date_of_payment);
+							$date_of_payment = date('d M Y', strtotime($date_of_payment));
+
+						//for getting quotation code
+							$this_year = date('y');
+							$next_year = $this_year +1;
+							$quotation_code = "VOLTA/" . $this_year . "-" . $next_year . "/" . $quotation_num;
+
+						//for getting total price of the quotation
+							$final_price = 0;
+
+							$get_element_price_query = "SELECT total_price FROM quotation WHERE quotation_num='$quotation_num'";
+							$get_element_price_query_run = mysqli_query($connect_link, $get_element_price_query);
+
+							while($get_element_price_assoc = mysqli_fetch_assoc($get_element_price_query_run))
+							{
+								$element_price = $get_element_price_assoc['total_price'];
+
+								$final_price = $final_price + $element_price;
+							}
+
+							$sum_of_money = $sum_of_money + $final_price;
+
+							echo "<tr>";
+								echo "<td>$quotation_code</td>";
+
+								if(isset($_SESSION['report_type']))
+								{
+									$report_type = $_SESSION['report_type'];
+
+									if($report_type != '*')
+									{
+										echo "<td>$type</td>";
+									}
+								}
+
+								echo "<td>$customer</td>";
+								echo "<td>$date</td>";
+								echo "<td>$final_price</td>";
+								echo "<td>$payment_method</td>";
+								echo "<td>$date_of_payment</td>";
+								echo "<td>$creator_username</td>";
+
+								if(isset($_SESSION['report_type']))
+								{
+									$report_type = $_SESSION['report_type'];
+
+									if($report_type == '*')
+									{
+										echo "<td>";
+											echo "<img quotation_num=\"$quotation_num\" class=\"user_view_icon\" src=\"img/view.png\"/>";
+										echo "</td>";
+									}
+								}
+								else
+								{
+									echo "<td>";
+										echo "<img quotation_num=\"$quotation_num\" class=\"user_view_icon\" src=\"img/view.png\"/>";
+									echo "</td>";
+								}								
+							echo "</tr>";				
+						}
 			?>
 
 		</table>
-		<br><br>
+		<br>
 
+	<!--showing limit of showing invoices quantity--> 
 		<?php			
 			if($lower_limit > 0)
 			{
@@ -192,11 +279,45 @@
 			echo $lower_limit . " - " . $uper_limit ;
 		?>
 
+	<!--showing total sum of the money for that particular report--> 
+		<?php
+			if(isset($_SESSION['report_type']))
+			{
+				echo "<div class=\"sum_of_money_div\">";
+					echo "<h3>Total Sum of Money during this period is: Rs.$sum_of_money </h3>";
+				echo "</div>";
+			}
+		?>
+
 	</div>
 
 
 <!---script------>
 	<script type="text/javascript">
+	//on choosing a report type
+		$('.report_type_div button').click(function()
+		{
+			var report_type = $(this).attr('type');
+
+		//setting session for report type
+			var session_of = report_type;
+			var session_name = "report_type";
+
+			$.post('php/session_creator.php', {session_of: session_of, session_name: session_name}, function(e)
+			{
+				if(e==1)
+				{
+					$('.user_module_content').html("<img class=\"gif_loader\" src=\"img/loaders1.gif\">").load('php/invoice_report.php');
+				}
+				else
+				{
+					//alert(e);
+					$('.warn_box').text("Something went wrong while setting the report type");
+					$('.warn_box').fadeIn(200).delay(3000).fadeOut(200);
+				}
+			});
+		});
+
 	//on clicking on search button
 		$('.search_date_button').click(function()
 		{

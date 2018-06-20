@@ -81,14 +81,27 @@
 
 			this_thing = $(this);
 			type = $(this).val();
-			var query = "SELECT brand FROM stock WHERE type= '" + type + "' AND creator_branch_code = '" + creator_branch_code + "' GROUP BY brand";
-			var to_get = "brand";
 
-			$.post('php/product_query_runner.php', {query:query , to_get:to_get}, function(data)
+			if(type == 'service') //if selected type is service then taking services dircetly from inventory
 			{
-				//alert(data);
-				this_thing.parent().parent().find('#quotation_brand').html(data);
-			});
+				var query = "SELECT brand FROM inventory WHERE type='" + type + "' GROUP BY brand";
+				var to_get = "brand";
+
+				$.post('php/product_query_runner.php', {query:query , to_get:to_get}, function(data)
+				{
+					this_thing.parent().parent().find('#quotation_brand').html(data);
+				});
+			}
+			else
+			{
+				var query = "SELECT brand FROM stock WHERE type= '" + type + "' AND creator_branch_code = '" + creator_branch_code + "' GROUP BY brand";
+				var to_get = "brand";
+
+				$.post('php/product_query_runner.php', {query:query , to_get:to_get}, function(data)
+				{
+					this_thing.parent().parent().find('#quotation_brand').html(data);
+				});
+			}
 		});
 
 	//on selecting a brand
@@ -98,14 +111,27 @@
 
 			this_thing = $(this);
 			brand = $(this).val();
-			var query = "SELECT model_name FROM stock WHERE brand ='" + brand + "' AND type ='" + type + "' AND creator_branch_code ='" + creator_branch_code + "' GROUP BY model_name";
-			var to_get = "model_name";
 
-			$.post('php/product_query_runner.php', {query:query , to_get:to_get}, function(data)
+			if(type == 'service') //if selected type is service then taking services dircetly from inventory
 			{
-				//alert(data);
-				this_thing.parent().parent().find('#quotation_model_name').html(data);
-			});
+				var query = "SELECT model_name FROM inventory WHERE brand ='" + brand + "' AND type='" + type + "'  GROUP BY model_name";
+				var to_get = "model_name";
+
+				$.post('php/product_query_runner.php', {query:query , to_get:to_get}, function(data)
+				{
+					this_thing.parent().parent().find('#quotation_model_name').html(data);
+				});
+			}
+			else
+			{
+				var query = "SELECT model_name FROM stock WHERE brand ='" + brand + "' AND type= '" + type + "' AND creator_branch_code = '" + creator_branch_code + "' GROUP BY model_name";
+				var to_get = "model_name";
+
+				$.post('php/product_query_runner.php', {query:query , to_get:to_get}, function(data)
+				{
+					this_thing.parent().parent().find('#quotation_model_name').html(data);
+				});
+			}
 		});
 
 	//on selecting a model_name
@@ -115,14 +141,27 @@
 
 			this_thing = $(this);
 			model_name = $(this).val();
-			var query = "SELECT model_number FROM stock WHERE model_name ='" + model_name + "'AND brand = '" + brand + "' AND type ='" + type + "' AND creator_branch_code ='" + creator_branch_code + "' GROUP BY model_number";
-			var to_get = "model_number";
 
-			$.post('php/product_query_runner.php', {query:query , to_get:to_get}, function(data)
+			if(type == 'service') //if selected type is service then taking services dircetly from inventory
 			{
-				//alert(data);
-				this_thing.parent().parent().find('#quotation_model_number').html(data);
-			});
+				var query = "SELECT model_number FROM inventory WHERE model_name ='" + model_name + "' AND brand = '" + brand + "' AND type ='" + type + "' GROUP BY model_number";
+				var to_get = "model_number";
+
+				$.post('php/product_query_runner.php', {query:query , to_get:to_get}, function(data)
+				{
+					this_thing.parent().parent().find('#quotation_model_number').html(data);
+				});
+			}
+			else
+			{
+				var query = "SELECT model_number FROM stock WHERE model_name ='" + model_name + "'AND brand = '" + brand + "' AND type ='" + type + "' AND creator_branch_code ='" + creator_branch_code + "' GROUP BY model_number";
+				var to_get = "model_number";
+
+				$.post('php/product_query_runner.php', {query:query , to_get:to_get}, function(data)
+				{
+					this_thing.parent().parent().find('#quotation_model_number').html(data);
+				});
+			}
 		});
 
 	//on selecting a model_number
@@ -133,13 +172,26 @@
 			model_number = $(this).val();
 
 		//populating hsn code
-			var query = "SELECT hsn_code FROM stock WHERE model_number ='" + model_number + "' AND model_name = '" + model_name + "' AND brand = '" + brand + "' AND type ='" + type + "' AND creator_branch_code ='" + creator_branch_code + "'";
-			var to_get = "hsn_code";
-
-			$.post('php/query_result_viewer.php', {query:query , to_get:to_get}, function(data)
+			if(type == 'service') //if selected type is service then taking services dircetly from inventory
 			{
-				this_thing.parent().parent().find('#quotation_hsn_code').val(data);
-			});
+				var query = "SELECT hsn_code FROM inventory WHERE model_number ='" + model_number + "' AND model_name = '" + model_name + "' AND brand = '" + brand + "' AND type='" + type + "'";
+				var to_get = "hsn_code";
+
+				$.post('php/query_result_viewer.php', {query:query , to_get:to_get}, function(data)
+				{
+					this_thing.parent().parent().find('#quotation_hsn_code').val(data);
+				});
+			}
+			else
+			{
+				var query = "SELECT hsn_code FROM stock WHERE model_number ='" + model_number + "' AND model_name = '" + model_name + "' AND brand = '" + brand + "' AND type ='" + type + "' AND creator_branch_code ='" + creator_branch_code + "'";
+				var to_get = "hsn_code";
+
+				$.post('php/query_result_viewer.php', {query:query , to_get:to_get}, function(data)
+				{
+					this_thing.parent().parent().find('#quotation_hsn_code').val(data);
+				});
+			}
 
 		//populating description
 			var query = "SELECT description FROM inventory WHERE model_number ='" + model_number + "' AND model_name = '" + model_name + "' AND brand = '" + brand + "' AND type ='" + type + "'";
@@ -151,13 +203,20 @@
 			});
 
 		//populating availability
-			var query = "SELECT in_stock FROM stock WHERE model_number ='" + model_number + "' AND model_name = '" + model_name + "' AND brand = '" + brand + "' AND type ='" + type + "' AND creator_branch_code ='" + creator_branch_code + "'";
-			var to_get = "in_stock";
-
-			$.post('php/query_result_viewer.php', {query:query , to_get:to_get}, function(data)
+			if(type == 'service')
 			{
-				this_thing.parent().parent().find('#item_availability').val(data);
-			});
+				this_thing.parent().parent().find('#item_availability').val('0');
+			}
+			else
+			{
+				var query = "SELECT in_stock FROM stock WHERE model_number ='" + model_number + "' AND model_name = '" + model_name + "' AND brand = '" + brand + "' AND type ='" + type + "' AND creator_branch_code ='" + creator_branch_code + "'";
+				var to_get = "in_stock";
+
+				$.post('php/query_result_viewer.php', {query:query , to_get:to_get}, function(data)
+				{
+					this_thing.parent().parent().find('#item_availability').val(data);
+				});
+			}
 		});
 
 	//on entering cgst rate
@@ -321,34 +380,42 @@
 			this_thing = $(this);			
 			var quantity = parseInt($(this).val());
 			var in_stock = parseInt(this_thing.parent().parent().find('#item_availability').val());
-
+			var type = this_thing.parent().parent().find('#quotation_item_type').val();
+			
 			var fo = this_thing.parent().parent().attr('fo');
 
-			if(quantity > in_stock)
+			if(type == 'service')
 			{
-				this_thing.css('border', 'red 1px solid');
-				$('.gen_quotation_span').text("You have entered a quantity greater than its avavilability in stock. Please change the quantity otherwise you are not able to create invoice.").css('color', 'red');
 
-				$('#quotation_gen_button').addClass(fo).fadeOut(0);
 			}
 			else
 			{
-				this_thing.css('border', 'red 0px solid');
-				
-				$('#quotation_gen_button').removeClass(fo);
-				var class_length = parseInt($('#quotation_gen_button').attr('class').length);
-
-				if(class_length > 0)
-				{
-					$('#quotation_gen_button').fadeOut(0);
+				if(quantity > in_stock)
+			{
+					this_thing.css('border', 'red 1px solid');
 					$('.gen_quotation_span').text("You have entered a quantity greater than its avavilability in stock. Please change the quantity otherwise you are not able to create invoice.").css('color', 'red');
+
+					$('#quotation_gen_button').addClass(fo).fadeOut(0);
 				}
 				else
 				{
-					$('#quotation_gen_button').fadeIn(0);
-					$('.gen_quotation_span').text("").css('color', 'black');
-				}
-			}	
+					this_thing.css('border', 'red 0px solid');
+					
+					$('#quotation_gen_button').removeClass(fo);
+					var class_length = parseInt($('#quotation_gen_button').attr('class').length);
+
+					if(class_length > 0)
+					{
+						$('#quotation_gen_button').fadeOut(0);
+						$('.gen_quotation_span').text("You have entered a quantity greater than its avavilability in stock. Please change the quantity otherwise you are not able to create invoice.").css('color', 'red');
+					}
+					else
+					{
+						$('#quotation_gen_button').fadeIn(0);
+						$('.gen_quotation_span').text("").css('color', 'black');
+					}
+				}	
+			}			
 		});
 
 	//on clicking on delete goods button
