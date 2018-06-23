@@ -573,10 +573,15 @@
 		$('#quotation_gen_button').click(function()
 		{
 			$('.gen_quotation_span').html("<img class=\"gif_loader\" src=\"img/loaders1.gif\">");
-			
-			var quotation_num = $.trim("<?php echo $quotation_num; ?>");
-			
+		//disabling the type, brand, model_name, model_number field
+			$('select#quotation_item_type').attr("disabled", true);
+			$('select#quotation_brand').attr("disabled", true);
+			$('select#quotation_model_name').attr("disabled", true);
+			$('select#quotation_model_number').attr("disabled", true);	
+			$('input#quotation_part_quantity').attr("disabled", true);		
+						
 		//getting variable values
+			var quotation_num = $.trim("<?php echo $quotation_num; ?>");			
 			var quotation_customer = $.trim($('#quotation_customer').val());
 			var quotation_date = $.trim($('#quotation_date').val());
 			
@@ -587,6 +592,8 @@
 				var row_count = count -1;
 
 				var i = 1;
+				var to_display_button = 0;
+
 				for(i; i<= row_count; i++)
 				{
 					var child_no = i + 1;
@@ -611,8 +618,27 @@
 					var quotation_part_igst = parseInt($('.quotation_entry_table tr:nth-child('+ child_no + ') #quotation_part_igst').val());
 					var quotation_part_total_price = $.trim($('.quotation_entry_table tr:nth-child('+ child_no + ') #quotation_part_total_price').val());
 					
+					var in_stock = parseInt($('.quotation_entry_table tr:nth-child('+ child_no + ') #item_availability').val());
+
 					var quotation_serial_num = "";
 					var quotation_part_name = "";
+
+				//checking availability
+					if(quotation_item_type == 'service')
+					{
+						to_display_button = to_display_button + 0;
+					}
+					else
+					{
+						if(quotation_part_quantity > in_stock)
+						{
+							to_display_button = to_display_button + 1;
+						}
+						else
+						{
+							to_display_button = to_display_button + 0;
+						}	
+					}
 
 				//if user forget to calculate total price
 					if(quotation_part_total_price == "calculate")
@@ -633,30 +659,16 @@
 
 							$('.gen_quotation_span').text('Successfully edited').css('color','green');
 
-						//disabling the type, brand, model_name, model_number field
-							$('select#quotation_item_type').attr("disabled", true);
-							$('select#quotation_brand').attr("disabled", true);
-							$('select#quotation_model_name').attr("disabled", true);
-							$('select#quotation_model_number').attr("disabled", true);	
-							$('input#quotation_part_quantity').attr("disabled", true);			
-
-						//checking availability 
-							to_display_button = 0;
-
-							$("input#quotation_part_quantity").each(function()
-							{
-						    	var border = parseInt($(this).css('border-width'));
-						    	to_display_button = to_display_button + border;
-						    });
-
-						    if(to_display_button == 0)
+						//checking availability 														
+						    if(to_display_button == "0")
 						    {
 						    	$('#invoice_gen_edit_button').fadeIn();
+						    	$('.gen_quotation_span').text('You can generate invoice now').css('color','green');
 						    }
 						    else
 						    {
 						    	$('#invoice_gen_edit_button').fadeOut();
-						    	$('.gen_quotation_span').text("You have entered a quantity greater than its avavilability in stock. You are not able to generate invoice.").css('color', 'red');
+						    	$('.gen_quotation_span').text("You have entered a quantity greater than its availability in stock. You are not able to generate invoice.").css('color', 'red');
 						    }
 						}
 						else

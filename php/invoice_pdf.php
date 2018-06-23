@@ -1,277 +1,254 @@
 <?php
-		session_start();
+	session_start();
 
-	//getting invoice type
-		if(isset($_SESSION['invoice_type']))
-		{
-			$invoice_type = $_SESSION['invoice_type'];
-		}
-		else
-		{
-			$invoice_type = "normal";
-		}
+//getting invoice type
+	if(isset($_SESSION['invoice_type']))
+	{
+		$invoice_type = $_SESSION['invoice_type'];
+	}
+	else
+	{
+		$invoice_type = "normal";
+	}
 
-		if($invoice_type == "normal")
-		{
-			$invoice_type_text = "Original for Recipient";
-		}
-		else if($invoice_type == "supplier")
-		{
-			$invoice_type_text = "Triplicate for Supplier";
-		}
-		else if($invoice_type == "transporter")
-		{
-			$invoice_type_text = "Duplicate for Transporter";
-		}
+	if($invoice_type == "normal")
+	{
+		$invoice_type_text = "Original for Recipient";
+	}
+	else if($invoice_type == "supplier")
+	{
+		$invoice_type_text = "Triplicate for Supplier";
+	}
+	else if($invoice_type == "transporter")
+	{
+		$invoice_type_text = "Duplicate for Transporter";
+	}
 
-	//fetching data from database
-		include('connect_db.php');
+//fetching data from database
+	include('connect_db.php');
 
-	//generating quotation code
-		$quotation_num = $_SESSION['pdf_invoice_of'];
+//generating quotation code
+	$quotation_num = $_SESSION['pdf_invoice_of'];
 
-		$this_year = date('y');
-		$next_year = $this_year +1;
+	$this_year = date('y');
+	$next_year = $this_year +1;
 
-		$quotation_code = "VOLTA/" . $this_year . "-" . $next_year . "/" . $quotation_num;
+	$quotation_code = "VOLTA/" . $this_year . "-" . $next_year . "/" . $quotation_num;
 
-	//query
-		$query = "SELECT * FROM quotation WHERE quotation_num = '$quotation_num' AND payment_method !='' ORDER BY serial";
-		$query_run = mysqli_query($connect_link, $query);
+//query
+	$query = "SELECT * FROM quotation WHERE quotation_num = '$quotation_num' AND payment_method !='' ORDER BY serial";
+	$query_run = mysqli_query($connect_link, $query);
 
-		if($query_assoc = mysqli_fetch_assoc($query_run))
-		{
-			$creator_username = $query_assoc['creator_username'];
-			$creator_branch_code = $query_assoc['creator_branch_code'];
-			$customer_name = $query_assoc['customer'];
-			$purchase_order = $query_assoc['purchase_order'];
+	if($query_assoc = mysqli_fetch_assoc($query_run))
+	{
+		$creator_username = $query_assoc['creator_username'];
+		$creator_branch_code = $query_assoc['creator_branch_code'];
+		$customer_name = $query_assoc['customer'];
+		$purchase_order = $query_assoc['purchase_order'];
 
-			$type = $query_assoc['type'];
+		$type = $query_assoc['type'];
 
-			$payment_method = $query_assoc['payment_method'];
-			$date_of_payment = $query_assoc['date_of_payment'];
+		$payment_method = $query_assoc['payment_method'];
+		$date_of_payment = $query_assoc['date_of_payment'];
+	
+	//gettting date of payemnt of invoice
+		$date_of_payment = str_replace('/', '-', $date_of_payment);
+		$date_of_payment = date('d M Y', strtotime($date_of_payment));
+
+	//gettting date of generation of quoatation
+		$date = $query_assoc['date'];
+		$date = str_replace('/', '-', $date);
+		$date_of_generation = date('d M Y', strtotime($date));
+
+	//getting information of branch
+		$get_branch_info_query = "SELECT * FROM branch WHERE branch_code = '$creator_branch_code'";
+		$get_branch_info_query_run = mysqli_query($connect_link, $get_branch_info_query);
+
+		$get_branch_info_assoc = mysqli_fetch_assoc($get_branch_info_query_run);
+		$branch_company_name = $get_branch_info_assoc['company_name'];
+		$branch_name = $get_branch_info_assoc['branch_name'];
+		$branch_address = $get_branch_info_assoc['address'];
+		$branch_email = $get_branch_info_assoc['email'];
+		$branch_phone_number = $get_branch_info_assoc['phone_number'];
+		$branch_gst_number = $get_branch_info_assoc['gst_number'];
 		
-		//gettting date of payemnt of invoice
-			$date_of_payment = str_replace('/', '-', $date_of_payment);
-			$date_of_payment = date('d M Y', strtotime($date_of_payment));
+		$bank_accnt_name = $get_branch_info_assoc['bank_accnt_name'];
+		$bank_accnt_no = $get_branch_info_assoc['bank_accnt_no'];
+		$bank_name = $get_branch_info_assoc['bank_name'];
+		$bank_ifsc = $get_branch_info_assoc['bank_ifsc'];
 
-		//gettting date of generation of quoatation
-			$date = $query_assoc['date'];
-			$date = str_replace('/', '-', $date);
-			$date_of_generation = date('d M Y', strtotime($date));
-
-		//getting information of branch
-			$get_branch_info_query = "SELECT * FROM branch WHERE branch_code = '$creator_branch_code'";
-			$get_branch_info_query_run = mysqli_query($connect_link, $get_branch_info_query);
-
-			$get_branch_info_assoc = mysqli_fetch_assoc($get_branch_info_query_run);
-			$branch_company_name = $get_branch_info_assoc['company_name'];
-			$branch_name = $get_branch_info_assoc['branch_name'];
-			$branch_address = $get_branch_info_assoc['address'];
-			$branch_email = $get_branch_info_assoc['email'];
-			$branch_phone_number = $get_branch_info_assoc['phone_number'];
-			$branch_gst_number = $get_branch_info_assoc['gst_number'];
-			
-			$bank_accnt_name = $get_branch_info_assoc['bank_accnt_name'];
-			$bank_accnt_no = $get_branch_info_assoc['bank_accnt_no'];
-			$bank_name = $get_branch_info_assoc['bank_name'];
-			$bank_ifsc = $get_branch_info_assoc['bank_ifsc'];
-
-			//breaking branch address
-				$branch_address_broken = explode("#", $branch_address);
-				$hash_count = substr_count($branch_address,"#");
-				if($hash_count == 4)
-				{
-					$branch_address_array[0] = $branch_address_broken[0];
-					$branch_address_array[1] = $branch_address_broken[1];
-					$branch_address_array[2] = $branch_address_broken[2];
-					$branch_address_array[3] = $branch_address_broken[3];
-					$branch_address_array[4] = $branch_address_broken[4];
-				}
-				else if($hash_count == 3)
-				{
-					$branch_address_array[0] = $branch_address_broken[0];
-					$branch_address_array[1] = $branch_address_broken[1];
-					$branch_address_array[2] = $branch_address_broken[2];
-					$branch_address_array[3] = $branch_address_broken[3];
-					$branch_address_array[4] = "";
-				}
-				else if($hash_count == 2)
-				{
-					$branch_address_array[0] = $branch_address_broken[0];
-					$branch_address_array[1] = $branch_address_broken[1];
-					$branch_address_array[2] = $branch_address_broken[2];
-					$branch_address_array[3] = "";
-					$branch_address_array[4] = "";
-				}
-				else if($hash_count == 1)
-				{
-					$branch_address_array[0] = $branch_address_broken[0];
-					$branch_address_array[1] = $branch_address_broken[1];
-					$branch_address_array[2] = "";
-					$branch_address_array[3] = "";
-					$branch_address_array[4] = "";
-				}
-				else if($hash_count == 0)
-				{
-					$branch_address_array[0] = $branch_address_broken[0];
-					$branch_address_array[1] = "";
-					$branch_address_array[2] = "";
-					$branch_address_array[3] = "";
-					$branch_address_array[4] = "";
-				}
-				else
-				{
-					$branch_address_array[0] = $branch_address_broken[0];
-					$branch_address_array[1] = "";
-					$branch_address_array[2] = "";
-					$branch_address_array[3] = "";
-					$branch_address_array[4] = "";
-				}
-
-		//getting customer info
-			$get_customer_info_query = "SELECT * FROM customers WHERE name = '$customer_name'";
-			$get_customer_info_query_run = mysqli_query($connect_link, $get_customer_info_query);
-			$get_customer_info_assoc = mysqli_fetch_assoc($get_customer_info_query_run);
-
-			$customer_company_name = $get_customer_info_assoc['company_name'];
-			$customer_address = $get_customer_info_assoc['address'];
-			$customer_mobile = $get_customer_info_assoc['mobile'];
-			$customer_email = $get_customer_info_assoc['email'];
-			$customer_gst = $get_customer_info_assoc['gst'];
-			$customer_shipping_address = $get_customer_info_assoc['shipping_address'];
-
-		//checking to mail to customer or not
-			$session_name = "mail_pdf_of_" . $quotation_num;
-
-			if(isset($_SESSION[$session_name]))
+		//breaking branch address
+			$branch_address_broken = explode("#", $branch_address);
+			$hash_count = substr_count($branch_address,"#");
+			if($hash_count == 4)
 			{
-			//mailing to the customer
-				$website = $_SERVER['HTTP_HOST'];
-
-				$mail_email = $customer_email;
-				$mail_subject = "Invoice from Voltatech";
-				$mail_header = "From: voltatech@pnds.in";
-				$mail_body = "Dear Customer \Invoice generated from our online resource is linked with this mail. Please find your invoice by following the link: http://" . $website . "/invoice/Invoice-" . $quotation_num . ".pdf \n \nRegards \nVoltatech \nhttp://" . $website;
-
-				if(@mail($mail_email, $mail_subject, $mail_body, $mail_header))
-				{
-					//echo 1;
-				}
-				else 
-				{
-					//echo 0;
-				}
+				$branch_address_array[0] = $branch_address_broken[0];
+				$branch_address_array[1] = $branch_address_broken[1];
+				$branch_address_array[2] = $branch_address_broken[2];
+				$branch_address_array[3] = $branch_address_broken[3];
+				$branch_address_array[4] = $branch_address_broken[4];
+			}
+			else if($hash_count == 3)
+			{
+				$branch_address_array[0] = $branch_address_broken[0];
+				$branch_address_array[1] = $branch_address_broken[1];
+				$branch_address_array[2] = $branch_address_broken[2];
+				$branch_address_array[3] = $branch_address_broken[3];
+				$branch_address_array[4] = "";
+			}
+			else if($hash_count == 2)
+			{
+				$branch_address_array[0] = $branch_address_broken[0];
+				$branch_address_array[1] = $branch_address_broken[1];
+				$branch_address_array[2] = $branch_address_broken[2];
+				$branch_address_array[3] = "";
+				$branch_address_array[4] = "";
+			}
+			else if($hash_count == 1)
+			{
+				$branch_address_array[0] = $branch_address_broken[0];
+				$branch_address_array[1] = $branch_address_broken[1];
+				$branch_address_array[2] = "";
+				$branch_address_array[3] = "";
+				$branch_address_array[4] = "";
+			}
+			else if($hash_count == 0)
+			{
+				$branch_address_array[0] = $branch_address_broken[0];
+				$branch_address_array[1] = "";
+				$branch_address_array[2] = "";
+				$branch_address_array[3] = "";
+				$branch_address_array[4] = "";
+			}
+			else
+			{
+				$branch_address_array[0] = $branch_address_broken[0];
+				$branch_address_array[1] = "";
+				$branch_address_array[2] = "";
+				$branch_address_array[3] = "";
+				$branch_address_array[4] = "";
 			}
 
-			//breaking customer address
-				$customer_address_broken = explode("#", $customer_address);
-				$hash_count = substr_count($customer_address,"#");
-				if($hash_count == 4)
-				{
-					$customer_address_array[0] = $customer_address_broken[0];
-					$customer_address_array[1] = $customer_address_broken[1];
-					$customer_address_array[2] = $customer_address_broken[2];
-					$customer_address_array[3] = $customer_address_broken[3];
-					$customer_address_array[4] = $customer_address_broken[4];
-				}
-				else if($hash_count == 3)
-				{
-					$customer_address_array[0] = $customer_address_broken[0];
-					$customer_address_array[1] = $customer_address_broken[1];
-					$customer_address_array[2] = $customer_address_broken[2];
-					$customer_address_array[3] = $customer_address_broken[3];
-					$customer_address_array[4] = "";
-				}
-				else if($hash_count == 2)
-				{
-					$customer_address_array[0] = $customer_address_broken[0];
-					$customer_address_array[1] = $customer_address_broken[1];
-					$customer_address_array[2] = $customer_address_broken[2];
-					$customer_address_array[3] = "";
-					$customer_address_array[4] = "";
-				}
-				else if($hash_count == 1)
-				{
-					$customer_address_array[0] = $customer_address_broken[0];
-					$customer_address_array[1] = $customer_address_broken[1];
-					$customer_address_array[2] = "";
-					$customer_address_array[3] = "";
-					$customer_address_array[4] = "";
-				}
-				else if($hash_count == 0)
-				{
-					$customer_address_array[0] = $customer_address_broken[0];
-					$customer_address_array[1] = "";
-					$customer_address_array[2] = "";
-					$customer_address_array[3] = "";
-					$customer_address_array[4] = "";
-				}
-				else
-				{
-					$customer_address_array[0] = $customer_address_broken[0];
-					$customer_address_array[1] = "";
-					$customer_address_array[2] = "";
-					$customer_address_array[3] = "";
-					$customer_address_array[4] = "";
-				}
+	//getting customer info
+		$get_customer_info_query = "SELECT * FROM customers WHERE name = '$customer_name'";
+		$get_customer_info_query_run = mysqli_query($connect_link, $get_customer_info_query);
+		$get_customer_info_assoc = mysqli_fetch_assoc($get_customer_info_query_run);
 
-			//breaking customer shipping address
-				$customer_shipping_address_broken = explode("#", $customer_shipping_address);
-				$hash_count = substr_count($customer_shipping_address,"#");
-				if($hash_count == 4)
-				{
-					$customer_shipping_address_array[0] = $customer_shipping_address_broken[0];
-					$customer_shipping_address_array[1] = $customer_shipping_address_broken[1];
-					$customer_shipping_address_array[2] = $customer_shipping_address_broken[2];
-					$customer_shipping_address_array[3] = $customer_shipping_address_broken[3];
-					$customer_shipping_address_array[4] = $customer_shipping_address_broken[4];
-				}
-				else if($hash_count == 3)
-				{
-					$customer_shipping_address_array[0] = $customer_shipping_address_broken[0];
-					$customer_shipping_address_array[1] = $customer_shipping_address_broken[1];
-					$customer_shipping_address_array[2] = $customer_shipping_address_broken[2];
-					$customer_shipping_address_array[3] = $customer_shipping_address_broken[3];
-					$customer_shipping_address_array[4] = "";
-				}
-				else if($hash_count == 2)
-				{
-					$customer_shipping_address_array[0] = $customer_shipping_address_broken[0];
-					$customer_shipping_address_array[1] = $customer_shipping_address_broken[1];
-					$customer_shipping_address_array[2] = $customer_shipping_address_broken[2];
-					$customer_shipping_address_array[3] = "";
-					$customer_shipping_address_array[4] = "";
-				}
-				else if($hash_count == 1)
-				{
-					$customer_shipping_address_array[0] = $customer_shipping_address_broken[0];
-					$customer_shipping_address_array[1] = $customer_shipping_address_broken[1];
-					$customer_shipping_address_array[2] = "";
-					$customer_shipping_address_array[3] = "";
-					$customer_shipping_address_array[4] = "";
-				}
-				else if($hash_count == 0)
-				{
-					$customer_shipping_address_array[0] = $customer_shipping_address_broken[0];
-					$customer_shipping_address_array[1] = "";
-					$customer_shipping_address_array[2] = "";
-					$customer_shipping_address_array[3] = "";
-					$customer_shipping_address_array[4] = "";
-				}
-				else
-				{
-					$customer_shipping_address_array[0] = $customer_address_broken[0];
-					$customer_shipping_address_array[1] = "";
-					$customer_shipping_address_array[2] = "";
-					$customer_shipping_address_array[3] = "";
-					$customer_shipping_address_array[4] = "";
-				}
-		}
-		else
-		{
-			die('Something went wrong while generating quotation pdf');
-		}
+		$customer_company_name = $get_customer_info_assoc['company_name'];
+		$customer_address = $get_customer_info_assoc['address'];
+		$customer_mobile = $get_customer_info_assoc['mobile'];
+		$customer_email = $get_customer_info_assoc['email'];
+		$customer_gst = $get_customer_info_assoc['gst'];
+		$customer_shipping_address = $get_customer_info_assoc['shipping_address'];
+
+		//breaking customer address
+			$customer_address_broken = explode("#", $customer_address);
+			$hash_count = substr_count($customer_address,"#");
+			if($hash_count == 4)
+			{
+				$customer_address_array[0] = $customer_address_broken[0];
+				$customer_address_array[1] = $customer_address_broken[1];
+				$customer_address_array[2] = $customer_address_broken[2];
+				$customer_address_array[3] = $customer_address_broken[3];
+				$customer_address_array[4] = $customer_address_broken[4];
+			}
+			else if($hash_count == 3)
+			{
+				$customer_address_array[0] = $customer_address_broken[0];
+				$customer_address_array[1] = $customer_address_broken[1];
+				$customer_address_array[2] = $customer_address_broken[2];
+				$customer_address_array[3] = $customer_address_broken[3];
+				$customer_address_array[4] = "";
+			}
+			else if($hash_count == 2)
+			{
+				$customer_address_array[0] = $customer_address_broken[0];
+				$customer_address_array[1] = $customer_address_broken[1];
+				$customer_address_array[2] = $customer_address_broken[2];
+				$customer_address_array[3] = "";
+				$customer_address_array[4] = "";
+			}
+			else if($hash_count == 1)
+			{
+				$customer_address_array[0] = $customer_address_broken[0];
+				$customer_address_array[1] = $customer_address_broken[1];
+				$customer_address_array[2] = "";
+				$customer_address_array[3] = "";
+				$customer_address_array[4] = "";
+			}
+			else if($hash_count == 0)
+			{
+				$customer_address_array[0] = $customer_address_broken[0];
+				$customer_address_array[1] = "";
+				$customer_address_array[2] = "";
+				$customer_address_array[3] = "";
+				$customer_address_array[4] = "";
+			}
+			else
+			{
+				$customer_address_array[0] = $customer_address_broken[0];
+				$customer_address_array[1] = "";
+				$customer_address_array[2] = "";
+				$customer_address_array[3] = "";
+				$customer_address_array[4] = "";
+			}
+
+		//breaking customer shipping address
+			$customer_shipping_address_broken = explode("#", $customer_shipping_address);
+			$hash_count = substr_count($customer_shipping_address,"#");
+			if($hash_count == 4)
+			{
+				$customer_shipping_address_array[0] = $customer_shipping_address_broken[0];
+				$customer_shipping_address_array[1] = $customer_shipping_address_broken[1];
+				$customer_shipping_address_array[2] = $customer_shipping_address_broken[2];
+				$customer_shipping_address_array[3] = $customer_shipping_address_broken[3];
+				$customer_shipping_address_array[4] = $customer_shipping_address_broken[4];
+			}
+			else if($hash_count == 3)
+			{
+				$customer_shipping_address_array[0] = $customer_shipping_address_broken[0];
+				$customer_shipping_address_array[1] = $customer_shipping_address_broken[1];
+				$customer_shipping_address_array[2] = $customer_shipping_address_broken[2];
+				$customer_shipping_address_array[3] = $customer_shipping_address_broken[3];
+				$customer_shipping_address_array[4] = "";
+			}
+			else if($hash_count == 2)
+			{
+				$customer_shipping_address_array[0] = $customer_shipping_address_broken[0];
+				$customer_shipping_address_array[1] = $customer_shipping_address_broken[1];
+				$customer_shipping_address_array[2] = $customer_shipping_address_broken[2];
+				$customer_shipping_address_array[3] = "";
+				$customer_shipping_address_array[4] = "";
+			}
+			else if($hash_count == 1)
+			{
+				$customer_shipping_address_array[0] = $customer_shipping_address_broken[0];
+				$customer_shipping_address_array[1] = $customer_shipping_address_broken[1];
+				$customer_shipping_address_array[2] = "";
+				$customer_shipping_address_array[3] = "";
+				$customer_shipping_address_array[4] = "";
+			}
+			else if($hash_count == 0)
+			{
+				$customer_shipping_address_array[0] = $customer_shipping_address_broken[0];
+				$customer_shipping_address_array[1] = "";
+				$customer_shipping_address_array[2] = "";
+				$customer_shipping_address_array[3] = "";
+				$customer_shipping_address_array[4] = "";
+			}
+			else
+			{
+				$customer_shipping_address_array[0] = $customer_address_broken[0];
+				$customer_shipping_address_array[1] = "";
+				$customer_shipping_address_array[2] = "";
+				$customer_shipping_address_array[3] = "";
+				$customer_shipping_address_array[4] = "";
+			}
+	}
+	else
+	{
+		die('Something went wrong while generating quotation pdf');
+	}
 		
 //generating pdf
 	require('fpdf181/fpdf.php');
@@ -446,6 +423,8 @@
 			$item_model_name = $get_item_info_assoc['model_name'];
 			$item_model_number = $get_item_info_assoc['model_number'];
 			$item_description = $get_item_info_assoc['description'];
+			$item_description = substr($item_description,0,40);
+
 			$item_hsn_code = $get_item_info_assoc['hsn_code'];
 			$type = $get_item_info_assoc['type'];
 
@@ -652,7 +631,62 @@
 		if($invoice_type == "normal")
 		{
 			$filename = "../invoice/Invoice-" . $quotation_num . ".pdf";
-			$pdf->Output($filename, 'F');	
+			$pdf->Output($filename, 'F');
+
+		//checking to mail to customer or not
+			$session_name = "mail_pdf_of_" . $quotation_num;
+
+			if(isset($_SESSION[$session_name]))
+			{
+			//mailing to the customer
+				$website = $_SERVER['HTTP_HOST'];
+
+				$mail_email = $customer_email;
+				$mail_subject = "Invoice from Voltatech";
+				$headers = "From: voltatech@pnds.in";
+
+				$mainMessage = "Dear Customer Invoice generated from our online resource is attached with this mail. Please find your attached invoice pdf file. \n \nRegards \nVoltatech \nhttp://" . $website;
+
+				  $fileatt     = "http://" . $website . "/invoice/Invoice-" . $quotation_num . ".pdf"; //file location
+				  $fileatttype = "application/pdf";
+				  $fileattname = "Invoice-" . $quotation_num . ".pdf"; //name that you want to use to send or you can use the same name
+				 
+				  // File
+				  $file = fopen($fileatt, 'rb');
+				  $data = fread($file, 10000);
+				  fclose($file);
+
+				  // This attaches the file
+				  $semi_rand     = md5(time());
+				  $mime_boundary = "==Multipart_Boundary_x{$semi_rand}x";
+				  $headers      .= "\nMIME-Version: 1.0\n" .
+				    "Content-Type: multipart/mixed;\n" .
+				    " boundary=\"{$mime_boundary}\"";
+				    $message = "This is a multi-part message in MIME format.\n\n" .
+				    "--{$mime_boundary}\n" .
+				    "Content-Type: text/plain; charset=\"iso-8859-1\n" .
+				    "Content-Transfer-Encoding: 7bit\n\n" .
+				    $mainMessage  . "\n\n";
+
+				  $data = chunk_split(base64_encode($data));
+				  $message .= "--{$mime_boundary}\n" .
+				    "Content-Type: {$fileatttype};\n" .
+				    " name=\"{$fileattname}\"\n" .
+				    "Content-Disposition: attachment;\n" .
+				    " filename=\"{$fileattname}\"\n" .
+				    "Content-Transfer-Encoding: base64\n\n" .
+				  $data . "\n\n" .
+				   "--{$mime_boundary}--\n";
+
+				if(@mail($mail_email, $mail_subject, $message, $headers))
+				{
+					//echo 1;
+				}
+				else 
+				{
+					//echo 0;
+				}
+			}	
 		}
 
 	//destroying the mailing session
@@ -661,4 +695,5 @@
 			unset($_SESSION[$session_name]);
 		}
 	
+
 ?>

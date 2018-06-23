@@ -300,17 +300,25 @@
 			this_thing = $(this);			
 			var quantity = parseInt($(this).val());
 			var in_stock = parseInt(this_thing.parent().parent().find('#item_availability').val());
-
-			if(quantity > in_stock)
+			var type = this_thing.parent().parent().find('#quotation_item_type').val();
+			
+			if(type == 'service')
 			{
-				this_thing.css('border', 'red 1px solid');
-				$('.gen_quotation_span').text("You have entered a quantity greater than its avavilability in stock. You are not able to generate invoice.").css('color', 'red');
+				$('.gen_quotation_span').text("").css('color', 'black');
 			}
 			else
 			{
-				this_thing.css('border', 'red 0px solid');
-				$('.gen_quotation_span').text("").css('color', 'black');
-			}	
+				if(quantity > in_stock)
+				{
+					this_thing.css('border', 'red 1px solid');
+					$('.gen_quotation_span').text("You have entered a quantity greater than its avavilability in stock. You are not able to generate invoice.").css('color', 'red');
+				}
+				else
+				{
+					this_thing.css('border', 'red 0px solid');
+					$('.gen_quotation_span').text("").css('color', 'black');
+				}	
+			}
 		});
 
 	//on clicking on delete goods button

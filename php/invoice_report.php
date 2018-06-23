@@ -85,6 +85,7 @@
 				?>
 
 				<th>Customer Number</th>
+				<th>Purchase Order</th>
 				<th>Date of Generation</th>
 				<th>Total Amount</th>
 				
@@ -183,6 +184,8 @@
 
 							$quotation_num = $manage_customer_result['quotation_num'];
 							$customer = $manage_customer_result['customer'];
+							$purchase_order = $manage_customer_result['purchase_order'];
+
 							$date = $manage_customer_result['date'];
 							$type = $manage_customer_result['type'];
 
@@ -233,6 +236,7 @@
 								}
 
 								echo "<td>$customer</td>";
+								echo "<td>$purchase_order</td>";
 								echo "<td>$date</td>";
 								echo "<td>$final_price</td>";
 								echo "<td>$payment_method</td>";

@@ -110,29 +110,6 @@
 			$customer_gst = $get_customer_info_assoc['gst'];;
 			$customer_shipping_address = $get_customer_info_assoc['shipping_address'];
 
-		//checking to mail to customer or not
-			$session_name = "mail_pdf_of_" . $quotation_num;
-
-			if(isset($_SESSION[$session_name]))
-			{
-			//mailing to the customer
-				$website = $_SERVER['HTTP_HOST'];
-
-				$mail_email = $customer_email;
-				$mail_subject = "Quotation from Voltatech";
-				$mail_header = "From: voltatech@pnds.in";
-				$mail_body = "Dear Customer \nQuotation generated from our online resource is linked with this mail. Please find your quotation by following the link: http://" . $website . "/quotation/Quotation-" . $quotation_num . ".pdf \n \nRegards \nVoltatech \nhttp://" . $website;
-
-				if(@mail($mail_email, $mail_subject, $mail_body, $mail_header))
-				{
-					//echo 1;
-				}
-				else 
-				{
-					//echo 0;
-				}
-			}
-
 			//breaking customer address
 				$customer_address_broken = explode("#", $customer_address);
 				$hash_count = substr_count($customer_address,"#");
@@ -412,6 +389,8 @@
 			$item_model_name = $get_item_info_assoc['model_name'];
 			$item_model_number = $get_item_info_assoc['model_number'];
 			$item_description = $get_item_info_assoc['description'];
+			$item_description = substr($item_description,0,40);
+
 			$item_hsn_code = $get_item_info_assoc['hsn_code'];
 			$type = $get_item_info_assoc['type'];
 
@@ -594,6 +573,61 @@
 	//getting output of the pdf in a file if mailing is to be done
 		$pdf->Output();
 		
-		$filename = "../invoice/Invoice-" . $quotation_num . ".pdf";
+		$filename = "../quotation/Quotation-" . $quotation_num . ".pdf";
 		$pdf->Output($filename, 'F');	
+
+	//checking to mail to customer or not
+		$session_name = "mail_pdf_of_" . $quotation_num;
+
+		if(isset($_SESSION[$session_name]))
+		{
+		//mailing to the customer
+			$website = $_SERVER['HTTP_HOST'];
+
+			$mail_email = $customer_email;
+			$mail_subject = "Quotation from Voltatech";
+			$headers = "From: voltatech@pnds.in";
+			
+			$mainMessage = "Dear Customer Quotation generated from our online resource is attached with this mail. Please find your attached Quotation pdf file. \n \nRegards \nVoltatech \nhttp://" . $website;
+
+			  $fileatt     = "http://" . $website . "/quotation/Quotation-" . $quotation_num . ".pdf"; //file location
+			  $fileatttype = "application/pdf";
+			  $fileattname = "Quotation-" . $quotation_num . ".pdf"; //name that you want to use to send or you can use the same name
+			 
+			  // File
+			  $file = fopen($fileatt, 'rb');
+			  $data = fread($file, 10000);
+			  fclose($file);
+
+			  // This attaches the file
+			  $semi_rand     = md5(time());
+			  $mime_boundary = "==Multipart_Boundary_x{$semi_rand}x";
+			  $headers      .= "\nMIME-Version: 1.0\n" .
+			    "Content-Type: multipart/mixed;\n" .
+			    " boundary=\"{$mime_boundary}\"";
+			    $message = "This is a multi-part message in MIME format.\n\n" .
+			    "--{$mime_boundary}\n" .
+			    "Content-Type: text/plain; charset=\"iso-8859-1\n" .
+			    "Content-Transfer-Encoding: 7bit\n\n" .
+			    $mainMessage  . "\n\n";
+
+			  $data = chunk_split(base64_encode($data));
+			  $message .= "--{$mime_boundary}\n" .
+			    "Content-Type: {$fileatttype};\n" .
+			    " name=\"{$fileattname}\"\n" .
+			    "Content-Disposition: attachment;\n" .
+			    " filename=\"{$fileattname}\"\n" .
+			    "Content-Transfer-Encoding: base64\n\n" .
+			  $data . "\n\n" .
+			   "--{$mime_boundary}--\n";
+
+			if(@mail($mail_email, $mail_subject, $message, $headers))
+			{
+				//echo 1;
+			}
+			else 
+			{
+				//echo 0;
+			}
+		}
 ?>
