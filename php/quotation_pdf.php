@@ -1,8 +1,28 @@
 <?php
+	session_start();
+
+//getting invoice type
+	if(isset($_SESSION['quotation_type']))
+	{
+		$quotation_type = $_SESSION['quotation_type'];
+	}
+	else
+	{
+		$quotation_type = "normal";
+	}
+
+	if($quotation_type == "normal")
+	{
+		$quotation_type_text = "Quotation";
+	}
+	else if($quotation_type == "performa")
+	{
+		$quotation_type_text = "Performa Invoice";
+	}
+
 	//fetching data from database
 		include('connect_db.php');
 
-		session_start();
 		$quotation_num = $_SESSION['pdf_quotation_of'];
 
 	//generating quotation code
@@ -232,7 +252,7 @@
 	//heading
 		$pdf->SetTextColor(204,0,0); //text color //red		
 		$pdf->SetFont('Arial', 'B', 16); //font
-		$pdf->Cell(110, 6, 'Quotation', 0, 0, 'R');
+		$pdf->Cell(110, 6, $quotation_type_text, 0, 0, 'R');
 
 		$pdf->SetTextColor(0,0,0); //text color //black		
 		$pdf->SetFont('Arial', '', 8); //font
@@ -389,7 +409,10 @@
 			$item_model_name = $get_item_info_assoc['model_name'];
 			$item_model_number = $get_item_info_assoc['model_number'];
 			$item_description = $get_item_info_assoc['description'];
-			$item_description = substr($item_description,0,40);
+
+			//breaking description in two lines
+				$item_description_1 = substr($item_description, 0,39);
+				$item_description_2 = substr($item_description, 39,43);
 
 			$item_hsn_code = $get_item_info_assoc['hsn_code'];
 			$type = $get_item_info_assoc['type'];
@@ -420,7 +443,7 @@
 
 		//item line
 				$pdf->Cell(8, 5, $item_serial, 'LR', 0, 'C');
-				$pdf->Cell(80, 5, $item_brand . ' ' . $item_model_name . ' ' . $item_model_number, 0, 0);
+				$pdf->Cell(80, 5, $item_brand, 0, 0);
 				
 				$pdf->Cell(14, 5, $item_rate ,  'L', 0,'C');
 				$pdf->Cell(8, 5, $item_quantity ,  'L', 0,'C');
@@ -432,7 +455,7 @@
 
 			//type line
 				$pdf->Cell(8, 5, '', 'LR', 0, 'C');
-				$pdf->Cell(80, 5, 'Type:' . $type, 0, 0);
+				$pdf->Cell(80, 5, $item_model_name . ' ' . $item_model_number, 0, 0);
 				
 				$pdf->Cell(14, 5, '' ,  'L', 0,'C');
 				$pdf->Cell(8, 5, '' ,  'L', 0,'C');
@@ -444,7 +467,7 @@
 
 			//serial line
 				$pdf->Cell(8, 5, '', 'LR', 0, 'C');
-				$pdf->Cell(80, 5, 'SL:' . $item_serial_number, 0, 0);
+				$pdf->Cell(80, 5, 'SL: ' . $item_serial_number, 0, 0);
 				
 				$pdf->Cell(14, 5, '' ,  'L', 0,'C');
 				$pdf->Cell(8, 5, '' ,  'L', 0,'C');
@@ -456,7 +479,7 @@
 
 			//hsn line
 				$pdf->Cell(8, 5, '', 'LR', 0, 'C');
-				$pdf->Cell(80, 5, 'HSN:' . $item_hsn_code, 0, 0);
+				$pdf->Cell(80, 5, 'HSN: ' . $item_hsn_code, 0, 0);
 				
 				$pdf->Cell(14, 5, '' ,  'L', 0,'C');
 				$pdf->Cell(8, 5, '' ,  'L', 0,'C');
@@ -468,7 +491,7 @@
 
 			//desc line
 				$pdf->Cell(8, 5, '', 'LR', 0, 'C');
-				$pdf->Cell(80, 5, 'Desc:' . $item_description, 0, 0);
+				$pdf->Cell(80, 5, 'Desc: ' . $item_description_1, 0, 0);
 				
 				$pdf->Cell(14, 5, '' ,  'L', 0,'C');
 				$pdf->Cell(8, 5, '' ,  'L', 0,'C');
@@ -480,7 +503,7 @@
 
 			//total amount line
 				$pdf->Cell(8, 5, '', 'LB', 0, 'C');
-				$pdf->Cell(80, 5, '', 'LB', 0);
+				$pdf->Cell(80, 5, $item_description_2, 'LB', 0);
 				
 				$pdf->Cell(14, 5, '' ,  'LB', 0,'C');
 				$pdf->Cell(8, 5, '' ,  'LB', 0,'C');
@@ -573,61 +596,95 @@
 	//getting output of the pdf in a file if mailing is to be done
 		$pdf->Output();
 		
-		$filename = "../quotation/Quotation-" . $quotation_num . ".pdf";
-		$pdf->Output($filename, 'F');	
+	//mailing to the customer if it is a normal quotation
+		if($quotation_type == "normal")
+		{
+			$filename = "../quotation/Quotation-" . $quotation_num . ".pdf";
+			$pdf->Output($filename, 'F');	
 
-	//checking to mail to customer or not
-		$session_name = "mail_pdf_of_" . $quotation_num;
+		//checking to mail to customer or not
+			$session_name = "mail_pdf_of_" . $quotation_num;
 
+			if(isset($_SESSION[$session_name]))
+			{
+			//mailing to the customer
+				$website = $_SERVER['HTTP_HOST'];
+				$mail_email = $customer_email;
+
+				if($website == "localhost" OR $website == "volta.pnds.in")
+				{
+					$mail_subject = "Quotation from Voltatech";
+					$headers = "From: voltatech@pnds.in";
+					
+					$mainMessage = "Dear Customer Quotation generated from our online resource is attached with this mail. Please find your attached Quotation pdf file. \n \nRegards \nVoltatech \nhttp://" . $website;
+				}
+				else if($website == "oxy.pnds.in")
+				{
+					$mail_subject = "Quotation from OxyVin";
+					$headers = "From: oxyvin@pnds.in";
+					
+					$mainMessage = "Dear Customer Quotation generated from our online resource is attached with this mail. Please find your attached invoice pdf file. \n \nRegards \nOxyVin \nhttp://" . $website;
+				}
+				else
+				{
+					$mail_subject = "Quotation from Voltatech";
+					$headers = "From: voltatech@pnds.in";
+					
+					$mainMessage = "Dear Customer Quotation generated from our online resource is attached with this mail. Please find your attached Quotation pdf file. \n \nRegards \nVoltatech \nhttp://" . $website;
+				}
+				
+				  $fileatt     = "http://" . $website . "/quotation/Quotation-" . $quotation_num . ".pdf"; //file location
+				  $fileatttype = "application/pdf";
+				  $fileattname = "Quotation-" . $quotation_num . ".pdf"; //name that you want to use to send or you can use the same name
+				 
+				  // File
+				  $file = fopen($fileatt, 'rb');
+				  $data = fread($file, 10000);
+				  fclose($file);
+
+				  // This attaches the file
+				  $semi_rand     = md5(time());
+				  $mime_boundary = "==Multipart_Boundary_x{$semi_rand}x";
+				  $headers      .= "\nMIME-Version: 1.0\n" .
+				    "Content-Type: multipart/mixed;\n" .
+				    " boundary=\"{$mime_boundary}\"";
+				    $message = "This is a multi-part message in MIME format.\n\n" .
+				    "--{$mime_boundary}\n" .
+				    "Content-Type: text/plain; charset=\"iso-8859-1\n" .
+				    "Content-Transfer-Encoding: 7bit\n\n" .
+				    $mainMessage  . "\n\n";
+
+				  $data = chunk_split(base64_encode($data));
+				  $message .= "--{$mime_boundary}\n" .
+				    "Content-Type: {$fileatttype};\n" .
+				    " name=\"{$fileattname}\"\n" .
+				    "Content-Disposition: attachment;\n" .
+				    " filename=\"{$fileattname}\"\n" .
+				    "Content-Transfer-Encoding: base64\n\n" .
+				  $data . "\n\n" .
+				   "--{$mime_boundary}--\n";
+
+				if(@mail($mail_email, $mail_subject, $message, $headers))
+				{
+					//echo 1;
+				}
+				else 
+				{
+					//echo 0;
+				}
+			}
+
+		}
+
+	//destroying the mailing session
 		if(isset($_SESSION[$session_name]))
 		{
-		//mailing to the customer
-			$website = $_SERVER['HTTP_HOST'];
+			unset($_SESSION[$session_name]);
+		}
 
-			$mail_email = $customer_email;
-			$mail_subject = "Quotation from Voltatech";
-			$headers = "From: voltatech@pnds.in";
-			
-			$mainMessage = "Dear Customer Quotation generated from our online resource is attached with this mail. Please find your attached Quotation pdf file. \n \nRegards \nVoltatech \nhttp://" . $website;
-
-			  $fileatt     = "http://" . $website . "/quotation/Quotation-" . $quotation_num . ".pdf"; //file location
-			  $fileatttype = "application/pdf";
-			  $fileattname = "Quotation-" . $quotation_num . ".pdf"; //name that you want to use to send or you can use the same name
-			 
-			  // File
-			  $file = fopen($fileatt, 'rb');
-			  $data = fread($file, 10000);
-			  fclose($file);
-
-			  // This attaches the file
-			  $semi_rand     = md5(time());
-			  $mime_boundary = "==Multipart_Boundary_x{$semi_rand}x";
-			  $headers      .= "\nMIME-Version: 1.0\n" .
-			    "Content-Type: multipart/mixed;\n" .
-			    " boundary=\"{$mime_boundary}\"";
-			    $message = "This is a multi-part message in MIME format.\n\n" .
-			    "--{$mime_boundary}\n" .
-			    "Content-Type: text/plain; charset=\"iso-8859-1\n" .
-			    "Content-Transfer-Encoding: 7bit\n\n" .
-			    $mainMessage  . "\n\n";
-
-			  $data = chunk_split(base64_encode($data));
-			  $message .= "--{$mime_boundary}\n" .
-			    "Content-Type: {$fileatttype};\n" .
-			    " name=\"{$fileattname}\"\n" .
-			    "Content-Disposition: attachment;\n" .
-			    " filename=\"{$fileattname}\"\n" .
-			    "Content-Transfer-Encoding: base64\n\n" .
-			  $data . "\n\n" .
-			   "--{$mime_boundary}--\n";
-
-			if(@mail($mail_email, $mail_subject, $message, $headers))
-			{
-				//echo 1;
-			}
-			else 
-			{
-				//echo 0;
-			}
+	//destroying the quotation type session
+		if(isset($_SESSION['quotation_type']))
+		{
+			unset($_SESSION['quotation_type']);
 		}
 ?>

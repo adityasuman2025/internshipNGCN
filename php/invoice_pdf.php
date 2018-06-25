@@ -423,7 +423,10 @@
 			$item_model_name = $get_item_info_assoc['model_name'];
 			$item_model_number = $get_item_info_assoc['model_number'];
 			$item_description = $get_item_info_assoc['description'];
-			$item_description = substr($item_description,0,40);
+
+			//breaking description in two lines
+				$item_description_1 = substr($item_description, 0,39);
+				$item_description_2 = substr($item_description, 39,43);
 
 			$item_hsn_code = $get_item_info_assoc['hsn_code'];
 			$type = $get_item_info_assoc['type'];
@@ -457,7 +460,7 @@
 
 			//item line
 				$pdf->Cell(8, 5, $item_serial, 'LR', 0, 'C');
-				$pdf->Cell(80, 5, $item_brand . ' ' . $item_model_name . ' ' . $item_model_number, 0, 0);
+				$pdf->Cell(80, 5, $item_brand, 0, 0);
 				
 				$pdf->Cell(14, 5, $item_rate ,  'L', 0,'C');
 				$pdf->Cell(8, 5, $item_quantity ,  'L', 0,'C');
@@ -470,7 +473,7 @@
 
 			//type line
 				$pdf->Cell(8, 5, '', 'LR', 0, 'C');
-				$pdf->Cell(80, 5, 'Type:' . $type, 0, 0);
+				$pdf->Cell(80, 5, $item_model_name . ' ' . $item_model_number, 0, 0);
 				
 				$pdf->Cell(14, 5, '' ,  'L', 0,'C');
 				$pdf->Cell(8, 5, '' ,  'L', 0,'C');
@@ -483,7 +486,7 @@
 
 			//serial line
 				$pdf->Cell(8, 5, '', 'LR', 0, 'C');
-				$pdf->Cell(80, 5, 'SL:' . $item_serial_number, 0, 0);
+				$pdf->Cell(80, 5, 'SL: ' . $item_serial_number, 0, 0);
 				
 				$pdf->Cell(14, 5, '' ,  'L', 0,'C');
 				$pdf->Cell(8, 5, '' ,  'L', 0,'C');
@@ -496,7 +499,7 @@
 
 			//hsn line
 				$pdf->Cell(8, 5, '', 'LR', 0, 'C');
-				$pdf->Cell(80, 5, 'HSN:' . $item_hsn_code, 0, 0);
+				$pdf->Cell(80, 5, 'HSN: ' . $item_hsn_code, 0, 0);
 				
 				$pdf->Cell(14, 5, '' ,  'L', 0,'C');
 				$pdf->Cell(8, 5, '' ,  'L', 0,'C');
@@ -509,7 +512,7 @@
 
 			//desc line
 				$pdf->Cell(8, 5, '', 'LR', 0, 'C');
-				$pdf->Cell(80, 5, 'Desc:' . $item_description, 0, 0);
+				$pdf->Cell(80, 5, 'Desc: ' . $item_description_1, 0, 0);
 				
 				$pdf->Cell(14, 5, '' ,  'L', 0,'C');
 				$pdf->Cell(8, 5, '' ,  'L', 0,'C');
@@ -522,7 +525,7 @@
 
 			//total amount line
 				$pdf->Cell(8, 5, '', 'LB', 0, 'C');
-				$pdf->Cell(80, 5, '', 'LB', 0);
+				$pdf->Cell(80, 5, $item_description_2, 'LB', 0);
 				
 				$pdf->Cell(14, 5, '' ,  'LB', 0,'C');
 				$pdf->Cell(8, 5, '' ,  'LB', 0,'C');
@@ -628,6 +631,7 @@
 	//getting output of the pdf in a file if mailing is to be done
 		$pdf->Output();
 		
+	//mailing to the customer if it is a normal invoice
 		if($invoice_type == "normal")
 		{
 			$filename = "../invoice/Invoice-" . $quotation_num . ".pdf";
@@ -640,12 +644,29 @@
 			{
 			//mailing to the customer
 				$website = $_SERVER['HTTP_HOST'];
-
 				$mail_email = $customer_email;
-				$mail_subject = "Invoice from Voltatech";
-				$headers = "From: voltatech@pnds.in";
-
-				$mainMessage = "Dear Customer Invoice generated from our online resource is attached with this mail. Please find your attached invoice pdf file. \n \nRegards \nVoltatech \nhttp://" . $website;
+				
+				if($website == "localhost" OR $website == "volta.pnds.in")
+				{
+					$mail_subject = "Invoice from Voltatech";
+					$headers = "From: voltatech@pnds.in";
+					
+					$mainMessage = "Dear Customer Invoice generated from our online resource is attached with this mail. Please find your attached invoice pdf file. \n \nRegards \nVoltatech \nhttp://" . $website;
+				}
+				else if($website == "oxy.pnds.in")
+				{
+					$mail_subject = "Invoice from OxyVin";
+					$headers = "From: oxyvin@pnds.in";
+					
+					$mainMessage = "Dear Customer Invoice generated from our online resource is attached with this mail. Please find your attached invoice pdf file. \n \nRegards \nOxyVin \nhttp://" . $website;
+				}
+				else
+				{
+					$mail_subject = "Invoice from Voltatech";
+					$headers = "From: voltatech@pnds.in";
+					
+					$mainMessage = "Dear Customer Invoice generated from our online resource is attached with this mail. Please find your attached invoice pdf file. \n \nRegards \nVoltatech \nhttp://" . $website;
+				}
 
 				  $fileatt     = "http://" . $website . "/invoice/Invoice-" . $quotation_num . ".pdf"; //file location
 				  $fileatttype = "application/pdf";
@@ -653,7 +674,7 @@
 				 
 				  // File
 				  $file = fopen($fileatt, 'rb');
-				  $data = fread($file, 10000);
+				  $data = fread($file, 1000000);
 				  fclose($file);
 
 				  // This attaches the file
@@ -694,6 +715,10 @@
 		{
 			unset($_SESSION[$session_name]);
 		}
-	
 
+	//destroying the invoice type session
+		if(isset($_SESSION['invoice_type']))
+		{
+			unset($_SESSION['invoice_type']);
+		}
 ?>

@@ -68,6 +68,8 @@
 						echo "<img quotation_num=\"$quotation_num\" class=\"user_view_icon\" src=\"img/view.png\"/>";
 						echo "<img quotation_num=\"$quotation_num\" type=\"$type\" class=\"user_edit_icon\" src=\"img/edit.png\"/>";
 						echo "<img quotation_num=\"$quotation_num\" class=\"user_delete_icon\" src=\"img/delete.png\"/>";
+						echo "<br>";
+						echo "<button class=\"performa_button\" quotation_num=\"$quotation_num\">Performa Invoice</button>";
 					echo "</td>";
 				echo "</tr>";
 			}
@@ -129,6 +131,38 @@
 				else
 				{
 					$('.warn_box').text("Something went wrong while generating pdf file of the quotation.");
+					$('.warn_box').fadeIn(200).delay(3000).fadeOut(200);
+				}
+			});
+		});
+	
+	//on clicking on performa invoice button
+		$('.performa_button').click(function()
+		{
+			var quotation_num =  $.trim($(this).attr('quotation_num'));
+
+		//for defining type of the quotation
+			var session_of = "performa";
+			var session_name = "quotation_type";
+				
+			$.post('php/session_creator.php', {session_of: session_of, session_name: session_name}, function(e)
+			{
+
+			});
+
+		//for getting pdf of the invoice
+			var session_of = quotation_num;
+			var session_name = "pdf_quotation_of";
+				
+			$.post('php/session_creator.php', {session_of: session_of, session_name: session_name}, function(e)
+			{
+				if(e ==1)
+				{
+					window.open('php/quotation_pdf.php', '_blank');	
+				}
+				else
+				{
+					$('.warn_box').text("Something went wrong while generating pdf file of the invoice.");
 					$('.warn_box').fadeIn(200).delay(3000).fadeOut(200);
 				}
 			});
