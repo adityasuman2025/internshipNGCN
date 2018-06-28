@@ -24,7 +24,7 @@
 	
 	<span class="user_entry_span"></span>
 	<br><br>
-	<input type="submit" value="Create New Customer" id="create_new_user_button">
+	<input type="submit" value="Create New Supplier" id="create_new_user_button">
 	<br><br>
 
 <!--------script-------->

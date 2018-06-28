@@ -195,6 +195,11 @@
 						$date_of_payment = str_replace('/', '-', $date_of_payment);
 						$date_of_payment = date('d M Y', strtotime($date_of_payment));
 
+						if($date_of_payment == "01 Jan 1970")
+						{
+							$date_of_payment = "not paid";
+						}
+
 					//for getting quotation code
 						$this_year = date('y');
 						$next_year = $this_year +1;
@@ -229,6 +234,7 @@
 							echo "<td>$creator_username</td>";
 							echo "<td>";
 								echo "<img quotation_num=\"$quotation_num\" class=\"user_view_icon\" src=\"img/view.png\"/>";
+								echo "<img quotation_num=\"$quotation_num\" type=\"$type\" class=\"user_edit_icon\" src=\"img/edit.png\"/>";
 								echo "<img quotation_num=\"$quotation_num\" class=\"user_delete_icon\" src=\"img/delete.png\"/>";
 							echo "</td>";
 						echo "</tr>";
@@ -330,6 +336,11 @@
 						$date_of_payment = str_replace('/', '-', $date_of_payment);
 						$date_of_payment = date('d M Y', strtotime($date_of_payment));
 
+						if($date_of_payment == "01 Jan 1970")
+						{
+							$date_of_payment = "not paid";
+						}
+
 					//for getting quotation code
 						$this_year = date('y');
 						$next_year = $this_year +1;
@@ -364,6 +375,7 @@
 							echo "<td>$creator_username</td>";
 							echo "<td>";
 								echo "<img quotation_num=\"$quotation_num\" class=\"user_view_icon\" src=\"img/view.png\"/>";
+								echo "<img quotation_num=\"$quotation_num\" type=\"$type\" class=\"user_edit_icon\" src=\"img/edit.png\"/>";
 								echo "<img quotation_num=\"$quotation_num\" class=\"user_delete_icon\" src=\"img/delete.png\"/>";
 							echo "</td>";
 						echo "</tr>";
@@ -527,6 +539,21 @@
 			});
 		});
 	
+	//on clicking on user edit icon
+		$('.user_edit_icon').click(function()
+		{
+			var quotation_num =  $.trim($(this).attr('quotation_num'));						
+			$('.ajax_loader_bckgrnd').fadeIn(400);
+				
+			$.post('php/edit_invoice.php', {quotation_num:quotation_num}, function(data)
+			{
+				//alert(data);
+				$('.ajax_loader_box').fadeIn(400);
+				$('.ajax_loader_content').html(data);
+			});						
+		});
+
+
 	//on clicking on search button
 		$('.search_date_button').click(function()
 		{

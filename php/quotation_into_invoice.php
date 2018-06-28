@@ -30,7 +30,7 @@
 	$get_customer_email = $get_customer_email_assoc['email'];
 ?>
 
-<!-----edit customer form------->
+<!-----choose payment form------->
 	<h3><?php echo $quotation_code; ?></h3>
 
 	<div class="user_entry_form" id="user_edit_form">
@@ -64,7 +64,14 @@
 		//adding payment method in the database and converting that quotation into invoice
 			if(payment_method!= "")
 			{
-				var query_recieved = "UPDATE quotation SET payment_method ='" + payment_method + "', date_of_payment = now() WHERE quotation_num = '" + quotation_num + "'";
+				if(payment_method == "Credit")
+				{
+					var query_recieved = "UPDATE quotation SET payment_method ='" + payment_method + "', date_of_payment='' WHERE quotation_num = '" + quotation_num + "'";
+				}
+				else
+				{
+					var query_recieved = "UPDATE quotation SET payment_method ='" + payment_method + "', date_of_payment = now() WHERE quotation_num = '" + quotation_num + "'";
+				}				
 				
 				$.post('php/query_runner.php', {query_recieved:query_recieved}, function(e)
 				{

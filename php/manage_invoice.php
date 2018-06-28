@@ -27,7 +27,7 @@
 		</tr>
 
 		<?php
-			$query = "SELECT * FROM quotation WHERE creator_branch_code = '$creator_branch_code' AND payment_method !='' GROUP BY quotation_num ORDER BY date_of_payment DESC";
+			$query = "SELECT * FROM quotation WHERE creator_branch_code = '$creator_branch_code' AND payment_method !='' GROUP BY quotation_num ORDER BY quotation_num DESC";
 			$list_quotation_query_run = mysqli_query($connect_link, $query);
 
 			while($list_quotation_assoc = mysqli_fetch_assoc($list_quotation_query_run))
@@ -50,6 +50,11 @@
 			//gettting date of payment of quoatation
 				$date_of_payment = str_replace('/', '-', $date_of_payment);
 				$date_of_payment = date('d M Y', strtotime($date_of_payment));
+
+				if($date_of_payment == "01 Jan 1970")
+				{
+					$date_of_payment = "not paid";
+				}
 
 			//for getting quotation code
 				$this_year = date('y');
@@ -79,6 +84,7 @@
 					echo "<td>$creator_username</td>";
 					echo "<td>";
 						echo "<img quotation_num=\"$quotation_num\" class=\"user_view_icon\" src=\"img/view.png\"/>";
+						echo "<img quotation_num=\"$quotation_num\" type=\"$type\" class=\"user_edit_icon\" src=\"img/edit.png\"/>";
 						echo "<img quotation_num=\"$quotation_num\" class=\"user_delete_icon\" src=\"img/delete.png\"/>";
 						echo "<button class=\"transporter_copy_button\" quotation_num=\"$quotation_num\">Transporter</button>";
 						echo "<br> <br>";
@@ -92,6 +98,20 @@
 
 <!------------script------------>
 	<script type="text/javascript">
+	//on clicking on user edit icon
+		$('.user_edit_icon').click(function()
+		{
+			var quotation_num =  $.trim($(this).attr('quotation_num'));						
+			$('.ajax_loader_bckgrnd').fadeIn(400);
+				
+			$.post('php/edit_invoice.php', {quotation_num:quotation_num}, function(data)
+			{
+				//alert(data);
+				$('.ajax_loader_box').fadeIn(400);
+				$('.ajax_loader_content').html(data);
+			});						
+		});
+
 	//on clicking on user delete icon
 		$('.user_delete_icon').click(function()
 		{
@@ -117,15 +137,6 @@
 		$('.user_view_icon').click(function()
 		{
 			var quotation_num =  $.trim($(this).attr('quotation_num'));
-
-		//for defining type of the invoice
-			var session_of = "normal";
-			var session_name = "invoice_type";
-				
-			$.post('php/session_creator.php', {session_of: session_of, session_name: session_name}, function(e)
-			{
-
-			});
 
 		//for getting pdf of the quotation
 			var session_of = quotation_num;

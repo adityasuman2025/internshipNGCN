@@ -35,7 +35,7 @@
 
 	$quotation_code = "VOLTA/" . $this_year . "-" . $next_year . "/" . $quotation_num;
 
-//query
+//getting the quotation info
 	$query = "SELECT * FROM quotation WHERE quotation_num = '$quotation_num' AND payment_method !='' ORDER BY serial";
 	$query_run = mysqli_query($connect_link, $query);
 
@@ -45,20 +45,20 @@
 		$creator_branch_code = $query_assoc['creator_branch_code'];
 		$customer_name = $query_assoc['customer'];
 		$purchase_order = $query_assoc['purchase_order'];
-
+		$service_id = $query_assoc['service_id'];
 		$type = $query_assoc['type'];
-
-		$payment_method = $query_assoc['payment_method'];
-		$date_of_payment = $query_assoc['date_of_payment'];
-	
-	//gettting date of payemnt of invoice
-		$date_of_payment = str_replace('/', '-', $date_of_payment);
-		$date_of_payment = date('d M Y', strtotime($date_of_payment));
 
 	//gettting date of generation of quoatation
 		$date = $query_assoc['date'];
 		$date = str_replace('/', '-', $date);
 		$date_of_generation = date('d M Y', strtotime($date));
+
+	//gettting date of payemnt of invoice
+		$payment_method = $query_assoc['payment_method'];
+		$date_of_payment = $query_assoc['date_of_payment'];
+	
+		$date_of_payment = str_replace('/', '-', $date_of_payment);
+		$date_of_payment = date('d M Y', strtotime($date_of_payment));
 
 	//getting information of branch
 		$get_branch_info_query = "SELECT * FROM branch WHERE branch_code = '$creator_branch_code'";
@@ -252,11 +252,9 @@
 		
 //generating pdf
 	require('fpdf181/fpdf.php');
-
 	//A4 width: 219mm
 	//default margin: 10mm each side
 	//writable horizontal: 219 - (10*2) = 189 mm
-
 		$pdf  = new FPDF('p', 'mm', 'A4');
 		$pdf -> AddPage();
 	
@@ -280,54 +278,45 @@
 
 		$pdf->SetFont('Arial', '', 10); //font
 		$pdf->Cell(120, 4, '', 0, 0);
-		$pdf->Cell(69, 4, $branch_address_array[0], 0, 1);
+		$pdf->Cell(69, 4, 'GSTN: ' . $branch_gst_number, 0, 1);
 
 		$pdf->Cell(120, 4, '', 0, 0);
-		$pdf->Cell(69, 4, $branch_address_array[1], 0, 1);
+		$pdf->Cell(69, 4, 'Date: ' . $date_of_generation , 0, 1);
 
 		$pdf->Cell(120, 4, '', 0, 0);
-		$pdf->Cell(69, 4, $branch_address_array[2], 0, 1);
+		$pdf->Cell(69, 4, 'Customer PO: ' . $purchase_order , 0, 1);
 
 		$pdf->Cell(120, 4, '', 0, 0);
-		$pdf->Cell(69, 4, $branch_address_array[3], 0, 1);
-
-		// $pdf->Cell(120, 4, '', 0, 0);
-		// $pdf->Cell(69, 4, $branch_address_array[4], 0, 1);
+		$pdf->Cell(69, 4, 'Service ID: ' . $service_id , 0, 1);
 
 		$pdf->Cell(120, 4, '', 0, 0);
-		$pdf->Cell(69, 4, "Ph: " . $branch_phone_number, 0, 1);
-
-		$pdf->Cell(120, 4, '', 0, 0);
-		$pdf->Cell(69, 4,"Email: " . $branch_email, 0, 1);
-
-		$pdf->Cell(120, 4, '', 0, 0);
-		$pdf->Cell(69, 4,"GST Number: ". $branch_gst_number, 0, 1);
+		$pdf->Cell(69, 4, "Invoice NO: " . $quotation_code, 0, 1);
 
 	//black space and line
-		$pdf -> Line(0, 49, 219, 49);
-		$pdf -> Line(0, 55, 219, 55);
-		$pdf->Cell(189, 1, '', 0, 1); //end of line
+		$pdf -> Line(0, 42, 219, 42);
+		$pdf -> Line(0, 45, 219, 45);
+		$pdf->Cell(189, 6, '', 0, 1); //end of line
 
 	//quotation number and date line
-		$pdf->SetFont('Arial', '', 12); //font
-		$pdf->SetTextColor(0,0,0); //text color //black
-		$pdf->Cell(20, 7, 'Date: ', 0, 0);
-		
-		$pdf->SetTextColor(204,0,0); //text color //red
-		$pdf->Cell(35, 7, $date_of_generation, 0, 0);
+		// 	$pdf->SetFont('Arial', '', 12); //font
+		// 	$pdf->SetTextColor(0,0,0); //text color //black
+		// 	$pdf->Cell(20, 7, 'Date: ', 0, 0);
+			
+		// 	$pdf->SetTextColor(204,0,0); //text color //red
+		// 	$pdf->Cell(35, 7, $date_of_generation, 0, 0);
 
-		$pdf->SetFont('Arial', '', 11); //font
-		$pdf->SetTextColor(0,0,0); //text color //black
-		$pdf->Cell(67, 7, 'Customer PO:' . $purchase_order , 0, 0);
+		// 	$pdf->SetFont('Arial', '', 11); //font
+		// 	$pdf->SetTextColor(0,0,0); //text color //black
+		// 	$pdf->Cell(67, 7, 'Customer PO:' . $purchase_order , 0, 0);
 
-		$pdf->SetFont('Arial', '', 12); //font
-		$pdf->SetTextColor(0,0,0); //text color //black
-		$pdf->Cell(35, 7, 'Quotation No: ', 0, 0);
+		// 	$pdf->SetFont('Arial', '', 12); //font
+		// 	$pdf->SetTextColor(0,0,0); //text color //black
+		// 	$pdf->Cell(35, 7, 'Invoice No: ', 0, 0);
 
-		$pdf->SetTextColor(204,0,0); //text color //red
-		$pdf->Cell(39, 7, $quotation_code, 0, 1);//end of line
+		// 	$pdf->SetTextColor(204,0,0); //text color //red
+		// 	$pdf->Cell(39, 7, $quotation_code, 0, 1);//end of line
 
-		$pdf->Cell(189, 1, '', 0, 1); //end of line
+		// 	$pdf->Cell(189, 1, '', 0, 1); //end of line
 
 	//second line (address)
 		$pdf->SetTextColor(0,0,0); //text color //black
@@ -364,10 +353,6 @@
 		$pdf->Cell(120, 4, $customer_address_array[3] , 0, 0);
 		$pdf->Cell(69, 4, $customer_shipping_address_array[3], 0, 1); //end of line
 
-	// //4th line (address)
-	// 	$pdf->Cell(120, 4, $customer_address_array[4] , 0, 0);
-	// 	$pdf->Cell(69, 4, $customer_shipping_address_array[4], 0, 1); //end of line
-
 	//5th line
 		$pdf->Cell(120, 4, "GST Number: " . $customer_gst, 0, 0);
 		$pdf->Cell(69, 4,"Ph: " .  $customer_mobile, 0, 1); //end of line
@@ -386,10 +371,11 @@
 		$pdf->Cell(8, 5, 'SL', 'LRT', 0, 'C');
 		$pdf->Cell(80, 5, 'Item', 'LRT', 0, 'C');
 		
-		$pdf->Cell(14, 5, 'Unit', 'LRT', 0, 'C');
+		$pdf->Cell(16, 5, 'HSN', 'LRT', 0, 'C');
 		$pdf->Cell(8, 5, 'Qty','LRT', 0, 'C');
-		$pdf->Cell(13, 5, 'Dscnt', 'LRT', 0, 'C');
-		$pdf->Cell(13, 5, 'Net', 'LRT', 0, 'C');
+		$pdf->Cell(12, 5, 'Unit', 'LRT', 0, 'C');
+		$pdf->Cell(12, 5, 'Dscnt', 'LRT', 0, 'C');
+		// $pdf->Cell(13, 5, 'Net', 'LRT', 0, 'C');
 
 		$pdf->Cell(11, 5, 'TAX', 'LRT', 0, 'C');
 		$pdf->Cell(11, 5, 'TAX', 'LRT',  0, 'C');
@@ -399,10 +385,11 @@
 		$pdf->Cell(8, 5, '','LRB', 0, 'C');
 		$pdf->Cell(80, 5, '','LRB', 0, 'C');
 
-		$pdf->Cell(14, 5, 'Price','LRB', 0, 'C');
+		$pdf->Cell(16, 5, 'Code','LRB', 0, 'C');
 		$pdf->Cell(8, 5, '','LRB', 0, 'C');
-		$pdf->Cell(13, 5, '%', 'LRB', 0, 'C');
-		$pdf->Cell(13, 5, 'Price','LRB', 0, 'C');
+		$pdf->Cell(12, 5, 'Price','LRB', 0, 'C');
+		$pdf->Cell(12, 5, '%', 'LRB', 0, 'C');
+		// $pdf->Cell(13, 5, 'Price','LRB', 0, 'C');
 
 		$pdf->Cell(11, 5, 'Rate','LRB', 0, 'C');
 		$pdf->Cell(11, 5, 'Type', 'LRB', 0, 'C');
@@ -462,10 +449,11 @@
 				$pdf->Cell(8, 5, $item_serial, 'LR', 0, 'C');
 				$pdf->Cell(80, 5, $item_brand, 0, 0);
 				
-				$pdf->Cell(14, 5, $item_rate ,  'L', 0,'C');
+
+				$pdf->Cell(16, 5, $item_hsn_code ,  'L', 0,'C');
 				$pdf->Cell(8, 5, $item_quantity ,  'L', 0,'C');
-				$pdf->Cell(13, 5, $item_discount. "%" ,  'L', 0,'C');
-				$pdf->Cell(13, 5, $net_price ,  'L', 0,'C');
+				$pdf->Cell(12, 5, $item_rate ,  'L', 0,'C');
+				$pdf->Cell(12, 5, $item_discount. "%" ,  'L', 0,'C');
 				$pdf->Cell(11, 5, $item_cgst . "%" ,  'L', 0,'C');
 				$pdf->Cell(11, 5, 'CGST' ,  'L', 0,'C');
 				$pdf->Cell(16, 5, $cgst_amount, 'L', 0, 'C');
@@ -475,10 +463,10 @@
 				$pdf->Cell(8, 5, '', 'LR', 0, 'C');
 				$pdf->Cell(80, 5, $item_model_name . ' ' . $item_model_number, 0, 0);
 				
-				$pdf->Cell(14, 5, '' ,  'L', 0,'C');
+				$pdf->Cell(16, 5, '' ,  'L', 0,'C');
 				$pdf->Cell(8, 5, '' ,  'L', 0,'C');
-				$pdf->Cell(13, 5, '' ,  'L', 0,'C');
-				$pdf->Cell(13, 5, '' ,  'L', 0,'C');
+				$pdf->Cell(12, 5, '' ,  'L', 0,'C');
+				$pdf->Cell(12, 5, '' ,  'L', 0,'C');
 				$pdf->Cell(11, 5, '' ,  'L', 0,'C');
 				$pdf->Cell(11, 5, '' ,  'L', 0,'C');
 				$pdf->Cell(16, 5, '', 'L', 0, 'C');
@@ -488,10 +476,10 @@
 				$pdf->Cell(8, 5, '', 'LR', 0, 'C');
 				$pdf->Cell(80, 5, 'SL: ' . $item_serial_number, 0, 0);
 				
-				$pdf->Cell(14, 5, '' ,  'L', 0,'C');
+				$pdf->Cell(16, 5, '' ,  'L', 0,'C');
 				$pdf->Cell(8, 5, '' ,  'L', 0,'C');
-				$pdf->Cell(13, 5, '' ,  'L', 0,'C');
-				$pdf->Cell(13, 5, '' ,  'L', 0,'C');
+				$pdf->Cell(12, 5, '' ,  'L', 0,'C');
+				$pdf->Cell(12, 5, '' ,  'L', 0,'C');
 				$pdf->Cell(11, 5, $item_sgst . "%" , 'L', 0,'C');
 				$pdf->Cell(11, 5, 'SGST' ,  'L', 0,'C');
 				$pdf->Cell(16, 5, $sgst_amount, 'L', 0, 'C');
@@ -499,12 +487,12 @@
 
 			//hsn line
 				$pdf->Cell(8, 5, '', 'LR', 0, 'C');
-				$pdf->Cell(80, 5, 'HSN: ' . $item_hsn_code, 0, 0);
+				$pdf->Cell(80, 5, 'Desc: ' . $item_description_1, 0, 0);
 				
-				$pdf->Cell(14, 5, '' ,  'L', 0,'C');
+				$pdf->Cell(16, 5, '' ,  'L', 0,'C');
 				$pdf->Cell(8, 5, '' ,  'L', 0,'C');
-				$pdf->Cell(13, 5, '' ,  'L', 0,'C');
-				$pdf->Cell(13, 5, '' ,  'L', 0,'C');
+				$pdf->Cell(12, 5, '' ,  'L', 0,'C');
+				$pdf->Cell(12, 5, '' ,  'L', 0,'C');
 				$pdf->Cell(11, 5, '' ,  'L', 0,'C');
 				$pdf->Cell(11, 5, '' ,  'L', 0,'C');
 				$pdf->Cell(16, 5, '', 'L', 0, 'C');
@@ -512,12 +500,12 @@
 
 			//desc line
 				$pdf->Cell(8, 5, '', 'LR', 0, 'C');
-				$pdf->Cell(80, 5, 'Desc: ' . $item_description_1, 0, 0);
+				$pdf->Cell(80, 5, $item_description_2, 0, 0);
 				
-				$pdf->Cell(14, 5, '' ,  'L', 0,'C');
+				$pdf->Cell(16, 5, '' ,  'L', 0,'C');
 				$pdf->Cell(8, 5, '' ,  'L', 0,'C');
-				$pdf->Cell(13, 5, '' ,  'L', 0,'C');
-				$pdf->Cell(13, 5, '' ,  'L', 0,'C');
+				$pdf->Cell(12, 5, '' ,  'L', 0,'C');
+				$pdf->Cell(12, 5, '' ,  'L', 0,'C');
 				$pdf->Cell(11, 5, $item_igst . "%" , 'L', 0,'C');
 				$pdf->Cell(11, 5, 'IGST' ,  'L', 0,'C');
 				$pdf->Cell(16, 5, $igst_amount, 'L', 0, 'C');
@@ -525,12 +513,12 @@
 
 			//total amount line
 				$pdf->Cell(8, 5, '', 'LB', 0, 'C');
-				$pdf->Cell(80, 5, $item_description_2, 'LB', 0);
+				$pdf->Cell(80, 5, '', 'LB', 0);
 				
-				$pdf->Cell(14, 5, '' ,  'LB', 0,'C');
+				$pdf->Cell(16, 5, '' ,  'LB', 0,'C');
 				$pdf->Cell(8, 5, '' ,  'LB', 0,'C');
-				$pdf->Cell(13, 5, '' ,  'LB', 0,'C');
-				$pdf->Cell(13, 5, '' ,  'LB', 0,'C');
+				$pdf->Cell(12, 5, '' ,  'LB', 0,'C');
+				$pdf->Cell(12, 5, '' ,  'LB', 0,'C');
 				$pdf->Cell(11, 5, '' ,  'LB', 0,'C');
 				$pdf->Cell(11, 5, '' ,  'LB', 0,'C');
 				$pdf->Cell(16, 5, '', 'LB', 0, 'C');
@@ -623,102 +611,123 @@
 		$pdf->Cell(27, 4, 'Payment Date:', 0, 0);
 		$pdf->Cell(45, 4, $date_of_payment, 0, 1);
 
-	//another page for terms and conditions
+//another page for terms and conditions and branch details
+	//adding new page
 		$pdf -> AddPage();
+
+	//terms and conditions
 		$pdf->SetTextColor(0, 0, 0); //text color //black
+		$pdf->SetFont('Arial', 'B', 11); //font
 		$pdf->Cell(189, 5, 'Terms & Conditions:', 0, 1);
 
-	//getting output of the pdf in a file if mailing is to be done
-		$pdf->Output();
-		
-	//mailing to the customer if it is a normal invoice
-		if($invoice_type == "normal")
-		{
-			$filename = "../invoice/Invoice-" . $quotation_num . ".pdf";
-			$pdf->Output($filename, 'F');
+	//leaving blank space
+		$pdf->Cell(200, 5, '', 0, 1);
 
-		//checking to mail to customer or not
-			$session_name = "mail_pdf_of_" . $quotation_num;
+	//branch details
+		$pdf->SetFont('Arial', 'B', 11); //font
+		$pdf->Cell(189, 5, 'Branch Details:', 0, 1);
 
-			if(isset($_SESSION[$session_name]))
-			{
-			//mailing to the customer
-				$website = $_SERVER['HTTP_HOST'];
-				$mail_email = $customer_email;
-				
-				if($website == "localhost" OR $website == "volta.pnds.in")
-				{
-					$mail_subject = "Invoice from Voltatech";
-					$headers = "From: voltatech@pnds.in";
-					
-					$mainMessage = "Dear Customer Invoice generated from our online resource is attached with this mail. Please find your attached invoice pdf file. \n \nRegards \nVoltatech \nhttp://" . $website;
-				}
-				else if($website == "oxy.pnds.in")
-				{
-					$mail_subject = "Invoice from OxyVin";
-					$headers = "From: oxyvin@pnds.in";
-					
-					$mainMessage = "Dear Customer Invoice generated from our online resource is attached with this mail. Please find your attached invoice pdf file. \n \nRegards \nOxyVin \nhttp://" . $website;
-				}
-				else
-				{
-					$mail_subject = "Invoice from Voltatech";
-					$headers = "From: voltatech@pnds.in";
-					
-					$mainMessage = "Dear Customer Invoice generated from our online resource is attached with this mail. Please find your attached invoice pdf file. \n \nRegards \nVoltatech \nhttp://" . $website;
-				}
+		$pdf->SetFont('Arial', '', 10); //font
+		$pdf->Cell(189, 5, 'Branch Name: ' . $branch_name , 0,1);
+		$pdf->Cell(189, 5, 'Branch Code: ' . $creator_branch_code , 0,1);
+		$pdf->Cell(189, 5, 'Created By: ' . $creator_username , 0,1);
+		$pdf->Cell(189, 5, $branch_address_array[0], 0,1);
+		$pdf->Cell(189, 5, $branch_address_array[1], 0,1);
+		$pdf->Cell(189, 5, $branch_address_array[2], 0,1);
+		$pdf->Cell(189, 5, $branch_address_array[3], 0,1);
+		$pdf->Cell(189, 5, $branch_address_array[4], 0,1);
 
-				  $fileatt     = "http://" . $website . "/invoice/Invoice-" . $quotation_num . ".pdf"; //file location
-				  $fileatttype = "application/pdf";
-				  $fileattname = "Invoice-" . $quotation_num . ".pdf"; //name that you want to use to send or you can use the same name
-				 
-				  // File
-				  $file = fopen($fileatt, 'rb');
-				  $data = fread($file, 1000000);
-				  fclose($file);
+//getting output of the pdf in a file if mailing is to be done
+	$pdf->Output();
+	
+//mailing to the customer if it is a normal invoice
+	if($invoice_type == "normal")
+	{
+		$filename = "../invoice/Invoice-" . $quotation_num . ".pdf";
+		$pdf->Output($filename, 'F');
 
-				  // This attaches the file
-				  $semi_rand     = md5(time());
-				  $mime_boundary = "==Multipart_Boundary_x{$semi_rand}x";
-				  $headers      .= "\nMIME-Version: 1.0\n" .
-				    "Content-Type: multipart/mixed;\n" .
-				    " boundary=\"{$mime_boundary}\"";
-				    $message = "This is a multi-part message in MIME format.\n\n" .
-				    "--{$mime_boundary}\n" .
-				    "Content-Type: text/plain; charset=\"iso-8859-1\n" .
-				    "Content-Transfer-Encoding: 7bit\n\n" .
-				    $mainMessage  . "\n\n";
+	//checking to mail to customer or not
+		$session_name = "mail_pdf_of_" . $quotation_num;
 
-				  $data = chunk_split(base64_encode($data));
-				  $message .= "--{$mime_boundary}\n" .
-				    "Content-Type: {$fileatttype};\n" .
-				    " name=\"{$fileattname}\"\n" .
-				    "Content-Disposition: attachment;\n" .
-				    " filename=\"{$fileattname}\"\n" .
-				    "Content-Transfer-Encoding: base64\n\n" .
-				  $data . "\n\n" .
-				   "--{$mime_boundary}--\n";
-
-				if(@mail($mail_email, $mail_subject, $message, $headers))
-				{
-					//echo 1;
-				}
-				else 
-				{
-					//echo 0;
-				}
-			}	
-		}
-
-	//destroying the mailing session
 		if(isset($_SESSION[$session_name]))
 		{
-			unset($_SESSION[$session_name]);
-		}
+		//mailing to the customer
+			$website = $_SERVER['HTTP_HOST'];
+			$mail_email = $customer_email;
+			
+			if($website == "localhost" OR $website == "volta.pnds.in")
+			{
+				$mail_subject = "Invoice from Voltatech";
+				$headers = "From: voltatech@pnds.in";
+				
+				$mainMessage = "Dear Customer Invoice generated from our online resource is attached with this mail. Please find your attached invoice pdf file. \n \nRegards \nVoltatech \nhttp://" . $website;
+			}
+			else if($website == "oxy.pnds.in")
+			{
+				$mail_subject = "Invoice from OxyVin";
+				$headers = "From: oxyvin@pnds.in";
+				
+				$mainMessage = "Dear Customer Invoice generated from our online resource is attached with this mail. Please find your attached invoice pdf file. \n \nRegards \nOxyVin \nhttp://" . $website;
+			}
+			else
+			{
+				$mail_subject = "Invoice from Voltatech";
+				$headers = "From: voltatech@pnds.in";
+				
+				$mainMessage = "Dear Customer Invoice generated from our online resource is attached with this mail. Please find your attached invoice pdf file. \n \nRegards \nVoltatech \nhttp://" . $website;
+			}
 
-	//destroying the invoice type session
-		if(isset($_SESSION['invoice_type']))
-		{
-			unset($_SESSION['invoice_type']);
-		}
+			  $fileatt     = "http://" . $website . "/invoice/Invoice-" . $quotation_num . ".pdf"; //file location
+			  $fileatttype = "application/pdf";
+			  $fileattname = "Invoice-" . $quotation_num . ".pdf"; //name that you want to use to send or you can use the same name
+			 
+			  // File
+			  $file = fopen($fileatt, 'rb');
+			  $data = fread($file, 1000000);
+			  fclose($file);
+
+			  // This attaches the file
+			  $semi_rand     = md5(time());
+			  $mime_boundary = "==Multipart_Boundary_x{$semi_rand}x";
+			  $headers      .= "\nMIME-Version: 1.0\n" .
+			    "Content-Type: multipart/mixed;\n" .
+			    " boundary=\"{$mime_boundary}\"";
+			    $message = "This is a multi-part message in MIME format.\n\n" .
+			    "--{$mime_boundary}\n" .
+			    "Content-Type: text/plain; charset=\"iso-8859-1\n" .
+			    "Content-Transfer-Encoding: 7bit\n\n" .
+			    $mainMessage  . "\n\n";
+
+			  $data = chunk_split(base64_encode($data));
+			  $message .= "--{$mime_boundary}\n" .
+			    "Content-Type: {$fileatttype};\n" .
+			    " name=\"{$fileattname}\"\n" .
+			    "Content-Disposition: attachment;\n" .
+			    " filename=\"{$fileattname}\"\n" .
+			    "Content-Transfer-Encoding: base64\n\n" .
+			  $data . "\n\n" .
+			   "--{$mime_boundary}--\n";
+
+			if(@mail($mail_email, $mail_subject, $message, $headers))
+			{
+				//echo 1;
+			}
+			else 
+			{
+				//echo 0;
+			}
+		}	
+	}
+
+//destroying the mailing session
+	if(isset($_SESSION[$session_name]))
+	{
+		unset($_SESSION[$session_name]);
+	}
+
+//destroying the invoice type session
+	if(isset($_SESSION['invoice_type']))
+	{
+		unset($_SESSION['invoice_type']);
+	}
 ?>
