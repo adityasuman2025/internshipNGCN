@@ -258,8 +258,9 @@
 
 			if(search_type !="")
 			{
-				var search_input = $(this).val();
+				$('.gen_quotation_span').text("");
 
+				var search_input = $(this).val();
 				var query = "SELECT model_number FROM inventory WHERE type = '" + search_type + "' AND model_number LIKE '" + search_input + "%'";
 				var to_get = "model_number";
 
@@ -277,66 +278,68 @@
 			}
 			else
 			{
-				$('.warn_box').text("Please select a row number and type.");
-				$('.warn_box').fadeIn(200).delay(2000).fadeOut(200);
+				$('.gen_quotation_span').text("Please select a type.").css('color', 'red');
 			}
 		});
 	
 	//on clicking on go on search product or part code
 		$('#quotation_search_code_button').click(function()
 		{
-			// var row_no = parseInt($('#quotation_search_row_no').val());
 			var search_type = $('#quotation_search_type').val();			
 			var model_number = $('#quotation_search_input').val();
-			// var original_row_no = row_no + 1;
 
-		//populating type and model number from the search input
-			// $('.quotation_entry_table tr:nth-child('+ original_row_no + ') #quotation_item_type').html("<option value ='"+ search_type + "'>" + search_type + "</option>");
-
-			// $('.quotation_entry_table tr:nth-child('+ original_row_no + ') #quotation_model_number').html("<option value ='"+ model_number + "'>" + model_number + "</option>");
-
-			$('.quotation_entry_table tr:last #quotation_item_type').html("<option value ='"+ search_type + "'>" + search_type + "</option>");
-
-			$('.quotation_entry_table tr:last #quotation_model_number').html("<option value ='"+ model_number + "'>" + model_number + "</option>");
-
-		//getting brand
-			var query = "SELECT brand FROM inventory WHERE model_number ='" + model_number + "' AND type='" + search_type + "'";
-			var to_get = "brand";
-
-			$.post('php/inventory_query_runner.php', {query:query , to_get:to_get}, function(data)
+			if(search_type !="" && model_number !="")
 			{
-				$('.quotation_entry_table tr:last #quotation_brand').html(data);
-			});
+				$('.gen_quotation_span').text('');
 
-		//getting model name
-			var query = "SELECT model_name FROM inventory WHERE model_number ='" + model_number + "' AND type='" + search_type + "'";
-			var to_get = "model_name";
+				$('.quotation_entry_table tr:last #quotation_item_type').html("<option value ='"+ search_type + "'>" + search_type + "</option>");
 
-			$.post('php/inventory_query_runner.php', {query:query , to_get:to_get}, function(data)
+				$('.quotation_entry_table tr:last #quotation_model_number').html("<option value ='"+ model_number + "'>" + model_number + "</option>");
+
+			//getting brand
+				var query = "SELECT brand FROM inventory WHERE model_number ='" + model_number + "' AND type='" + search_type + "'";
+				var to_get = "brand";
+
+				$.post('php/inventory_query_runner.php', {query:query , to_get:to_get}, function(data)
+				{
+					$('.quotation_entry_table tr:last #quotation_brand').html(data);
+				});
+
+			//getting model name
+				var query = "SELECT model_name FROM inventory WHERE model_number ='" + model_number + "' AND type='" + search_type + "'";
+				var to_get = "model_name";
+
+				$.post('php/inventory_query_runner.php', {query:query , to_get:to_get}, function(data)
+				{
+					//alert(data);
+					$('.quotation_entry_table tr:last #quotation_model_name').html(data);
+				});
+
+			//getting hsn code
+				var query = "SELECT hsn_code FROM inventory WHERE model_number ='" + model_number + "' AND type='" + search_type + "'";
+				var to_get = "hsn_code";
+
+				$.post('php/query_result_viewer.php', {query:query , to_get:to_get}, function(data)
+				{
+					//alert(data);
+					$('.quotation_entry_table tr:last #quotation_hsn_code').val(data);
+				});
+
+			//getting description
+				var query = "SELECT description FROM inventory WHERE model_number ='" + model_number + "' AND type='" + search_type + "'";
+				var to_get = "description";
+
+				$.post('php/query_result_viewer.php', {query:query , to_get:to_get}, function(data)
+				{
+					//alert(data);
+					$('.quotation_entry_table tr:last #quotation_description').val(data);
+				});
+
+			}
+			else
 			{
-				//alert(data);
-				$('.quotation_entry_table tr:last #quotation_model_name').html(data);
-			});
-
-		//getting hsn code
-			var query = "SELECT hsn_code FROM inventory WHERE model_number ='" + model_number + "' AND type='" + search_type + "'";
-			var to_get = "hsn_code";
-
-			$.post('php/query_result_viewer.php', {query:query , to_get:to_get}, function(data)
-			{
-				//alert(data);
-				$('.quotation_entry_table tr:last #quotation_hsn_code').val(data);
-			});
-
-		//getting description
-			var query = "SELECT description FROM inventory WHERE model_number ='" + model_number + "' AND type='" + search_type + "'";
-			var to_get = "description";
-
-			$.post('php/query_result_viewer.php', {query:query , to_get:to_get}, function(data)
-			{
-				//alert(data);
-				$('.quotation_entry_table tr:last #quotation_description').val(data);
-			});
+				$('.gen_quotation_span').text('Please select Type and Product/Part/Service Code.').css('color', 'red');
+			}
 		});
 
 	//on selecting a item type

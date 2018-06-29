@@ -214,19 +214,19 @@
 		});
 
 	//on choosing a row for search bar
-		$('#quotation_search_row_no').focus(function()
-		{
-			$(this).html("<option value=''></option>");
+		// $('#quotation_search_row_no').focus(function()
+		// {
+		// 	$(this).html("<option value=''></option>");
 
-			var row_count = $('.quotation_entry_table tr').length;
-			var actual_row_count = row_count - 1;
+		// 	var row_count = $('.quotation_entry_table tr').length;
+		// 	var actual_row_count = row_count - 1;
 
-			var i;
-			for (i = 1; i <= actual_row_count; i++) 
-			{ 
-			    $(this).append("<option value='" + i + "'>" + i + "</option>");
-			}
-		});
+		// 	var i;
+		// 	for (i = 1; i <= actual_row_count; i++) 
+		// 	{ 
+		// 	    $(this).append("<option value='" + i + "'>" + i + "</option>");
+		// 	}
+		// });
 
 	//on choosing a search type
 		$('#quotation_search_type').change(function()
@@ -253,8 +253,9 @@
 
 			if(search_type !="")
 			{
-				var search_input = $(this).val();
+				$('.gen_quotation_span').text("");
 
+				var search_input = $(this).val();
 				if(search_type == "service") //if selected type is service then taking services dircetly from inventory
 				{
 					var query = "SELECT model_number FROM inventory WHERE type = '" + search_type + "' AND model_number LIKE '" + search_input + "%'";
@@ -292,113 +293,122 @@
 			}
 			else
 			{
-				$('.warn_box').text("Please select a row number and type.");
-				$('.warn_box').fadeIn(200).delay(2000).fadeOut(200);
+				$('.gen_quotation_span').text("Please select a type.").css('color', 'red');
 			}
 		});
 	
 	//on clicking on go on search product or part code
 		$('#quotation_search_code_button').click(function()
 		{
-			var search_type = $('#quotation_search_type').val();			
-			var model_number = $('#quotation_search_input').val();
+			var search_type = $.trim($('#quotation_search_type').val());			
+			var model_number = $.trim($('#quotation_search_input').val());
 		
-			$('.quotation_entry_table tr:last #quotation_item_type').html("<option value ='"+ search_type + "'>" + search_type + "</option>");
-			$('.quotation_entry_table tr:last #quotation_model_number').html("<option value ='"+ model_number + "'>" + model_number + "</option>");
-
-		//getting brand
-			if(search_type == 'service')
+			if(search_type !="" && model_number !="")
 			{
-				var query = "SELECT brand FROM inventory WHERE model_number ='" + model_number + "' AND type='" + search_type + "'";
-				var to_get = "brand";
+				$('.gen_quotation_span').text('').css('color', 'red');
 
-				$.post('php/inventory_query_runner.php', {query:query , to_get:to_get}, function(data)
+				$('.quotation_entry_table tr:last #quotation_item_type').html("<option value ='"+ search_type + "'>" + search_type + "</option>");
+				$('.quotation_entry_table tr:last #quotation_model_number').html("<option value ='"+ model_number + "'>" + model_number + "</option>");
+
+			//getting brand
+				if(search_type == 'service')
 				{
-					$('.quotation_entry_table tr:last #quotation_brand').html(data);
-				});
-			}
-			else
-			{
-				var query = "SELECT brand FROM stock WHERE model_number ='" + model_number + "' AND type='" + search_type + "' AND creator_branch_code ='" + creator_branch_code + "'";
-				var to_get = "brand";
+					var query = "SELECT brand FROM inventory WHERE model_number ='" + model_number + "' AND type='" + search_type + "'";
+					var to_get = "brand";
 
-				$.post('php/inventory_query_runner.php', {query:query , to_get:to_get}, function(data)
+					$.post('php/inventory_query_runner.php', {query:query , to_get:to_get}, function(data)
+					{
+						$('.quotation_entry_table tr:last #quotation_brand').html(data);
+					});
+				}
+				else
 				{
-					$('.quotation_entry_table tr:last #quotation_brand').html(data);
-				});
-			}
+					var query = "SELECT brand FROM stock WHERE model_number ='" + model_number + "' AND type='" + search_type + "' AND creator_branch_code ='" + creator_branch_code + "'";
+					var to_get = "brand";
 
-		//getting model name
-			if(search_type == 'service')
-			{
-				var query = "SELECT model_name FROM inventory WHERE model_number ='" + model_number + "' AND type='" + search_type + "'";
-				var to_get = "model_name";
+					$.post('php/inventory_query_runner.php', {query:query , to_get:to_get}, function(data)
+					{
+						$('.quotation_entry_table tr:last #quotation_brand').html(data);
+					});
+				}
 
-				$.post('php/inventory_query_runner.php', {query:query , to_get:to_get}, function(data)
+			//getting model name
+				if(search_type == 'service')
 				{
-					$('.quotation_entry_table tr:last #quotation_model_name').html(data);
-				});
-			}
-			else
-			{
-				var query = "SELECT model_name FROM stock WHERE model_number ='" + model_number + "' AND type='" + search_type + "' AND creator_branch_code ='" + creator_branch_code + "'";
-				var to_get = "model_name";
+					var query = "SELECT model_name FROM inventory WHERE model_number ='" + model_number + "' AND type='" + search_type + "'";
+					var to_get = "model_name";
 
-				$.post('php/inventory_query_runner.php', {query:query , to_get:to_get}, function(data)
+					$.post('php/inventory_query_runner.php', {query:query , to_get:to_get}, function(data)
+					{
+						$('.quotation_entry_table tr:last #quotation_model_name').html(data);
+					});
+				}
+				else
 				{
-					//alert(data);
-					$('.quotation_entry_table tr:last #quotation_model_name').html(data);
-				});
-			}			
+					var query = "SELECT model_name FROM stock WHERE model_number ='" + model_number + "' AND type='" + search_type + "' AND creator_branch_code ='" + creator_branch_code + "'";
+					var to_get = "model_name";
 
-		//getting hsn code
-			if(search_type == 'service')
-			{
-				var query = "SELECT hsn_code FROM inventory WHERE model_number ='" + model_number + "' AND type ='" + search_type + "'";
-				var to_get = "hsn_code";
+					$.post('php/inventory_query_runner.php', {query:query , to_get:to_get}, function(data)
+					{
+						//alert(data);
+						$('.quotation_entry_table tr:last #quotation_model_name').html(data);
+					});
+				}			
+
+			//getting hsn code
+				if(search_type == 'service')
+				{
+					var query = "SELECT hsn_code FROM inventory WHERE model_number ='" + model_number + "' AND type ='" + search_type + "'";
+					var to_get = "hsn_code";
+
+					$.post('php/query_result_viewer.php', {query:query , to_get:to_get}, function(data)
+					{
+						//alert(data);
+						$('.quotation_entry_table tr:last #quotation_hsn_code').val(data);
+					});
+				}
+				else
+				{
+					var query = "SELECT hsn_code FROM stock WHERE model_number ='" + model_number + "' AND type ='" + search_type + "' AND creator_branch_code ='" + creator_branch_code + "'";
+					var to_get = "hsn_code";
+
+					$.post('php/query_result_viewer.php', {query:query , to_get:to_get}, function(data)
+					{
+						$('.quotation_entry_table tr:last #quotation_hsn_code').val(data);
+					});
+				}
+
+			//getting description
+				var query = "SELECT description FROM inventory WHERE model_number ='" + model_number + "' AND type='" + search_type + "'";
+				var to_get = "description";
 
 				$.post('php/query_result_viewer.php', {query:query , to_get:to_get}, function(data)
 				{
 					//alert(data);
-					$('.quotation_entry_table tr:last #quotation_hsn_code').val(data);
+					$('.quotation_entry_table tr:last #quotation_description').val(data);
 				});
+
+			//getting availability
+				if(search_type == 'service')
+				{
+					$('.quotation_entry_table tr:last #item_availability').val('0');
+				}
+				else
+				{
+					var query = "SELECT in_stock FROM stock WHERE model_number ='" + model_number + "' AND type ='" + search_type + "' AND creator_branch_code ='" + creator_branch_code + "'";
+					var to_get = "in_stock";
+
+					$.post('php/query_result_viewer.php', {query:query , to_get:to_get}, function(data)
+					{
+						$('.quotation_entry_table tr:last #item_availability').val(data);
+					});
+				}
+		
 			}
 			else
 			{
-				var query = "SELECT hsn_code FROM stock WHERE model_number ='" + model_number + "' AND type ='" + search_type + "' AND creator_branch_code ='" + creator_branch_code + "'";
-				var to_get = "hsn_code";
-
-				$.post('php/query_result_viewer.php', {query:query , to_get:to_get}, function(data)
-				{
-					$('.quotation_entry_table tr:last #quotation_hsn_code').val(data);
-				});
-			}
-
-		//getting description
-			var query = "SELECT description FROM inventory WHERE model_number ='" + model_number + "' AND type='" + search_type + "'";
-			var to_get = "description";
-
-			$.post('php/query_result_viewer.php', {query:query , to_get:to_get}, function(data)
-			{
-				//alert(data);
-				$('.quotation_entry_table tr:last #quotation_description').val(data);
-			});
-
-		//getting availability
-			if(search_type == 'service')
-			{
-				$('.quotation_entry_table tr:last #item_availability').val('0');
-			}
-			else
-			{
-				var query = "SELECT in_stock FROM stock WHERE model_number ='" + model_number + "' AND type ='" + search_type + "' AND creator_branch_code ='" + creator_branch_code + "'";
-				var to_get = "in_stock";
-
-				$.post('php/query_result_viewer.php', {query:query , to_get:to_get}, function(data)
-				{
-					$('.quotation_entry_table tr:last #item_availability').val(data);
-				});
-			}
+				$('.gen_quotation_span').text('Please select Type and Product/Part/Service Code.').css('color', 'red');
+			}		
 		});
 
 	//on selecting a item type

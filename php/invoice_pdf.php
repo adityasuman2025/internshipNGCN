@@ -37,15 +37,35 @@
 
 //getting the quotation info
 	$query = "SELECT * FROM quotation WHERE quotation_num = '$quotation_num' AND payment_method !='' ORDER BY serial";
-	$query_run = mysqli_query($connect_link, $query);
+	
+//getting the service id and purchase order fields from any of the item od that invoice
+	$service_id_org = "";
+	$purchase_order_org = "";
 
+	$get_invoice_info_query_run = mysqli_query($connect_link, $query);
+	while($get_invoice_info_assoc = mysqli_fetch_assoc($get_invoice_info_query_run))
+	{
+		$service_id = $get_invoice_info_assoc['service_id'];
+		if($service_id != "")
+		{
+			$service_id_org = $service_id;
+		}
+
+		$purchase_order = $get_invoice_info_assoc['purchase_order'];
+		if($purchase_order != "")
+		{
+			$purchase_order_org = $purchase_order;
+		}
+	}
+
+//getting invoice info
+	$query_run = mysqli_query($connect_link, $query);
+	
 	if($query_assoc = mysqli_fetch_assoc($query_run))
 	{
 		$creator_username = $query_assoc['creator_username'];
 		$creator_branch_code = $query_assoc['creator_branch_code'];
 		$customer_name = $query_assoc['customer'];
-		$purchase_order = $query_assoc['purchase_order'];
-		$service_id = $query_assoc['service_id'];
 		$type = $query_assoc['type'];
 
 	//gettting date of generation of quoatation
@@ -59,6 +79,11 @@
 	
 		$date_of_payment = str_replace('/', '-', $date_of_payment);
 		$date_of_payment = date('d M Y', strtotime($date_of_payment));
+
+		if($date_of_payment == "01 Jan 1970" OR $date_of_payment == "30 Nov -0001" OR $date_of_payment == "")
+		{
+			$date_of_payment = "Not Paid";
+		}
 
 	//getting information of branch
 		$get_branch_info_query = "SELECT * FROM branch WHERE branch_code = '$creator_branch_code'";
@@ -283,11 +308,27 @@
 		$pdf->Cell(120, 4, '', 0, 0);
 		$pdf->Cell(69, 4, 'Date: ' . $date_of_generation , 0, 1);
 
-		$pdf->Cell(120, 4, '', 0, 0);
-		$pdf->Cell(69, 4, 'Customer PO: ' . $purchase_order , 0, 1);
-
-		$pdf->Cell(120, 4, '', 0, 0);
-		$pdf->Cell(69, 4, 'Service ID: ' . $service_id , 0, 1);
+		if($purchase_order_org != "")
+		{
+			$pdf->Cell(120, 4, '', 0, 0);
+			$pdf->Cell(69, 4, 'Customer PO: ' . $purchase_order_org , 0, 1);
+		}
+		else
+		{
+			$pdf->Cell(120, 4, '', 0, 0);
+			$pdf->Cell(69, 4, '', 0, 1);
+		}
+		
+		if($service_id_org != "")
+		{
+			$pdf->Cell(120, 4, '', 0, 0);
+			$pdf->Cell(69, 4, 'Service ID: ' . $service_id_org , 0, 1);
+		}
+		else
+		{
+			$pdf->Cell(120, 4, '', 0, 0);
+			$pdf->Cell(69, 4, '', 0, 1);
+		}
 
 		$pdf->Cell(120, 4, '', 0, 0);
 		$pdf->Cell(69, 4, "Invoice NO: " . $quotation_code, 0, 1);
@@ -414,6 +455,7 @@
 			//breaking description in two lines
 				$item_description_1 = substr($item_description, 0,39);
 				$item_description_2 = substr($item_description, 39,43);
+				$item_description_3 = substr($item_description, 82,43);
 
 			$item_hsn_code = $get_item_info_assoc['hsn_code'];
 			$type = $get_item_info_assoc['type'];
@@ -424,7 +466,12 @@
 
 			$item_quantity = $get_item_info_assoc['quantity'];
 			$item_rate = round($get_item_info_assoc['rate'], 2);
+
 			$item_discount = $get_item_info_assoc['discount'];
+			if($item_discount == "")
+			{
+				$item_discount = 0;
+			}
 
 			$discount_amount = $item_discount*$item_quantity*$item_rate/100;
 			$net_price = $item_quantity*$item_rate - $item_discount*$item_quantity*$item_rate/100;
@@ -453,7 +500,7 @@
 				$pdf->Cell(16, 5, $item_hsn_code ,  'L', 0,'C');
 				$pdf->Cell(8, 5, $item_quantity ,  'L', 0,'C');
 				$pdf->Cell(12, 5, $item_rate ,  'L', 0,'C');
-				$pdf->Cell(12, 5, $item_discount. "%" ,  'L', 0,'C');
+				$pdf->Cell(12, 5, $item_discount . "%" ,  'L', 0,'C');
 				$pdf->Cell(11, 5, $item_cgst . "%" ,  'L', 0,'C');
 				$pdf->Cell(11, 5, 'CGST' ,  'L', 0,'C');
 				$pdf->Cell(16, 5, $cgst_amount, 'L', 0, 'C');
@@ -513,7 +560,7 @@
 
 			//total amount line
 				$pdf->Cell(8, 5, '', 'LB', 0, 'C');
-				$pdf->Cell(80, 5, '', 'LB', 0);
+				$pdf->Cell(80, 5, $item_description_3, 'LB', 0);
 				
 				$pdf->Cell(16, 5, '' ,  'LB', 0,'C');
 				$pdf->Cell(8, 5, '' ,  'LB', 0,'C');
@@ -625,17 +672,35 @@
 
 	//branch details
 		$pdf->SetFont('Arial', 'B', 11); //font
-		$pdf->Cell(189, 5, 'Branch Details:', 0, 1);
+		$pdf->Cell(189, 5, 'Address:', 0, 1);
 
 		$pdf->SetFont('Arial', '', 10); //font
-		$pdf->Cell(189, 5, 'Branch Name: ' . $branch_name , 0,1);
-		$pdf->Cell(189, 5, 'Branch Code: ' . $creator_branch_code , 0,1);
-		$pdf->Cell(189, 5, 'Created By: ' . $creator_username , 0,1);
 		$pdf->Cell(189, 5, $branch_address_array[0], 0,1);
-		$pdf->Cell(189, 5, $branch_address_array[1], 0,1);
-		$pdf->Cell(189, 5, $branch_address_array[2], 0,1);
-		$pdf->Cell(189, 5, $branch_address_array[3], 0,1);
-		$pdf->Cell(189, 5, $branch_address_array[4], 0,1);
+
+		if($branch_address_array[1] != "")
+		{
+			$pdf->Cell(189, 5, $branch_address_array[1], 0,1);
+		}
+
+		if($branch_address_array[2] != "")
+		{
+			$pdf->Cell(189, 5, $branch_address_array[2], 0,1);
+		}
+
+		if($branch_address_array[3] != "")
+		{
+			$pdf->Cell(189, 5, $branch_address_array[3], 0,1);
+		}
+
+		if($branch_address_array[4] != "")
+		{
+			$pdf->Cell(189, 5, $branch_address_array[4], 0,1);
+		}
+		
+		$pdf->SetFont('Arial', '', 8); //font
+		$pdf->Cell(50, 5, 'Branch Name: ' . $branch_name , 0,0);
+		$pdf->Cell(100, 5, 'Created By: ' . $creator_username , 0,1);
+	
 
 //getting output of the pdf in a file if mailing is to be done
 	$pdf->Output();

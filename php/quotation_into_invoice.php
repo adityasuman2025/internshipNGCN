@@ -66,7 +66,7 @@
 			{
 				if(payment_method == "Credit")
 				{
-					var query_recieved = "UPDATE quotation SET payment_method ='" + payment_method + "', date_of_payment='' WHERE quotation_num = '" + quotation_num + "'";
+					var query_recieved = "UPDATE quotation SET payment_method ='" + payment_method + "', date_of_payment= '00' WHERE quotation_num = '" + quotation_num + "'";
 				}
 				else
 				{

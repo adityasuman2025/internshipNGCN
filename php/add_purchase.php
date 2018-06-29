@@ -10,7 +10,7 @@
 		<select id="purchase_supplier">
 			<option value=""></option>
 			<?php
-				$get_brand_query = "SELECT name FROM supplier WHERE creator_branch_code = '$creator_branch_code'";
+				$get_brand_query = "SELECT name FROM supplier";
 				$get_brand_query_run = mysqli_query($connect_link, $get_brand_query);
 
 				while($get_brand_result = mysqli_fetch_assoc($get_brand_query_run))

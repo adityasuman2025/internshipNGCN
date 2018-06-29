@@ -104,9 +104,15 @@
 					}
 				?>
 
-				<th>Customer Number</th>
+				<th>Customer Name</th>
+				<th>Company Name</th>
+				<th>Phone Number</th>
+				<th>Email ID</th>
+
+				<th>Purchase Order</th>
 				<th>Date of Generation</th>
 				<th>Total Amount</th>
+				<th>Total Tax</th>
 				
 				<th>Payment Method</th>
 				<th>Payment Date</th>
@@ -115,7 +121,7 @@
 			</tr>
 
 			<?php
-				if(isset($_SESSION['selected_branch']))
+				if(isset($_SESSION['selected_branch'])) //if any branch is selected
 				{
 					$selected_branch = $_SESSION['selected_branch'];
 						
@@ -169,16 +175,30 @@
 						$manage_customer_query = "SELECT * FROM quotation WHERE creator_branch_code ='$selected_branch' AND payment_method !='' AND date >= '$date_lower_limit' AND date <= '$date_uper_limit' GROUP BY quotation_num ORDER BY quotation_num DESC LIMIT " . $lower_limit . ", " . $uper_limit;
 					}
 
-					// $manage_customer_query = "SELECT * FROM quotation WHERE creator_branch_code ='$selected_branch' AND payment_method !='' AND date >= '$date_lower_limit' AND date <= '$date_uper_limit' GROUP BY quotation_num ORDER BY quotation_num DESC LIMIT " . $lower_limit . ", " . $uper_limit;
-
 					$manage_customer_query_run = mysqli_query($connect_link, $manage_customer_query);
 
+				//getting customer info
+					$manage_customer_result = mysqli_fetch_assoc($manage_customer_query_run);
+					$customer = $manage_customer_result['customer'];
+
+					$get_customer_info_query = "SELECT * FROM customers WHERE name = '$customer'";
+					$get_customer_info_query_run = mysqli_query($connect_link, $get_customer_info_query);
+
+					if($get_customer_info_result = mysqli_fetch_assoc($get_customer_info_query_run))
+					{
+						$customer_company = $get_customer_info_result['company_name'];
+						$customer_mobile = $get_customer_info_result['mobile'];							
+						$customer_email = $get_customer_info_result['email'];
+					}
+
+				//getting the invoice details
 					while($manage_customer_result = mysqli_fetch_assoc($manage_customer_query_run))
 					{
 						$quotation_id = $manage_customer_result['id'];
 
 						$quotation_num = $manage_customer_result['quotation_num'];
-						$customer = $manage_customer_result['customer'];
+						$purchase_order = $manage_customer_result['purchase_order'];
+
 						$date = $manage_customer_result['date'];
 						$type = $manage_customer_result['type'];
 
@@ -195,6 +215,11 @@
 						$date_of_payment = str_replace('/', '-', $date_of_payment);
 						$date_of_payment = date('d M Y', strtotime($date_of_payment));
 
+						if($date_of_payment == "01 Jan 1970" OR $date_of_payment == "30 Nov -0001" OR $date_of_payment == "")
+						{
+							$date_of_payment = "Not Paid";
+						}
+
 					//for getting quotation code
 						$this_year = date('y');
 						$next_year = $this_year +1;
@@ -203,17 +228,42 @@
 					//for getting total price of the quotation
 						$final_price = 0;
 
-						$get_element_price_query = "SELECT total_price FROM quotation WHERE quotation_num='$quotation_num'";
+						$get_element_price_query = "SELECT * FROM quotation WHERE quotation_num='$quotation_num'";
 						$get_element_price_query_run = mysqli_query($connect_link, $get_element_price_query);
 
 						while($get_element_price_assoc = mysqli_fetch_assoc($get_element_price_query_run))
 						{
-							$element_price = $get_element_price_assoc['total_price'];
+						//getting total tax
+							$item_quantity = $get_element_price_assoc['quantity'];
+							$item_rate = round($get_element_price_assoc['rate'], 2);
 
+							$item_discount = $get_element_price_assoc['discount'];
+							if($item_discount == "")
+							{
+								$item_discount = 0;
+							}
+
+							$discount_amount = $item_discount*$item_quantity*$item_rate/100;
+							$net_price = $item_quantity*$item_rate - $item_discount*$item_quantity*$item_rate/100;
+
+							$item_cgst = $get_element_price_assoc['cgst'];
+							$item_sgst = $get_element_price_assoc['sgst'];
+							$item_igst = $get_element_price_assoc['igst'];
+
+							$cgst_amount = ($item_rate*$item_quantity - $discount_amount)*$item_cgst/100;
+							$sgst_amount = ($item_rate*$item_quantity - $discount_amount)*$item_sgst/100;
+							$igst_amount = ($item_rate*$item_quantity - $discount_amount)*$item_igst/100;
+
+							$element_tax = $cgst_amount + $sgst_amount + $igst_amount;
+							$final_tax = $final_tax + $element_tax;
+
+						//getting total price
+							$element_price = $get_element_price_assoc['total_price'];
 							$final_price = $final_price + $element_price;
 						}
 
 						echo "<tr>";
+
 							echo "<td>$quotation_code</td>";
 							if($selected_branch == '*')
 							{
@@ -221,12 +271,18 @@
 							}
 
 							echo "<td>$customer</td>";
+							echo "<td>$customer_company</td>";
+							echo "<td>$customer_mobile</td>";
+							echo "<td>$customer_email</td>";
+
+							echo "<td>$purchase_order</td>";
 							echo "<td>$date</td>";
 							echo "<td>$final_price</td>";
-							// echo "<td>$type</td>";
+							echo "<td>$final_tax</td>";
 							echo "<td>$payment_method</td>";
 							echo "<td>$date_of_payment</td>";
 							echo "<td>$creator_username</td>";
+
 							echo "<td>";
 								echo "<img quotation_num=\"$quotation_num\" class=\"user_view_icon\" src=\"img/view.png\"/>";
 							echo "</td>";
@@ -301,16 +357,30 @@
 						$manage_customer_query = "SELECT * FROM quotation WHERE creator_branch_code ='$selected_branch' AND payment_method !='' AND date >= '$date_lower_limit' AND date <= '$date_uper_limit' GROUP BY quotation_num ORDER BY quotation_num DESC LIMIT " . $lower_limit . ", " . $uper_limit;
 					}
 
-					// $manage_customer_query = "SELECT * FROM quotation WHERE creator_branch_code ='$selected_branch' AND payment_method !='' AND date >= '$date_lower_limit' AND date <= '$date_uper_limit' GROUP BY quotation_num ORDER BY quotation_num DESC LIMIT " . $lower_limit . ", " . $uper_limit;
-
 					$manage_customer_query_run = mysqli_query($connect_link, $manage_customer_query);
 
+				//getting customer info
+					$manage_customer_result = mysqli_fetch_assoc($manage_customer_query_run);
+					$customer = $manage_customer_result['customer'];
+
+					$get_customer_info_query = "SELECT * FROM customers WHERE name = '$customer'";
+					$get_customer_info_query_run = mysqli_query($connect_link, $get_customer_info_query);
+
+					if($get_customer_info_result = mysqli_fetch_assoc($get_customer_info_query_run))
+					{
+						$customer_company = $get_customer_info_result['company_name'];
+						$customer_mobile = $get_customer_info_result['mobile'];							
+						$customer_email = $get_customer_info_result['email'];
+					}
+
+				//getting the invoice details
 					while($manage_customer_result = mysqli_fetch_assoc($manage_customer_query_run))
 					{
 						$quotation_id = $manage_customer_result['id'];
 
 						$quotation_num = $manage_customer_result['quotation_num'];
-						$customer = $manage_customer_result['customer'];
+						$purchase_order = $manage_customer_result['purchase_order'];
+
 						$date = $manage_customer_result['date'];
 						$type = $manage_customer_result['type'];
 
@@ -323,9 +393,14 @@
 						$date = str_replace('/', '-', $date);
 						$date = date('d M Y', strtotime($date));
 
-					//gettting date of payment of quoatation
+					//gettting date of payment of quotation
 						$date_of_payment = str_replace('/', '-', $date_of_payment);
 						$date_of_payment = date('d M Y', strtotime($date_of_payment));
+
+						if($date_of_payment == "01 Jan 1970" OR $date_of_payment == "30 Nov -0001" OR $date_of_payment == "")
+						{
+							$date_of_payment = "Not Paid";
+						}
 
 					//for getting quotation code
 						$this_year = date('y');
@@ -334,18 +409,44 @@
 
 					//for getting total price of the quotation
 						$final_price = 0;
+						$final_tax = 0;
 
-						$get_element_price_query = "SELECT total_price FROM quotation WHERE quotation_num='$quotation_num'";
+						$get_element_price_query = "SELECT * FROM quotation WHERE quotation_num ='$quotation_num'";
 						$get_element_price_query_run = mysqli_query($connect_link, $get_element_price_query);
 
 						while($get_element_price_assoc = mysqli_fetch_assoc($get_element_price_query_run))
 						{
-							$element_price = $get_element_price_assoc['total_price'];
+						//getting total tax
+							$item_quantity = $get_element_price_assoc['quantity'];
+							$item_rate = round($get_element_price_assoc['rate'], 2);
 
+							$item_discount = $get_element_price_assoc['discount'];
+							if($item_discount == "")
+							{
+								$item_discount = 0;
+							}
+
+							$discount_amount = $item_discount*$item_quantity*$item_rate/100;
+							$net_price = $item_quantity*$item_rate - $item_discount*$item_quantity*$item_rate/100;
+
+							$item_cgst = $get_element_price_assoc['cgst'];
+							$item_sgst = $get_element_price_assoc['sgst'];
+							$item_igst = $get_element_price_assoc['igst'];
+
+							$cgst_amount = ($item_rate*$item_quantity - $discount_amount)*$item_cgst/100;
+							$sgst_amount = ($item_rate*$item_quantity - $discount_amount)*$item_sgst/100;
+							$igst_amount = ($item_rate*$item_quantity - $discount_amount)*$item_igst/100;
+
+							$element_tax = $cgst_amount + $sgst_amount + $igst_amount;
+							$final_tax = $final_tax + $element_tax;
+
+						//getting total price
+							$element_price = $get_element_price_assoc['total_price'];
 							$final_price = $final_price + $element_price;
 						}
 
 						echo "<tr>";
+
 							echo "<td>$quotation_code</td>";
 							if($selected_branch == '*')
 							{
@@ -353,12 +454,18 @@
 							}
 
 							echo "<td>$customer</td>";
+							echo "<td>$customer_company</td>";
+							echo "<td>$customer_mobile</td>";
+							echo "<td>$customer_email</td>";
+
+							echo "<td>$purchase_order</td>";
 							echo "<td>$date</td>";
 							echo "<td>$final_price</td>";
-							// echo "<td>$type</td>";
+							echo "<td>$final_tax</td>";
 							echo "<td>$payment_method</td>";
 							echo "<td>$date_of_payment</td>";
 							echo "<td>$creator_username</td>";
+
 							echo "<td>";
 								echo "<img quotation_num=\"$quotation_num\" class=\"user_view_icon\" src=\"img/view.png\"/>";
 							echo "</td>";

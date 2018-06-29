@@ -51,7 +51,7 @@
 				$date_of_payment = str_replace('/', '-', $date_of_payment);
 				$date_of_payment = date('d M Y', strtotime($date_of_payment));
 
-				if($date_of_payment == "01 Jan 1970")
+				if($date_of_payment == "01 Jan 1970" OR $date_of_payment == "30 Nov -0001" OR $date_of_payment == "")
 				{
 					$date_of_payment = "not paid";
 				}
