@@ -303,6 +303,17 @@
 			$pdf->Cell(69, 4, '', 0, 1);
 		}
 
+		if($quotation_type == "performa" && $purchase_order_org != "")
+		{
+			$pdf->Cell(120, 4, '', 0, 0);
+			$pdf->Cell(69, 4, 'Customer PO: ' . $purchase_order_org , 0, 1);
+		}
+		else
+		{
+			$pdf->Cell(120, 4, '', 0, 0);
+			$pdf->Cell(69, 4, '', 0, 1);
+		}
+
 		$pdf->Cell(120, 4, '', 0, 0);
 		$pdf->Cell(69, 4, "Quotation NO: " . $quotation_code, 0, 1);
 

@@ -704,12 +704,12 @@ body, html
 		background: #cc0000;
 	}
 
-	#invoice_gen_edit_button
+	#invoice_gen_edit_button, #performa_invoice_gen_edit_button
 	{
 		display: none;
 	}
 
-/*----quotation listing area--------*/
+/*----quotation manage-------*/
 	.quotation_list_container
 	{
 		width: 100%;
@@ -784,6 +784,12 @@ body, html
 		padding: 5px;
 		background: #cc0000;
 		color: white;
+	}
+
+	.pdf_button
+	{
+		color: #cc0000;
+		background: white;
 	}
 
 /*--------report area area------*/

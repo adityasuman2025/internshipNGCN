@@ -171,10 +171,10 @@
 							$manage_customer_query = "SELECT * FROM quotation WHERE creator_branch_code ='$creator_branch_code' AND payment_method !='' AND date >= '$date_lower_limit' AND date <= '$date_uper_limit' GROUP BY quotation_num ORDER BY quotation_num DESC LIMIT " . $lower_limit . ", " . $uper_limit;
 						}		
 
-						$manage_customer_query_run = mysqli_query($connect_link, $manage_customer_query);
+						$manage_customer_info_query_run = mysqli_query($connect_link, $manage_customer_query);
 						
 					//getting customer info
-						$manage_customer_result = mysqli_fetch_assoc($manage_customer_query_run);
+						$manage_customer_result = mysqli_fetch_assoc($manage_customer_info_query_run);
 						$customer = $manage_customer_result['customer'];
 
 						$get_customer_info_query = "SELECT * FROM customers WHERE name = '$customer'";
@@ -190,6 +190,7 @@
 					//getting the invoice details
 						$sum_of_money = 0;
 
+						$manage_customer_query_run = mysqli_query($connect_link, $manage_customer_query);
 						while($manage_customer_result = mysqli_fetch_assoc($manage_customer_query_run))
 						{
 							$quotation_id = $manage_customer_result['id'];

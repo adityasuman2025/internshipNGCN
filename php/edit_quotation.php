@@ -248,6 +248,7 @@
 		<input type="button" value="Save Edit" id="quotation_gen_button">
 
 		<input type="button" value="Generate Invoice" id="invoice_gen_edit_button">
+		<input type="button" value="Generate Performa Invoice" quotation_num="<?php echo $quotation_num; ?>" id="performa_invoice_gen_edit_button">
 	</div>
 	
 	<span class="gen_quotation_span"></span>
@@ -573,6 +574,7 @@
 		$('#quotation_gen_button').click(function()
 		{
 			$('.gen_quotation_span').html("<img class=\"gif_loader\" src=\"img/loaders1.gif\">");
+
 		//disabling the type, brand, model_name, model_number field
 			$('select#quotation_item_type').attr("disabled", true);
 			$('select#quotation_brand').attr("disabled", true);
@@ -611,6 +613,7 @@
 					var quotation_description = $.trim($('.quotation_entry_table tr:nth-child('+ child_no + ') #quotation_description').val());
 
 					var quotation_service_id = $('.quotation_entry_table tr:nth-child('+ child_no + ') #quotation_service_id').val();
+					var quotation_purchase_order =$('.quotation_entry_table tr:nth-child('+ child_no + ') #quotation_purchase_order').val();
 					var quotation_part_quantity = parseInt($('.quotation_entry_table tr:nth-child('+ child_no + ') #quotation_part_quantity').val());
 					var quotation_part_rate = parseInt($('.quotation_entry_table tr:nth-child('+ child_no + ') #quotation_part_rate').val());
 					var quotation_part_cgst = parseInt($('.quotation_entry_table tr:nth-child('+ child_no + ') #quotation_part_cgst').val());
@@ -647,12 +650,15 @@
 					}
 
 				//adding this to database	
-					var query_recieved = "UPDATE quotation SET type = '" + quotation_item_type + "', serial = '" + quotation_serial + "', description = '" + quotation_description + "', customer ='" + quotation_customer + "', date ='" + quotation_date + "', brand = '" + quotation_brand + "', model_name = '" + quotation_model_name + "', model_number = '" + quotation_model_number + "', serial_num = '" + quotation_serial_num + "', service_id = '" + quotation_service_id + "', part_name = '" + quotation_part_name + "', quantity = '" + quotation_part_quantity + "', rate = '" + quotation_part_rate + "', cgst = '" + quotation_part_cgst + "', sgst = '" + quotation_part_sgst + "', igst = '" + quotation_part_igst + "', hsn_code = '" + quotation_part_hsn_code + "', total_price = '" + quotation_part_total_price + "' WHERE id = '" + quotation_id + "'";
+					var query_recieved = "UPDATE quotation SET type = '" + quotation_item_type + "', serial = '" + quotation_serial + "', description = '" + quotation_description + "', customer ='" + quotation_customer + "', date ='" + quotation_date + "', brand = '" + quotation_brand + "', model_name = '" + quotation_model_name + "', model_number = '" + quotation_model_number + "', serial_num = '" + quotation_serial_num + "', service_id = '" + quotation_service_id + "', part_name = '" + quotation_part_name + "', quantity = '" + quotation_part_quantity + "', rate = '" + quotation_part_rate + "', cgst = '" + quotation_part_cgst + "', sgst = '" + quotation_part_sgst + "', igst = '" + quotation_part_igst + "', hsn_code = '" + quotation_part_hsn_code + "', total_price = '" + quotation_part_total_price + "', purchase_order = '" +  quotation_purchase_order + "' WHERE id = '" + quotation_id + "'";
 				
 					$.post('php/query_runner.php', {query_recieved:query_recieved}, function(e)
 					{
 						if(e==1)
 						{
+						//appearing the performa invoice generating button
+							$('#performa_invoice_gen_edit_button').fadeIn();
+
 						//disappearing the user entry form														
 							$('#quotation_gen_button').fadeOut();
 							$('#add_new_goods_button').fadeOut();
@@ -828,4 +834,40 @@
 			$('.ask_mailing_div').fadeOut(0);
 		});
 	
+	//on clicking performa invoice button
+		$('#performa_invoice_gen_edit_button').click(function() 
+		{
+			var quotation_num =  $.trim($(this).attr('quotation_num'));
+
+		//for defining type of the quotation
+			var session_of = "performa";
+			var session_name = "quotation_type";
+				
+			$.post('php/session_creator.php', {session_of: session_of, session_name: session_name}, function(e)
+			{
+				if(e ==1)
+				{
+					//for getting pdf of the invoice
+					var session_of = quotation_num;
+					var session_name = "pdf_quotation_of";
+						
+					$.post('php/session_creator.php', {session_of: session_of, session_name: session_name}, function(e)
+					{
+						if(e ==1)
+						{
+							window.open('php/quotation_pdf.php', '_blank');	
+						}
+						else
+						{
+							$('.warn_box').text("Something went wrong while generating pdf file of the invoice.");
+							$('.warn_box').fadeIn(200).delay(3000).fadeOut(200);
+						}
+					});
+				}
+				else
+				{
+					$('.warn_box').text("Something went wrong while generating pdf file of the invoice.");
+				}
+			});		
+		});
 	</script>
