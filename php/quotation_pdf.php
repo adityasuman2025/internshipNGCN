@@ -661,29 +661,28 @@
 		$pdf->Cell(50, 5, 'Branch Name: ' . $branch_name , 0,0);
 		$pdf->Cell(100, 5, 'Created By: ' . $creator_username , 0,1);
 
+//getting output of the pdf in a file if mailing is to be done
+	$pdf->Output();
+	
+//mailing to the customer if it is a normal quotation
+	if($quotation_type == "normal")
+	{
+		$filename = "../quotation/Quotation-" . $quotation_num . ".pdf";
+		$pdf->Output($filename, 'F');	
 
-	//getting output of the pdf in a file if mailing is to be done
-		$pdf->Output();
-		
-	//mailing to the customer if it is a normal quotation
-		if($quotation_type == "normal")
+	//checking to mail to customer or not
+		$session_name = "mail_pdf_of_" . $quotation_num;
+
+		if(isset($_SESSION[$session_name]))
 		{
-			$filename = "../quotation/Quotation-" . $quotation_num . ".pdf";
-			$pdf->Output($filename, 'F');	
+		//mailing to the customer
+			$website = $_SERVER['HTTP_HOST'];
+			$mail_email = $customer_email;
 
-		//checking to mail to customer or not
-			$session_name = "mail_pdf_of_" . $quotation_num;
-
-			if(isset($_SESSION[$session_name]))
-			{
-			//mailing to the customer
-				$website = $_SERVER['HTTP_HOST'];
-				$mail_email = $customer_email;
-
-				if($website == "localhost" OR $website == "volta.pnds.in")
+				if($website == "localhost" OR $website == "volta.pnds.in" OR $website == "erp.voltatech.in")
 				{
 					$mail_subject = "Quotation from Voltatech";
-					$headers = "From: voltatech@pnds.in";
+					$headers = "From: voltatech@voltatech.in";
 					
 					$mainMessage = "Dear Customer Quotation generated from our online resource is attached with this mail. Please find your attached Quotation pdf file. \n \nRegards \nVoltatech \nhttp://" . $website;
 				}
@@ -701,59 +700,59 @@
 					
 					$mainMessage = "Dear Customer Quotation generated from our online resource is attached with this mail. Please find your attached Quotation pdf file. \n \nRegards \nVoltatech \nhttp://" . $website;
 				}
-				
-				  $fileatt     = "http://" . $website . "/quotation/Quotation-" . $quotation_num . ".pdf"; //file location
-				  $fileatttype = "application/pdf";
-				  $fileattname = "Quotation-" . $quotation_num . ".pdf"; //name that you want to use to send or you can use the same name
-				 
-				  // File
-				  $file = fopen($fileatt, 'rb');
-				  $data = fread($file, 10000);
-				  fclose($file);
+			
+			  $fileatt     = "http://" . $website . "/quotation/Quotation-" . $quotation_num . ".pdf"; //file location
+			  $fileatttype = "application/pdf";
+			  $fileattname = "Quotation-" . $quotation_num . ".pdf"; //name that you want to use to send or you can use the same name
+			 
+			  // File
+			  $file = fopen($fileatt, 'rb');
+			  $data = fread($file, 10000);
+			  fclose($file);
 
-				  // This attaches the file
-				  $semi_rand     = md5(time());
-				  $mime_boundary = "==Multipart_Boundary_x{$semi_rand}x";
-				  $headers      .= "\nMIME-Version: 1.0\n" .
-				    "Content-Type: multipart/mixed;\n" .
-				    " boundary=\"{$mime_boundary}\"";
-				    $message = "This is a multi-part message in MIME format.\n\n" .
-				    "--{$mime_boundary}\n" .
-				    "Content-Type: text/plain; charset=\"iso-8859-1\n" .
-				    "Content-Transfer-Encoding: 7bit\n\n" .
-				    $mainMessage  . "\n\n";
+			  // This attaches the file
+			  $semi_rand     = md5(time());
+			  $mime_boundary = "==Multipart_Boundary_x{$semi_rand}x";
+			  $headers      .= "\nMIME-Version: 1.0\n" .
+			    "Content-Type: multipart/mixed;\n" .
+			    " boundary=\"{$mime_boundary}\"";
+			    $message = "This is a multi-part message in MIME format.\n\n" .
+			    "--{$mime_boundary}\n" .
+			    "Content-Type: text/plain; charset=\"iso-8859-1\n" .
+			    "Content-Transfer-Encoding: 7bit\n\n" .
+			    $mainMessage  . "\n\n";
 
-				  $data = chunk_split(base64_encode($data));
-				  $message .= "--{$mime_boundary}\n" .
-				    "Content-Type: {$fileatttype};\n" .
-				    " name=\"{$fileattname}\"\n" .
-				    "Content-Disposition: attachment;\n" .
-				    " filename=\"{$fileattname}\"\n" .
-				    "Content-Transfer-Encoding: base64\n\n" .
-				  $data . "\n\n" .
-				   "--{$mime_boundary}--\n";
+			  $data = chunk_split(base64_encode($data));
+			  $message .= "--{$mime_boundary}\n" .
+			    "Content-Type: {$fileatttype};\n" .
+			    " name=\"{$fileattname}\"\n" .
+			    "Content-Disposition: attachment;\n" .
+			    " filename=\"{$fileattname}\"\n" .
+			    "Content-Transfer-Encoding: base64\n\n" .
+			  $data . "\n\n" .
+			   "--{$mime_boundary}--\n";
 
-				if(@mail($mail_email, $mail_subject, $message, $headers))
-				{
-					//echo 1;
-				}
-				else 
-				{
-					//echo 0;
-				}
+			if(@mail($mail_email, $mail_subject, $message, $headers))
+			{
+				//echo 1;
 			}
-
+			else 
+			{
+				//echo 0;
+			}
 		}
 
-	//destroying the mailing session
-		if(isset($_SESSION[$session_name]))
-		{
-			unset($_SESSION[$session_name]);
-		}
+	}
 
-	//destroying the quotation type session
-		if(isset($_SESSION['quotation_type']))
-		{
-			unset($_SESSION['quotation_type']);
-		}
+//destroying the mailing session
+	if(isset($_SESSION[$session_name]))
+	{
+		unset($_SESSION[$session_name]);
+	}
+
+//destroying the quotation type session
+	if(isset($_SESSION['quotation_type']))
+	{
+		unset($_SESSION['quotation_type']);
+	}
 ?>

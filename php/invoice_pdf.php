@@ -701,7 +701,6 @@
 		$pdf->Cell(50, 5, 'Branch Name: ' . $branch_name , 0,0);
 		$pdf->Cell(100, 5, 'Created By: ' . $creator_username , 0,1);
 	
-
 //getting output of the pdf in a file if mailing is to be done
 	$pdf->Output();
 	
@@ -720,27 +719,27 @@
 			$website = $_SERVER['HTTP_HOST'];
 			$mail_email = $customer_email;
 			
-			if($website == "localhost" OR $website == "volta.pnds.in")
-			{
-				$mail_subject = "Invoice from Voltatech";
-				$headers = "From: voltatech@pnds.in";
-				
-				$mainMessage = "Dear Customer Invoice generated from our online resource is attached with this mail. Please find your attached invoice pdf file. \n \nRegards \nVoltatech \nhttp://" . $website;
-			}
-			else if($website == "oxy.pnds.in")
-			{
-				$mail_subject = "Invoice from OxyVin";
-				$headers = "From: oxyvin@pnds.in";
-				
-				$mainMessage = "Dear Customer Invoice generated from our online resource is attached with this mail. Please find your attached invoice pdf file. \n \nRegards \nOxyVin \nhttp://" . $website;
-			}
-			else
-			{
-				$mail_subject = "Invoice from Voltatech";
-				$headers = "From: voltatech@pnds.in";
-				
-				$mainMessage = "Dear Customer Invoice generated from our online resource is attached with this mail. Please find your attached invoice pdf file. \n \nRegards \nVoltatech \nhttp://" . $website;
-			}
+				if($website == "localhost" OR $website == "volta.pnds.in" OR $website == "erp.voltatech.in")
+				{
+					$mail_subject = "Invoice from Voltatech";
+					$headers = "From: voltatech@voltatech.in";
+					
+					$mainMessage = "Dear Customer Invoice generated from our online resource is attached with this mail. Please find your attached invoice pdf file. \n \nRegards \nVoltatech \nhttp://" . $website;
+				}
+				else if($website == "oxy.pnds.in")
+				{
+					$mail_subject = "Invoice from OxyVin";
+					$headers = "From: oxyvin@pnds.in";
+					
+					$mainMessage = "Dear Customer Invoice generated from our online resource is attached with this mail. Please find your attached invoice pdf file. \n \nRegards \nOxyVin \nhttp://" . $website;
+				}
+				else
+				{
+					$mail_subject = "Invoice from Voltatech";
+					$headers = "From: voltatech@pnds.in";
+					
+					$mainMessage = "Dear Customer Invoice generated from our online resource is attached with this mail. Please find your attached invoice pdf file. \n \nRegards \nVoltatech \nhttp://" . $website;
+				}
 
 			  $fileatt     = "http://" . $website . "/invoice/Invoice-" . $quotation_num . ".pdf"; //file location
 			  $fileatttype = "application/pdf";
