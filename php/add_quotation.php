@@ -51,7 +51,21 @@
 				$this_year = date('y');
 				$next_year = $this_year +1;
 
-				$quotation_code = "VOLTA/" . $this_year . "-" . $next_year . "/" . $new_quotation_num;
+				$website = $_SERVER['HTTP_HOST'];
+				if($website == "localhost" OR $website == "volta.pnds.in" OR $website == "erp.voltatech.in")
+				{
+					$comp_code = "VOLTA/";
+				}
+				else if($website == "oxy.pnds.in")
+				{
+					$comp_code = "OXY/";
+				}
+				else
+				{
+					$comp_code = "VOLTA/";
+				}		
+
+				$quotation_code = $comp_code . $this_year . "-" . $next_year . "/" . $quotation_num;
 			?>
 			<input type="text" id="quotation_num" quotation_num="<?php echo $new_quotation_num; ?>" value="<?php echo $quotation_code; ?>" disabled="disabled">
 		</div>
