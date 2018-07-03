@@ -6,7 +6,21 @@
 	$this_year = date('y');
 	$next_year = $this_year +1;
 
-	$quotation_code = "VOLTA/" . $this_year . "-" . $next_year . "/" . $quotation_num;
+	$website = $_SERVER['HTTP_HOST'];
+	if($website == "localhost" OR $website == "volta.pnds.in" OR $website == "erp.voltatech.in")
+	{
+		$comp_code = "VOLTA/";
+	}
+	else if($website == "oxy.pnds.in")
+	{
+		$comp_code = "OXY/";
+	}
+	else
+	{
+		$comp_code = "VOLTA/";
+	}		
+
+	$quotation_code = $comp_code . $this_year . "-" . $next_year . "/" . $quotation_num;
 
 	$query = "SELECT * FROM quotation WHERE quotation_num='$quotation_num'";
 	$query_run = mysqli_query($connect_link, $query);

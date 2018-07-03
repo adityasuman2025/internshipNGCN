@@ -61,15 +61,7 @@
 		<div class="quotation_search_div">
 			<h4>Search For Product/Part/Service Code</h4>
 			<br>
-			
-			<!-- <div>
-				<b>Select Row Number</b>
-				<br>
-				<select id="quotation_search_row_no">
-					<option value=""></option>
-				</select>
-			</div>
- -->
+
 			<div>
 				<b>Type</b>
 				<br>
@@ -181,11 +173,23 @@
 		<br>
 
 		<button id="add_new_goods_button">Add New Item</button>
-		<br><br><br>
+		
+		<button style="color: #cc0000; background: lightgrey;" id="add_note_button">Add Note</button>
+		<br>
 
+		<div style="display: none;" id="add_note_div">
+			<b style="font-size: 120%;">Add Note</b>
+			<br>
+
+			<textarea id="invoice_note" style="width: 840px; height: 300px; resize: none;"></textarea>
+		</div>
+		
+		<br>
 		<input type="button" value="Generate Invoice" id="quotation_gen_button" class="">
+
 	</div>
 	
+<!-------invoice feedback area---------->
 	<span class="gen_quotation_span"></span>
 	<br><br>
 	
@@ -213,20 +217,12 @@
 			customer = $(this).find('option:selected');
 		});
 
-	//on choosing a row for search bar
-		// $('#quotation_search_row_no').focus(function()
-		// {
-		// 	$(this).html("<option value=''></option>");
-
-		// 	var row_count = $('.quotation_entry_table tr').length;
-		// 	var actual_row_count = row_count - 1;
-
-		// 	var i;
-		// 	for (i = 1; i <= actual_row_count; i++) 
-		// 	{ 
-		// 	    $(this).append("<option value='" + i + "'>" + i + "</option>");
-		// 	}
-		// });
+	//on clicking on add note button
+		$('#add_note_button').click(function()
+		{
+			$(this).fadeOut(0);
+			$('#add_note_div').fadeIn(200);
+		});
 
 	//on choosing a search type
 		$('#quotation_search_type').change(function()
@@ -780,9 +776,11 @@
 			$('.gen_quotation_span').html("<img class=\"gif_loader\" src=\"img/loaders1.gif\">");
 			
 		//getting variable values
+			quotation_num = $.trim($('#quotation_num').attr('quotation_num'));
+
 			var quotation_customer = $.trim($('#quotation_customer').val());
-			var quotation_date = $.trim($('#quotation_date').val());
-			quotation_num = $.trim($('#quotation_num').attr('quotation_num'));		
+			var quotation_date = $.trim($('#quotation_date').val());	
+			var invoice_note = $.trim($('#invoice_note').val());		
 
 			if(quotation_customer !="" && quotation_date !="" && quotation_num !="")
 			{
@@ -853,6 +851,13 @@
 						}
 					});				
 				}
+
+			//adding note in the database
+				var query_recieved = "INSERT INTO notes VALUES('', '" + quotation_num + "', '" + invoice_note + "')";
+				$.post('php/query_runner.php', {query_recieved: query_recieved}, function(e)
+				{
+					
+				});
 			}
 			else
 			{

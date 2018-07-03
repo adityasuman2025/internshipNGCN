@@ -33,7 +33,21 @@
 	$this_year = date('y');
 	$next_year = $this_year +1;
 
-	$quotation_code = "VOLTA/" . $this_year . "-" . $next_year . "/" . $quotation_num;
+	$website = $_SERVER['HTTP_HOST'];
+	if($website == "localhost" OR $website == "volta.pnds.in" OR $website == "erp.voltatech.in")
+	{
+		$comp_code = "VOLTA/";
+	}
+	else if($website == "oxy.pnds.in")
+	{
+		$comp_code = "OXY/";
+	}
+	else
+	{
+		$comp_code = "VOLTA/";
+	}		
+
+	$quotation_code = $comp_code . $this_year . "-" . $next_year . "/" . $quotation_num;
 
 //getting the quotation info
 	$query = "SELECT * FROM quotation WHERE quotation_num = '$quotation_num' AND payment_method !='' ORDER BY serial";
@@ -663,6 +677,35 @@
 		$pdf->Cell(27, 4, 'Payment Date:', 0, 0);
 		$pdf->Cell(45, 4, $date_of_payment, 0, 1);
 
+	//leaving blank space
+		$pdf->Cell(200, 3, '', 0, 1);
+
+	//invoice note
+		$get_note_query = "SELECT note FROM notes WHERE quotation_num = '$quotation_num'";
+		$get_note_query_run = mysqli_query($connect_link, $get_note_query);
+		$get_note_assoc = mysqli_fetch_assoc($get_note_query_run);
+
+		$invoice_note = $get_note_assoc['note'];
+
+		$pdf->SetTextColor(0, 0, 0); //text color //black
+		$pdf->SetFont('Arial', 'B', 11); //font
+
+		if($invoice_note != "")
+		{
+			$pdf->Cell(189, 5, 'Notes:', 0, 1);
+			$pdf->SetFont('Arial', '', 9); //font
+
+			$invoice_note_broken = explode("#", $invoice_note);
+			$hash_count = substr_count($invoice_note,"#");
+
+			$ka= 0;
+			for($ka= 0; $ka < $hash_count; $ka++)
+			{
+				$pdf->Cell(189, 5, $invoice_note_broken[$ka], 0, 1);
+			}			
+		}
+		
+
 //another page for terms and conditions and branch details
 	//adding new page
 		$pdf -> AddPage();
@@ -720,7 +763,7 @@
 		$pdf->SetFont('Arial', '', 8); //font
 		$pdf->Cell(50, 5, 'Branch Name: ' . $branch_name , 0,0);
 		$pdf->Cell(100, 5, 'Created By: ' . $creator_username , 0,1);
-	
+
 //getting output of the pdf in a file if mailing is to be done
 	$pdf->Output();
 	

@@ -709,6 +709,16 @@ body, html
 		display: none;
 	}
 
+	.add_note_div
+	{
+		display: none;
+	}
+
+	#add_note_button
+	{
+		
+	}
+
 /*----quotation manage-------*/
 	.quotation_list_container
 	{
