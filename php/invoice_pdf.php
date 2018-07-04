@@ -694,15 +694,19 @@
 		{
 			$pdf->Cell(189, 5, 'Notes:', 0, 1);
 			$pdf->SetFont('Arial', '', 9); //font
+			$pdf->MultiCell(189, 4, $invoice_note, 0, 1);
 
-			$invoice_note_broken = explode("#", $invoice_note);
-			$hash_count = substr_count($invoice_note,"#");
+			// $pdf->Cell(189, 5, 'Notes:', 0, 1);
+			// $pdf->SetFont('Arial', '', 9); //font
 
-			$ka= 0;
-			for($ka= 0; $ka < $hash_count; $ka++)
-			{
-				$pdf->Cell(189, 5, $invoice_note_broken[$ka], 0, 1);
-			}			
+			// $invoice_note_broken = explode("#", $invoice_note);
+			// $hash_count = substr_count($invoice_note,"#");
+
+			// $ka= 0;
+			// for($ka= 0; $ka < $hash_count; $ka++)
+			// {
+			// 	$pdf->Cell(189, 5, $invoice_note_broken[$ka], 0, 1);
+			// }			
 		}
 		
 

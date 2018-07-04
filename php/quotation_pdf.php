@@ -632,6 +632,38 @@
 
 		$pdf->Cell(39, 5, 'Authorized Signatory', 0,1);
 
+	//leaving blank space
+		$pdf->Cell(200, 3, '', 0, 1);
+		
+	//invoice note
+		$get_note_query = "SELECT note FROM notes WHERE quotation_num = '$quotation_num'";
+		$get_note_query_run = mysqli_query($connect_link, $get_note_query);
+		$get_note_assoc = mysqli_fetch_assoc($get_note_query_run);
+
+		$invoice_note = $get_note_assoc['note'];
+
+		$pdf->SetTextColor(0, 0, 0); //text color //black
+		$pdf->SetFont('Arial', 'B', 11); //font
+
+		if($invoice_note != "")
+		{
+			$pdf->Cell(189, 5, 'Notes:', 0, 1);
+			$pdf->SetFont('Arial', '', 9); //font
+			$pdf->MultiCell(189, 4, $invoice_note, 0, 1);
+
+			// $pdf->Cell(189, 5, 'Notes:', 0, 1);
+			// $pdf->SetFont('Arial', '', 9); //font
+
+			// $invoice_note_broken = explode("#", $invoice_note);
+			// $hash_count = substr_count($invoice_note,"#");
+
+			// $ka= 0;
+			// for($ka= 0; $ka < $hash_count; $ka++)
+			// {
+			// 	$pdf->Cell(189, 5, $invoice_note_broken[$ka], 0, 1);
+			// }			
+		}
+
 //another page for terms and conditions and branch details
 	//adding new page
 		$pdf -> AddPage();

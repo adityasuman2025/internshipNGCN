@@ -832,6 +832,22 @@
 		$('#mail_no').click(function()
 		{
 			$('.ask_mailing_div').fadeOut(0);
+
+			var session_of = quotation_num;
+			var session_name = "pdf_invoice_of";
+
+			$.post('php/session_creator.php', {session_of: session_of, session_name: session_name}, function(e)
+			{
+				if(e ==1)
+				{
+					window.open('php/invoice_pdf.php', '_blank');	
+				}
+				else
+				{
+					$('.warn_box').text("Something went wrong while mailing the customer.");
+					$('.warn_box').fadeIn(200).delay(3000).fadeOut(200);
+				}
+			});
 		});
 	
 	//on clicking performa invoice button

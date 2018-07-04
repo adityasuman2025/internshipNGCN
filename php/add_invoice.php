@@ -65,7 +65,7 @@
 					$comp_code = "VOLTA/";
 				}		
 
-				$quotation_code = $comp_code . $this_year . "-" . $next_year . "/" . $quotation_num;
+				$quotation_code = $comp_code . $this_year . "-" . $next_year . "/" . $new_quotation_num;
 			?>
 			<input type="text" id="quotation_num" quotation_num="<?php echo $new_quotation_num; ?>" value="<?php echo $quotation_code; ?>" disabled="disabled">
 		</div>
@@ -802,7 +802,6 @@
 				var count = $(".quotation_entry_table tr").length;
 				var row_count = count -1;
 
-				//alert(row_count);
 				var i = 1;
 				for(i; i<= row_count; i++)
 				{
@@ -868,9 +867,10 @@
 
 			//adding note in the database
 				var query_recieved = "INSERT INTO notes VALUES('', '" + quotation_num + "', '" + invoice_note + "')";
+				//alert(query_recieved);
 				$.post('php/query_runner.php', {query_recieved: query_recieved}, function(e)
 				{
-					
+				
 				});
 			}
 			else

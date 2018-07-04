@@ -65,7 +65,7 @@
 					$comp_code = "VOLTA/";
 				}		
 
-				$quotation_code = $comp_code . $this_year . "-" . $next_year . "/" . $quotation_num;
+				$quotation_code = $comp_code . $this_year . "-" . $next_year . "/" . $new_quotation_num;
 			?>
 			<input type="text" id="quotation_num" quotation_num="<?php echo $new_quotation_num; ?>" value="<?php echo $quotation_code; ?>" disabled="disabled">
 		</div>
@@ -194,8 +194,18 @@
 		<br>
 
 		<button id="add_new_goods_button">Add New Item</button>
-		<br><br><br>
+		
+		<button style="color: #cc0000; background: lightgrey;" id="add_note_button">Add Note</button>
+		<br>
 
+		<div style="display: none;" id="add_note_div">
+			<b style="font-size: 120%;">Add Note</b>
+			<br>
+
+			<textarea id="invoice_note" style="width: 840px; height: 300px; resize: none;"></textarea>
+		</div>
+		
+		<br>
 		<input type="button" value="Generate Quotation" id="quotation_gen_button">
 	</div>
 	
@@ -227,26 +237,18 @@
 			customer = $(this).find('option:selected');
 		});
 
+	//on clicking on add note button
+		$('#add_note_button').click(function()
+		{
+			$(this).fadeOut(0);
+			$('#add_note_div').fadeIn(200);
+		});
+
 	//on clicking on create inventory button
 		$('.create_inventory_button').click(function()
 		{
 			$('.user_module_content').html("<img class=\"gif_loader\" src=\"img/loaders1.gif\">").load('php/add_inventory.php');
 		});
-
-	//on choosing a row for search bar
-		// $('#quotation_search_row_no').focus(function()
-		// {
-		// 	$(this).html("<option value=''></option>");
-
-		// 	var row_count = $('.quotation_entry_table tr').length;
-		// 	var actual_row_count = row_count - 1;
-
-		// 	var i;
-		// 	for (i = 1; i <= actual_row_count; i++) 
-		// 	{ 
-		// 	    $(this).append("<option value='" + i + "'>" + i + "</option>");
-		// 	}
-		// });
 
 	//on choosing a search type
 		$('#quotation_search_type').change(function()
@@ -566,9 +568,11 @@
 			$('.gen_quotation_span').html("<img class=\"gif_loader\" src=\"img/loaders1.gif\">");
 			
 		//getting variable values
+			quotation_num = $.trim($('#quotation_num').attr('quotation_num'));		
+
 			var quotation_customer = $.trim($('#quotation_customer').val());
 			var quotation_date = $.trim($('#quotation_date').val());
-			quotation_num = $.trim($('#quotation_num').attr('quotation_num'));		
+			var invoice_note = $.trim($('#invoice_note').val());
 
 			if(quotation_customer !="" && quotation_date !="" && quotation_num !="")
 			{
@@ -632,6 +636,14 @@
 						}
 					});				
 				}
+
+			//adding note in the database
+				var query_recieved = "INSERT INTO notes VALUES('', '" + quotation_num + "', '" + invoice_note + "')";
+				//alert(query_recieved);
+				$.post('php/query_runner.php', {query_recieved: query_recieved}, function(e)
+				{
+					
+				});
 			}
 			else
 			{

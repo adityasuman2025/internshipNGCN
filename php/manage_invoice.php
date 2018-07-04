@@ -130,13 +130,28 @@
 	//on clicking on user delete icon
 		$('.user_delete_icon').click(function()
 		{
-			//alert('ok');
 			var quotation_num = $.trim($(this).attr('quotation_num'));
-			var query_recieved = "DELETE FROM quotation WHERE quotation_num = '" + quotation_num + "'";
 
-			$.post('php/query_runner.php', {query_recieved:query_recieved}, function(e)
+		//deleting notes of the invoice
+			var query_recieved2 = "DELETE FROM notes WHERE quotation_num = '" + quotation_num + "'";
+			$.post('php/query_runner.php', {query_recieved: query_recieved2}, function(f)
 			{
-				if(e==1)
+				if(f == 1)
+				{
+					//$('.user_module_content').html("<img class=\"gif_loader\" src=\"img/loaders1.gif\">").load('php/manage_invoice.php');
+				}
+				else
+				{
+					$('.warn_box').text("Something went wrong while deleting the notes");
+					$('.warn_box').fadeIn(200).delay(3000).fadeOut(200);
+				}
+			});		
+
+		//deleting invoice
+			var query_recieved = "DELETE FROM quotation WHERE quotation_num = '" + quotation_num + "'";
+			$.post('php/query_runner.php', {query_recieved: query_recieved}, function(e)
+			{
+				if(e == 1)
 				{
 					$('.user_module_content').html("<img class=\"gif_loader\" src=\"img/loaders1.gif\">").load('php/manage_invoice.php');
 				}
@@ -145,7 +160,7 @@
 					$('.warn_box').text("Something went wrong while deleting the user");
 					$('.warn_box').fadeIn(200).delay(3000).fadeOut(200);
 				}
-			});
+			});				
 		});
 
 	//on clicking on view icon
