@@ -12,6 +12,7 @@
 	$date = $query_assoc['date'];
 	
 	$customer = $query_assoc['customer'];
+	$customer_company = $query_assoc['customer_company'];
 
 //getting the email id of the customer
 	$get_customer_email_query = "SELECT email FROM customers WHERE name ='$customer'";
@@ -28,16 +29,19 @@
 			<b>Customer:</b>
 			<br>
 			<select id="quotation_customer">
-				<option value = "<?php echo $customer; ?>" email="<?php echo $get_customer_email; ?>"><?php echo $customer; ?></option>
+				<option customer_company= "<?php echo $customer_company; ?>" value = "<?php echo $customer; ?>" email="<?php echo $get_customer_email; ?>"><?php echo $customer . ", " . $customer_company; ?></option>
 				<?php
-					$get_brand_query = "SELECT * FROM customers WHERE creator_branch_code = '$creator_branch_code' AND name !='$customer'";
+					$get_brand_query = "SELECT * FROM customers WHERE creator_branch_code = '$creator_branch_code' AND name !='$customer' AND company_name !='$customer_company' ORDER BY id DESC";
 					$get_brand_query_run = mysqli_query($connect_link, $get_brand_query);
 
 					while($get_brand_result = mysqli_fetch_assoc($get_brand_query_run))
 					{
+						$company_name = $get_brand_result['company_name'];
+						$name = $get_brand_result['name'];
 						$email = $get_brand_result['email'];
-						echo "<option email=\"$email\">";
-							echo $get_brand_result['name'];
+
+						echo "<option value=\"$name\" email=\"$email\" customer_company=\"$company_name\">";
+							echo $name . ", $company_name";
 						echo "</option>";
 					}
 				?>	
@@ -243,12 +247,31 @@
 		<br>
 
 		<button id="add_new_goods_button">Add New Item</button>
-		<br><br><br>
 
+		<button style="color: #cc0000; background: lightgrey;" id="add_note_button">Edit Note</button>
+		<br>
+
+		<div style="display: none;" id="add_note_div">
+			<?php
+				$get_note_query = "SELECT * FROM notes WHERE quotation_num = '$quotation_num'";
+				$get_note_query_run = mysqli_query($connect_link, $get_note_query);
+
+				$get_note_query_assoc = mysqli_fetch_assoc($get_note_query_run);
+				$get_note = $get_note_query_assoc['note'];
+			?>
+			<b style="font-size: 120%;">Add Note</b>
+			<br>
+
+			<textarea id="invoice_note" style="width: 840px; height: 300px; resize: none;"><?php echo $get_note; ?></textarea>
+		</div>
+
+		<br>
 		<input type="button" value="Save Edit" id="quotation_gen_button">
 
-		<input type="button" value="Generate Invoice" id="invoice_gen_edit_button">
 		<input type="button" value="Generate Performa Invoice" quotation_num="<?php echo $quotation_num; ?>" id="performa_invoice_gen_edit_button">
+
+		<input type="button" value="Generate Invoice" id="invoice_gen_edit_button">
+		
 	</div>
 	
 	<span class="gen_quotation_span"></span>
@@ -267,6 +290,13 @@
 		$('#quotation_add_customer').click(function()
 		{
 			$('.user_module_content').html("<img class=\"gif_loader\" src=\"img/loaders1.gif\">").load('php/add_customer.php');
+		});
+
+	//on clicking on edit note button
+		$('#add_note_button').click(function()
+		{
+			$(this).fadeOut(0);
+			$('#add_note_div').fadeIn(200);
 		});
 
 	//on selecting a item type
@@ -511,6 +541,8 @@
 			var quotation_num = $.trim("<?php echo $quotation_num; ?>");
 			
 			var quotation_customer = $.trim($('#quotation_customer').val());
+			var quotation_customer_company = $.trim($('#quotation_customer option:selected').attr('customer_company'));
+
 			var quotation_date = $.trim($('#quotation_date').val());		
 			var quotation_brand = '';
 			var quotation_model_name = '';
@@ -584,11 +616,22 @@
 						
 		//getting variable values
 			var quotation_num = $.trim("<?php echo $quotation_num; ?>");			
+
 			var quotation_customer = $.trim($('#quotation_customer').val());
+			var quotation_customer_company = $.trim($('#quotation_customer option:selected').attr('customer_company'));
+
 			var quotation_date = $.trim($('#quotation_date').val());
+			var invoice_note = $.trim($('#invoice_note').val());	
 			
 			if(quotation_customer !="" && quotation_date !="" && quotation_num !="")
 			{
+			//updating note in the database
+				var query_recieved = "UPDATE notes SET note = '" + invoice_note + "' WHERE quotation_num = '" + quotation_num + "'";
+				$.post('php/query_runner.php', {query_recieved: query_recieved}, function(l)
+				{
+					//alert(l);
+				});
+
 			//for getting inputs of each of the row
 				var count = $(".quotation_entry_table tr").length;
 				var row_count = count -1;
@@ -627,21 +670,21 @@
 					var quotation_part_name = "";
 
 				//checking availability
-					if(quotation_item_type == 'service')
-					{
-						to_display_button = to_display_button + 0;
-					}
-					else
-					{
-						if(quotation_part_quantity > in_stock)
-						{
-							to_display_button = to_display_button + 1;
-						}
-						else
-						{
-							to_display_button = to_display_button + 0;
-						}	
-					}
+					// if(quotation_item_type == 'service')
+					// {
+					// 	to_display_button = to_display_button + 0;
+					// }
+					// else
+					// {
+					// 	if(quotation_part_quantity > in_stock)
+					// 	{
+					// 		to_display_button = to_display_button + 1;
+					// 	}
+					// 	else
+					// 	{
+					// 		to_display_button = to_display_button + 0;
+					// 	}	
+					// }
 
 				//if user forget to calculate total price
 					if(quotation_part_total_price == "calculate")
@@ -650,32 +693,29 @@
 					}
 
 				//adding this to database	
-					var query_recieved = "UPDATE quotation SET type = '" + quotation_item_type + "', serial = '" + quotation_serial + "', description = '" + quotation_description + "', customer ='" + quotation_customer + "', date ='" + quotation_date + "', brand = '" + quotation_brand + "', model_name = '" + quotation_model_name + "', model_number = '" + quotation_model_number + "', serial_num = '" + quotation_serial_num + "', service_id = '" + quotation_service_id + "', part_name = '" + quotation_part_name + "', quantity = '" + quotation_part_quantity + "', rate = '" + quotation_part_rate + "', cgst = '" + quotation_part_cgst + "', sgst = '" + quotation_part_sgst + "', igst = '" + quotation_part_igst + "', hsn_code = '" + quotation_part_hsn_code + "', total_price = '" + quotation_part_total_price + "', purchase_order = '" +  quotation_purchase_order + "' WHERE id = '" + quotation_id + "'";
+					var query_recieved = "UPDATE quotation SET type = '" + quotation_item_type + "', serial = '" + quotation_serial + "', description = '" + quotation_description + "', customer ='" + quotation_customer + "', customer_company = '" + quotation_customer_company + "', date ='" + quotation_date + "', brand = '" + quotation_brand + "', model_name = '" + quotation_model_name + "', model_number = '" + quotation_model_number + "', serial_num = '" + quotation_serial_num + "', service_id = '" + quotation_service_id + "', part_name = '" + quotation_part_name + "', quantity = '" + quotation_part_quantity + "', rate = '" + quotation_part_rate + "', cgst = '" + quotation_part_cgst + "', sgst = '" + quotation_part_sgst + "', igst = '" + quotation_part_igst + "', hsn_code = '" + quotation_part_hsn_code + "', total_price = '" + quotation_part_total_price + "', purchase_order = '" +  quotation_purchase_order + "' WHERE id = '" + quotation_id + "'";
 				
 					$.post('php/query_runner.php', {query_recieved:query_recieved}, function(e)
 					{
 						if(e==1)
-						{
-						//appearing the performa invoice generating button
-							$('#performa_invoice_gen_edit_button').fadeIn();
-
+						{						
 						//disappearing the user entry form														
 							$('#quotation_gen_button').fadeOut();
 							$('#add_new_goods_button').fadeOut();
 
 							$('.gen_quotation_span').text('Successfully edited').css('color','green');
 
-						//checking availability 														
-						    if(to_display_button == "0")
-						    {
-						    	$('#invoice_gen_edit_button').fadeIn();
-						    	$('.gen_quotation_span').text('You can generate invoice now').css('color','green');
-						    }
-						    else
-						    {
-						    	$('#invoice_gen_edit_button').fadeOut();
-						    	$('.gen_quotation_span').text("You have entered a quantity greater than its availability in stock. You are not able to generate invoice.").css('color', 'red');
-						    }
+						// //checking availability 														
+						//     if(to_display_button == "0")
+						//     {
+						//     	$('#invoice_gen_edit_button').fadeIn();
+						//     	$('.gen_quotation_span').text('You can generate invoice now').css('color','green');
+						//     }
+						//     else
+						//     {
+						//     	$('#invoice_gen_edit_button').fadeOut();
+						//     	$('.gen_quotation_span').text("You have entered a quantity greater than its availability in stock. You are not able to generate invoice.").css('color', 'red');
+						//     }
 						}
 						else
 						{
@@ -699,17 +739,30 @@
 			
 		//getting variable values
 			var quotation_customer = $.trim($('#quotation_customer').val());
+			var quotation_customer_company = $.trim($('#quotation_customer option:selected').attr('customer_company'));
+
 			var quotation_date = $.trim($('#quotation_date').val());
-
-			//alert(quotation_num + quotation_customer + quotation_date);
-
+			var invoice_note = $.trim($('#invoice_note').val());	
+			
 			if(quotation_customer !="" && quotation_date !="" && quotation_num !="")
 			{
+				//$(this).fadeOut(0);
+
+			//updating note in the database
+				var query_recieved = "UPDATE notes SET note = '" + invoice_note + "' WHERE quotation_num = '" + quotation_num + "'";
+				//alert(query_recieved);
+				$.post('php/query_runner.php', {query_recieved: query_recieved}, function(l)
+				{
+					//alert(l);
+				});
+			
 			//for getting inputs of each of the row
 				var count = $(".quotation_entry_table tr").length;
 				var row_count = count -1;
 
 				var i = 1;
+				var to_display_button = 0;
+
 				for(i; i<= row_count; i++)
 				{
 					var child_no = i + 1;
@@ -736,8 +789,27 @@
 					
 					var quotation_serial_num =$('.quotation_entry_table tr:nth-child('+ child_no + ') #quotation_serial_num').val();
 					var quotation_purchase_order =$('.quotation_entry_table tr:nth-child('+ child_no + ') #quotation_purchase_order').val();
+					
+					var in_stock = parseInt($('.quotation_entry_table tr:nth-child('+ child_no + ') #item_availability').val())
 
 					var quotation_part_name = "";
+
+				//checking availability
+					if(quotation_item_type == 'service')
+					{
+						to_display_button = to_display_button + 0;
+					}
+					else
+					{
+						if(quotation_part_quantity > in_stock)
+						{
+							to_display_button = to_display_button + 1;
+						}
+						else
+						{
+							to_display_button = to_display_button + 0;
+						}	
+					}
 
 				//if user forget to calculate total price
 					if(quotation_part_total_price == "calculate")
@@ -746,26 +818,41 @@
 					}
 
 				//adding this to database	
-					var query_recieved = "UPDATE quotation SET type = '" + quotation_item_type + "', serial = '" + quotation_serial + "', description = '" + quotation_description + "', customer ='" + quotation_customer + "', date ='" + quotation_date + "', brand = '" + quotation_brand + "', model_name = '" + quotation_model_name + "', model_number = '" + quotation_model_number + "', serial_num = '" + quotation_serial_num + "', service_id = '" + quotation_service_id + "', purchase_order = '" + quotation_purchase_order + "', part_name = '" + quotation_part_name + "', quantity = '" + quotation_part_quantity + "', rate = '" + quotation_part_rate + "', cgst = '" + quotation_part_cgst + "', sgst = '" + quotation_part_sgst + "', igst = '" + quotation_part_igst + "', hsn_code = '" + quotation_part_hsn_code + "', total_price = '" + quotation_part_total_price + "', date_of_payment='' WHERE id = '" + quotation_id + "'";
+					var query_recieved = "UPDATE quotation SET type = '" + quotation_item_type + "', serial = '" + quotation_serial + "', description = '" + quotation_description + "', customer ='" + quotation_customer + "', customer_company = '" + quotation_customer_company + "', date ='" + quotation_date + "', brand = '" + quotation_brand + "', model_name = '" + quotation_model_name + "', model_number = '" + quotation_model_number + "', serial_num = '" + quotation_serial_num + "', service_id = '" + quotation_service_id + "', purchase_order = '" + quotation_purchase_order + "', part_name = '" + quotation_part_name + "', quantity = '" + quotation_part_quantity + "', rate = '" + quotation_part_rate + "', cgst = '" + quotation_part_cgst + "', sgst = '" + quotation_part_sgst + "', igst = '" + quotation_part_igst + "', hsn_code = '" + quotation_part_hsn_code + "', total_price = '" + quotation_part_total_price + "', date_of_payment='' WHERE id = '" + quotation_id + "'";
 						
 					//alert(query_recieved);
 					$.post('php/query_runner.php', {query_recieved:query_recieved}, function(e)
 					{
 						if(e==1)
 						{
-						//disappearing the user entry form
-							$('.user_entry_form').html("<img class=\"gif_loader\" src=\"img/loaders1.gif\">").fadeOut(0);
-							$('.gen_quotation_span').text('Invoice has been successfully created.').css('color','green');
-							
-						//asking to mail or not
-							$('.ask_mailing_div').fadeIn(100);
-
+						//showing the payment method and payment date input field
 							var generated_from = "invoice";
 							$.post('php/quotation_into_invoice.php', {quotation_num:quotation_num, generated_from:generated_from}, function(data)
 							{
-								$('.ajax_loader_box').fadeIn(400);
 								$('.ajax_loader_content').html(data);
 							});
+
+						//checking availability 														
+						    if(to_display_button == "0") //good to generate invoice
+						    {
+						    	$('.ajax_loader_box').fadeIn(0);
+								
+						    	$('.user_entry_form').fadeOut(0);
+						    	$('.gen_quotation_span').text('Invoice successfully generated.').css('color','green');
+						   
+						   	//asking to mail or not
+								$('.ask_mailing_div').fadeIn(0);
+						    }
+						    else //availability is not enough to generate invoice
+						    {
+						    	$('.ajax_loader_box').fadeOut(0);
+
+						    	$('.user_entry_form').fadeIn(0);
+						    	$('.gen_quotation_span').text("You have entered a quantity greater than its availability in stock. Invoice failed to generate.").css('color', 'red');
+
+						    //asking to mail or not
+								$('.ask_mailing_div').fadeOut(0);
+						    }
 						}
 						else
 						{

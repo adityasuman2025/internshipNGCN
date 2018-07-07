@@ -12,14 +12,16 @@
 			<select id="quotation_customer">
 				<option value=""></option>
 				<?php
-					$get_brand_query = "SELECT * FROM customers WHERE creator_branch_code = '$creator_branch_code'";
+					$get_brand_query = "SELECT * FROM customers WHERE creator_branch_code = '$creator_branch_code' ORDER BY id DESC";
 					$get_brand_query_run = mysqli_query($connect_link, $get_brand_query);
 
 					while($get_brand_result = mysqli_fetch_assoc($get_brand_query_run))
 					{
-						$email = $get_brand_result['email'];
-						echo "<option email=\"$email\">";
-							echo $get_brand_result['name'];
+						$company_name = $get_brand_result['company_name'];
+						$name = $get_brand_result['name'];
+
+						echo "<option value=\"$name\" customer_company=\"$company_name\">";
+							echo $name . ", $company_name";
 						echo "</option>";
 					}
 				?>	
@@ -786,18 +788,30 @@
 
 	//on clicking on add invoice button
 		$('#quotation_gen_button').click(function()
-		{
+		{			
 			$('.gen_quotation_span').html("<img class=\"gif_loader\" src=\"img/loaders1.gif\">");
 			
 		//getting variable values
 			quotation_num = $.trim($('#quotation_num').attr('quotation_num'));
 
 			var quotation_customer = $.trim($('#quotation_customer').val());
+			var quotation_customer_company = $.trim($('#quotation_customer option:selected').attr('customer_company'));
+
 			var quotation_date = $.trim($('#quotation_date').val());	
 			var invoice_note = $.trim($('#invoice_note').val());		
 
 			if(quotation_customer !="" && quotation_date !="" && quotation_num !="")
 			{
+				$(this).fadeOut(0);
+				
+			//adding note in the database
+				var query_recieved = "INSERT INTO notes VALUES('', '" + quotation_num + "', '" + invoice_note + "')";
+				//alert(query_recieved);
+				$.post('php/query_runner.php', {query_recieved: query_recieved}, function(l)
+				{
+					//alert(l);
+				});
+
 			//for getting inputs of each of the row
 				var count = $(".quotation_entry_table tr").length;
 				var row_count = count -1;
@@ -839,7 +853,7 @@
 					}
 
 				//adding this to database					
-					$.post('php/create_quotation.php', {quotation_customer: quotation_customer, quotation_date: quotation_date, quotation_num:quotation_num, quotation_serial:quotation_serial, quotation_description:quotation_description, quotation_brand:quotation_brand, quotation_model_name:quotation_model_name, quotation_model_number:quotation_model_number, quotation_serial_num:quotation_serial_num, quotation_service_id:quotation_service_id, quotation_part_name:quotation_part_name, quotation_purchase_order:quotation_purchase_order, quotation_part_quantity:quotation_part_quantity, quotation_part_rate:quotation_part_rate, quotation_discount:quotation_discount, quotation_part_cgst:quotation_part_cgst, quotation_part_sgst:quotation_part_sgst, quotation_part_igst:quotation_part_igst, quotation_hsn_code:quotation_hsn_code, quotation_part_total_price:quotation_part_total_price, quotation_item_type:quotation_item_type}, function(e)
+					$.post('php/create_quotation.php', {quotation_customer: quotation_customer, quotation_customer_company:quotation_customer_company, quotation_date: quotation_date, quotation_num:quotation_num, quotation_serial:quotation_serial, quotation_description:quotation_description, quotation_brand:quotation_brand, quotation_model_name:quotation_model_name, quotation_model_number:quotation_model_number, quotation_serial_num:quotation_serial_num, quotation_service_id:quotation_service_id, quotation_part_name:quotation_part_name, quotation_purchase_order:quotation_purchase_order, quotation_part_quantity:quotation_part_quantity, quotation_part_rate:quotation_part_rate, quotation_discount:quotation_discount, quotation_part_cgst:quotation_part_cgst, quotation_part_sgst:quotation_part_sgst, quotation_part_igst:quotation_part_igst, quotation_hsn_code:quotation_hsn_code, quotation_part_total_price:quotation_part_total_price, quotation_item_type:quotation_item_type}, function(e)
 					{
 						if(e==1)
 						{
@@ -865,13 +879,6 @@
 					});				
 				}
 
-			//adding note in the database
-				var query_recieved = "INSERT INTO notes VALUES('', '" + quotation_num + "', '" + invoice_note + "')";
-				//alert(query_recieved);
-				$.post('php/query_runner.php', {query_recieved: query_recieved}, function(e)
-				{
-				
-				});
 			}
 			else
 			{

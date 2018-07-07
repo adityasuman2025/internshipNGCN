@@ -706,7 +706,7 @@ body, html
 
 	#invoice_gen_edit_button, #performa_invoice_gen_edit_button
 	{
-		display: none;
+		//display: none;
 	}
 
 	.add_note_div

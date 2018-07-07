@@ -78,6 +78,8 @@
 		//adding payment method in the database and converting that quotation into invoice
 			if(payment_method!= "")
 			{
+				$(this).fadeOut(0);
+
 				if(payment_method == "Credit")
 				{
 					var query_recieved = "UPDATE quotation SET payment_method ='" + payment_method + "', date_of_payment= '00' WHERE quotation_num = '" + quotation_num + "'";

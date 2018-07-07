@@ -93,6 +93,8 @@
 	<script type="text/javascript">
 		$('#user_save_edit_button').click(function()
 		{
+			$(this).fadeOut();
+
 			var redirect_page = $.trim("<?php echo $redirect_page; ?>");
 
 			var quotation_num = "<?php echo $quotation_num; ?>";

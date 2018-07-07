@@ -53,7 +53,7 @@
 
 		Shipping Address:
 		<br>
-		<input id="user_entry_shipping_address" type="text" value="<?php echo $shipping_address; ?>">
+		<textarea id="user_entry_shipping_address" type="text"> <?php echo $shipping_address; ?></textarea>
 		<br>
 
 		<br>

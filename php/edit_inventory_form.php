@@ -64,7 +64,7 @@
 			var hsn_code = $('#user_edit_form #user_entry_hsn_code').val();
 			var description = $('#user_edit_form #user_entry_description').val();
 								
-			if(brand!= "" && model_name!= "" && model_number!= "")
+			if(brand!= "")
 			{
 				var query_recieved = "UPDATE inventory SET brand ='" + brand + "', model_name ='" + model_name + "', model_number = '" + model_number + "', hsn_code = '" + hsn_code + "', description = '" + description + "' WHERE id = '" + user_id + "'";
 			

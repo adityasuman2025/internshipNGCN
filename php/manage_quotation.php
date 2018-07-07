@@ -83,8 +83,8 @@
 						echo "<img quotation_num=\"$quotation_num\" class=\"user_view_icon\" src=\"img/view.png\"/>";
 						echo "<img quotation_num=\"$quotation_num\" type=\"$type\" class=\"user_edit_icon\" src=\"img/edit.png\"/>";
 						echo "<img quotation_num=\"$quotation_num\" class=\"user_delete_icon\" src=\"img/delete.png\"/>";
-						echo "<br>";
-						echo "<button class=\"performa_button\" style=\"color: #cc0000; background: white;\" quotation_num=\"$quotation_num\">Performa Invoice</button>";
+						// echo "<br>";
+						// echo "<button class=\"performa_button\" style=\"color: #cc0000; background: white;\" quotation_num=\"$quotation_num\">Performa Invoice</button>";
 					echo "</td>";
 				echo "</tr>";
 			}
