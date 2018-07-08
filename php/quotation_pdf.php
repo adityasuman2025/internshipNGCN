@@ -256,7 +256,7 @@
 		$pdf->Cell(16, 5, 'HSN', 'LRT', 0, 'C');
 		$pdf->Cell(8, 5, 'Qty','LRT', 0, 'C');
 		$pdf->Cell(12, 5, 'Unit', 'LRT', 0, 'C');
-		// $pdf->Cell(12, 5, 'Dscnt', 'LRT', 0, 'C');
+		$pdf->Cell(12, 5, 'Dscnt', 'LRT', 0, 'C');
 		// $pdf->Cell(13, 5, 'Net', 'LRT', 0, 'C');
 
 		$pdf->Cell(11, 5, 'TAX', 'LRT', 0, 'C');
@@ -270,7 +270,7 @@
 		$pdf->Cell(16, 5, 'Code','LRB', 0, 'C');
 		$pdf->Cell(8, 5, '','LRB', 0, 'C');
 		$pdf->Cell(12, 5, 'Price','LRB', 0, 'C');
-		// $pdf->Cell(12, 5, '%', 'LRB', 0, 'C');
+		$pdf->Cell(12, 5, '%', 'LRB', 0, 'C');
 		// $pdf->Cell(13, 5, 'Price','LRB', 0, 'C');
 
 		$pdf->Cell(11, 5, 'Rate','LRB', 0, 'C');
@@ -307,15 +307,24 @@
 			$item_quantity = $get_item_info_assoc['quantity'];
 			$item_rate = round($get_item_info_assoc['rate'], 2);
 
-			$net_price = $item_quantity*$item_rate;
+			$item_discount = $get_item_info_assoc['discount'];
+			if($item_discount == "")
+			{
+				$item_discount = 0;
+			}
+
+			$advance_payment = $get_item_info_assoc['advance'];
+
+			$discount_amount = $item_discount*$item_quantity*$item_rate/100;
+			$net_price = $item_quantity*$item_rate - $item_discount*$item_quantity*$item_rate/100;
 
 			$item_cgst = $get_item_info_assoc['cgst'];
 			$item_sgst = $get_item_info_assoc['sgst'];
 			$item_igst = $get_item_info_assoc['igst'];
 
-			$cgst_amount = ($item_rate*$item_quantity)*$item_cgst/100;
-			$sgst_amount = ($item_rate*$item_quantity)*$item_sgst/100;
-			$igst_amount = ($item_rate*$item_quantity)*$item_igst/100;
+			$cgst_amount = ($item_rate*$item_quantity - $discount_amount)*$item_cgst/100;
+			$sgst_amount = ($item_rate*$item_quantity - $discount_amount)*$item_sgst/100;
+			$igst_amount = ($item_rate*$item_quantity - $discount_amount)*$item_igst/100;
 
 			$item_total_price = round($get_item_info_assoc['total_price'],2);
 			$total_amount = $total_amount + $item_total_price;
@@ -324,13 +333,14 @@
 			$pdf->SetFont('Arial', '', 10); //font
 			$pdf->SetTextColor(30, 30, 30); //text color //black
 
-		//item line
+			//item line
 				$pdf->Cell(8, 5, $item_serial, 'LR', 0, 'C');
 				$pdf->Cell(80, 5, $item_brand, 0, 0);
 				
 				$pdf->Cell(16, 5, $item_hsn_code ,  'L', 0,'C');
 				$pdf->Cell(8, 5, $item_quantity ,  'L', 0,'C');
 				$pdf->Cell(12, 5, $item_rate ,  'L', 0,'C');
+				$pdf->Cell(12, 5, $item_discount . "%" ,  'L', 0,'C');
 				$pdf->Cell(11, 5, $item_cgst . "%" ,  'L', 0,'C');
 				$pdf->Cell(11, 5, 'CGST' ,  'L', 0,'C');
 				$pdf->Cell(16, 5, $cgst_amount, 'L', 0, 'C');
@@ -342,6 +352,7 @@
 				
 				$pdf->Cell(16, 5, '' ,  'L', 0,'C');
 				$pdf->Cell(8, 5, '' ,  'L', 0,'C');
+				$pdf->Cell(12, 5, '' ,  'L', 0,'C');
 				$pdf->Cell(12, 5, '' ,  'L', 0,'C');
 				$pdf->Cell(11, 5, '' ,  'L', 0,'C');
 				$pdf->Cell(11, 5, '' ,  'L', 0,'C');
@@ -355,6 +366,7 @@
 				$pdf->Cell(16, 5, '' ,  'L', 0,'C');
 				$pdf->Cell(8, 5, '' ,  'L', 0,'C');
 				$pdf->Cell(12, 5, '' ,  'L', 0,'C');
+				$pdf->Cell(12, 5, '' ,  'L', 0,'C');
 				$pdf->Cell(11, 5, $item_sgst . "%" , 'L', 0,'C');
 				$pdf->Cell(11, 5, 'SGST' ,  'L', 0,'C');
 				$pdf->Cell(16, 5, $sgst_amount, 'L', 0, 'C');
@@ -366,6 +378,7 @@
 				
 				$pdf->Cell(16, 5, '' ,  'L', 0,'C');
 				$pdf->Cell(8, 5, '' ,  'L', 0,'C');
+				$pdf->Cell(12, 5, '' ,  'L', 0,'C');
 				$pdf->Cell(12, 5, '' ,  'L', 0,'C');
 				$pdf->Cell(11, 5, '' ,  'L', 0,'C');
 				$pdf->Cell(11, 5, '' ,  'L', 0,'C');
@@ -379,6 +392,7 @@
 				$pdf->Cell(16, 5, '' ,  'L', 0,'C');
 				$pdf->Cell(8, 5, '' ,  'L', 0,'C');
 				$pdf->Cell(12, 5, '' ,  'L', 0,'C');
+				$pdf->Cell(12, 5, '' ,  'L', 0,'C');
 				$pdf->Cell(11, 5, $item_igst . "%" , 'L', 0,'C');
 				$pdf->Cell(11, 5, 'IGST' ,  'L', 0,'C');
 				$pdf->Cell(16, 5, $igst_amount, 'L', 0, 'C');
@@ -390,6 +404,7 @@
 				
 				$pdf->Cell(16, 5, '' ,  'LB', 0,'C');
 				$pdf->Cell(8, 5, '' ,  'LB', 0,'C');
+				$pdf->Cell(12, 5, '' ,  'LB', 0,'C');
 				$pdf->Cell(12, 5, '' ,  'LB', 0,'C');
 				$pdf->Cell(11, 5, '' ,  'LB', 0,'C');
 				$pdf->Cell(11, 5, '' ,  'LB', 0,'C');
@@ -449,12 +464,35 @@
 		$in_words = "Rupees " . $result . "Only";
 
 		$pdf->SetFont('Arial', '', 11); //font
-		$pdf->Cell(129, 6, $in_words, 1, 0);
+		$pdf->Cell(136, 7, $in_words, 1, 0);
 
 		$pdf->SetFont('Arial', 'B', 12); //font
 		$pdf->SetTextColor(0, 0, 0); //text color //black
-		$pdf->Cell(30, 6, 'Total Amount', 1, 0);
-		$pdf->Cell(20, 6, $total_amount, 1, 1); //end of line
+		$pdf->Cell(30, 7, 'Total Amount', 1, 0);
+		$pdf->Cell(25, 7, $total_amount, 1, 1); //end of line
+
+	//advance payemnt
+		if($advance_payment != "")
+		{
+		//advance
+			$pdf->SetFont('Arial', '', 11); //font
+			$pdf->Cell(120, 7, '', 'LB', 0);
+
+			$pdf->SetFont('Arial', 'B', 11); //font
+			$pdf->Cell(46, 7, 'Less: Advances', 'B', 'R', 0);
+			$pdf->SetFont('Arial', '', 11); //font
+			$pdf->Cell(25, 7, $advance_payment, 1, 1); //end of line
+
+		//balance
+			$balance = $total_amount - $advance_payment;
+
+			$pdf->Cell(120, 7, '', 'LB', 0);
+
+			$pdf->SetFont('Arial', 'B', 11); //font
+			$pdf->Cell(46, 7, 'Balance', 'B', 'R', 0);
+			$pdf->SetFont('Arial', '', 11); //font
+			$pdf->Cell(25, 7, $balance, 1, 1); //end of line
+		}
 
 	//leaving blank space
 		$pdf->Cell(200, 3, '', 0, 1);
@@ -488,19 +526,7 @@
 		{
 			$pdf->Cell(189, 5, 'Notes:', 0, 1);
 			$pdf->SetFont('Arial', '', 9); //font
-			$pdf->MultiCell(189, 4, $invoice_note, 0, 1);
-
-			// $pdf->Cell(189, 5, 'Notes:', 0, 1);
-			// $pdf->SetFont('Arial', '', 9); //font
-
-			// $invoice_note_broken = explode("#", $invoice_note);
-			// $hash_count = substr_count($invoice_note,"#");
-
-			// $ka= 0;
-			// for($ka= 0; $ka < $hash_count; $ka++)
-			// {
-			// 	$pdf->Cell(189, 5, $invoice_note_broken[$ka], 0, 1);
-			// }			
+			$pdf->MultiCell(189, 4, $invoice_note, 0, 1);	
 		}
 
 //another page for terms and conditions and branch details

@@ -19,7 +19,6 @@
 	$quotation_service_id = htmlentities(mysqli_real_escape_string($connect_link, $_POST['quotation_service_id']));
 	$quotation_description = htmlentities(mysqli_real_escape_string($connect_link, $_POST['quotation_description']));
 
-	$quotation_part_name = htmlentities(mysqli_real_escape_string($connect_link, $_POST['quotation_part_name']));
 	$quotation_purchase_order = htmlentities(mysqli_real_escape_string($connect_link, $_POST['quotation_purchase_order']));
 
 	$quotation_part_quantity = htmlentities(mysqli_real_escape_string($connect_link, $_POST['quotation_part_quantity']));
@@ -29,6 +28,8 @@
 	$quotation_part_igst = htmlentities(mysqli_real_escape_string($connect_link, $_POST['quotation_part_igst']));
 	$quotation_hsn_code = htmlentities(mysqli_real_escape_string($connect_link, $_POST['quotation_hsn_code']));
 	$quotation_part_total_price = htmlentities(mysqli_real_escape_string($connect_link, $_POST['quotation_part_total_price']));
+
+	$advance_payment = htmlentities(mysqli_real_escape_string($connect_link, $_POST['advance_payment']));
 	
 	if(isset($_POST['quotation_discount']))
 	{
@@ -39,7 +40,7 @@
 		$quotation_discount = "";
 	}
 
-	$create_user_query = "INSERT INTO quotation VALUES('', '$user_username', '$creator_branch_code', '$quotation_num', '$quotation_serial', '$quotation_description', '$quotation_customer', '$quotation_customer_company', '$quotation_date', '$quotation_brand', '$quotation_model_name', '$quotation_model_number', '$quotation_serial_num', '$quotation_service_id', '$quotation_part_name', '$quotation_purchase_order', '$quotation_part_quantity', '$quotation_part_rate', '$quotation_discount', '$quotation_part_cgst', '$quotation_part_sgst', '$quotation_part_igst', '$quotation_hsn_code', '$quotation_part_total_price', '$quotation_item_type', '', '')";
+	$create_user_query = "INSERT INTO quotation VALUES('', '$user_username', '$creator_branch_code', '$quotation_num', '$quotation_serial', '$quotation_description', '$quotation_customer', '$quotation_customer_company', '$quotation_date', '$quotation_brand', '$quotation_model_name', '$quotation_model_number', '$quotation_serial_num', '$quotation_service_id', '$advance_payment', '$quotation_purchase_order', '$quotation_part_quantity', '$quotation_part_rate', '$quotation_discount', '$quotation_part_cgst', '$quotation_part_sgst', '$quotation_part_igst', '$quotation_hsn_code', '$quotation_part_total_price', '$quotation_item_type', '', '')";
 	if($create_user_query_run = mysqli_query($connect_link, $create_user_query))
 	{
 		echo 1;

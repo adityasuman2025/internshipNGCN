@@ -9,16 +9,16 @@
 
 <div id="table_export" class="inventory_list_container">
 	
-<!-------for whole unit-------->
-	<h4>Whole Unit</h4>
-
 	<table id="table_export1" class="list_inventory_table">
 		<tr>
 			<th>Customer</th>
+			<th>Company</th>
 			<th>Invoice Number</th>
+			<th>Type</th>
 			<th>Brand</th>
-			<th>Model Name</th>
-			<th>Model Number</th>
+			<th>Product/Part Name</th>
+			<th>Product/Part Code</th>
+			<th>HSN Code</th>
 			<th>Return Note</th>
 			<th>Date</th>
 			<th>Created By</th>
@@ -30,21 +30,30 @@
 			$user_username = $_COOKIE['logged_username'];
 			$creator_branch_code = $_COOKIE['logged_username_branch_code'];
 
-			$manage_customer_query = "SELECT * FROM returns WHERE type='whole' AND creator_branch_code='$creator_branch_code' ORDER BY id DESC";
+			$manage_customer_query = "SELECT * FROM returns WHERE creator_branch_code='$creator_branch_code' ORDER BY id DESC";
 			$manage_customer_query_run = mysqli_query($connect_link, $manage_customer_query);
 
 			while($manage_customer_result = mysqli_fetch_assoc($manage_customer_query_run))
 			{
 				$return_id = $manage_customer_result['id'];
+
+			//gettting date of generation of return
+				$date = $manage_customer_result['date'];
+				$date = str_replace('/', '-', $date);
+				$date = date('d M Y', strtotime($date));
 				
 				echo "<tr>";
 					echo "<td>" .$manage_customer_result['customer'] . "</td>";
+					echo "<td>" .$manage_customer_result['customer_company'] . "</td>";
 					echo "<td>" . $manage_customer_result['invoice_num'] . "</td>";
+					echo "<td>" . $manage_customer_result['type'] . "</td>";
 					echo "<td>" . $manage_customer_result['brand'] . "</td>";
 					echo "<td>" . $manage_customer_result['model_name'] . "</td>";
 					echo "<td>" . $manage_customer_result['model_number'] . "</td>";
+					echo "<td>" . $manage_customer_result['hsn_code'] . "</td>";
+
 					echo "<td>" . $manage_customer_result['return_note'] . "</td>";
-					echo "<td>" . $manage_customer_result['date'] . "</td>";		
+					echo "<td>" . $date . "</td>";		
 					echo "<td>" . $manage_customer_result['creator_username'] . "</td>";
 
 					echo "<td>";
@@ -56,60 +65,6 @@
 			}
 		?>
 	</table>
-
-<!-------for parts only-------->
-	<br>
-	<h4>Parts Only</h4>
-
-	<table id="table_export2" class="list_inventory_table">
-		<tr>
-			<th>Customer</th>
-			<th>Invoice Number</th>
-			<th>Brand</th>
-			<th>Model Name</th>
-			<th>Model Number</th>
-			<th>Part Name</th>
-			<th>Part Number</th>
-			<th>Return Note</th>
-			<th>Date</th>
-			<th>Created By</th>
-			<th>Actions</th>
-		</tr>
-
-		<?php
-			include('connect_db.php');
-			$user_username = $_COOKIE['logged_username'];
-			$creator_branch_code = $_COOKIE['logged_username_branch_code'];
-
-			$manage_customer_query = "SELECT * FROM returns WHERE type='part' AND creator_branch_code= '$creator_branch_code' ORDER BY id DESC";
-			$manage_customer_query_run = mysqli_query($connect_link, $manage_customer_query);
-
-			while($manage_customer_result = mysqli_fetch_assoc($manage_customer_query_run))
-			{
-				$return_id = $manage_customer_result['id'];
-				
-				echo "<tr>";
-					echo "<td>" .$manage_customer_result['customer'] . "</td>";
-					echo "<td>" . $manage_customer_result['invoice_num'] . "</td>";
-					echo "<td>" . $manage_customer_result['brand'] . "</td>";
-					echo "<td>" . $manage_customer_result['model_name'] . "</td>";
-					echo "<td>" . $manage_customer_result['model_number'] . "</td>";
-					echo "<td>" . $manage_customer_result['part_name'] . "</td>";
-					echo "<td>" . $manage_customer_result['part_number'] . "</td>";
-					echo "<td>" . $manage_customer_result['return_note'] . "</td>";
-					echo "<td>" . $manage_customer_result['date'] . "</td>";		
-					echo "<td>" . $manage_customer_result['creator_username'] . "</td>";
-
-					echo "<td>";
-						echo "<img return_id=\"$return_id\" class=\"product_edit_icon\" src=\"img/edit.png\"/>";
-						echo "<img return_id=\"$return_id\" class=\"product_delete_icon\" src=\"img/delete.png\"/>";
-						
-					echo "</td>";
-				echo "</tr>";
-			}
-		?>
-	</table>
-
 </div>
 
 <!---script------>

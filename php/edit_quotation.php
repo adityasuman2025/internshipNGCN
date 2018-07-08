@@ -78,6 +78,7 @@
 					<th class="to_invoice">Availability</th>	
 
 					<th>Rate</th>
+					<th>Discount</th>
 
 					<th>CGST Rate</th>
 					<th>CGST Amount</th>
@@ -114,6 +115,7 @@
 						$purchase_order = $query_assoc['purchase_order'];
 						$quantity = $query_assoc['quantity'];
 						$rate = $query_assoc['rate'];
+						$discount = $query_assoc['discount'];
 
 						$cgst = $query_assoc['cgst'];
 						$cgst_amount = ($rate*$cgst/100)*$quantity;
@@ -125,6 +127,8 @@
 						$igst_amount = ($rate*$igst/100)*$quantity;
 
 						$total_price = $query_assoc['total_price'];
+
+						$advance_payment = $query_assoc['advance'];
 
 						echo "<tr id=\"$quotation_id\" fo=\"$serial\">";
 
@@ -221,10 +225,10 @@
 							echo "<td><input type=\"number\" fo=\"$fo\" style=\"$avail_class\" value=\"$quantity\" id=\"quotation_part_quantity\"></td>";
 							echo "<td><input type=\"number\" disabled=\"disabled\" value=\"$in_stock\" id=\"item_availability\"></td>";
 
-							echo "<td><input type=\"number\" value=\"$rate\" id=\"quotation_part_rate\"></td>
+							echo "	<td><input type=\"number\" value=\"$rate\" id=\"quotation_part_rate\"></td>
+									<td><input type=\"number\" value=\"$discount\" id=\"quotation_discount\"></td>";
 
-								<td><input type=\"number\" value=\"$cgst\" id=\"quotation_part_cgst\"></td>";
-							
+							echo "<td><input type=\"number\" value=\"$cgst\" id=\"quotation_part_cgst\"></td>";							
 							echo "<td><input type=\"number\" disabled=\"disabled\" value=\"$cgst_amount\" id=\"quotation_cgst_amount\"></td>";
 
 							echo"<td><input type=\"number\" value=\"$sgst\" id=\"quotation_part_sgst\"></td>";
@@ -265,7 +269,11 @@
 			<textarea id="invoice_note" style="width: 840px; height: 300px; resize: none;"><?php echo $get_note; ?></textarea>
 		</div>
 
-		<br>
+		<br><br>
+		<b>Advance</b>
+		<input type="number" value="<?php echo $advance_payment; ?>" id="advance_payment">
+
+		<br><br>
 		<input type="button" value="Save Edit" id="quotation_gen_button">
 
 		<input type="button" value="Generate Performa Invoice" quotation_num="<?php echo $quotation_num; ?>" id="performa_invoice_gen_edit_button">
@@ -404,9 +412,12 @@
 		{
 			var quantity = parseInt($(this).parent().parent().find('#quotation_part_quantity').val());
 			var rate = parseInt($(this).parent().parent().find('#quotation_part_rate').val());
-			var cgst_rate = parseInt($(this).parent().parent().find('#quotation_part_cgst').val());
+			var discount = parseInt($(this).parent().parent().find('#quotation_discount').val());
 
-			var cgst_amount = (rate*cgst_rate/100)*quantity;
+			var cgst_rate = parseInt($(this).parent().parent().find('#quotation_part_cgst').val());
+			var discount_amount = discount*quantity*rate/100;
+
+			var cgst_amount = (rate*quantity - discount_amount)*cgst_rate/100;
 
 			$(this).parent().parent().find('#quotation_cgst_amount').val(cgst_amount);
 		});
@@ -416,9 +427,12 @@
 		{
 			var quantity = parseInt($(this).parent().parent().find('#quotation_part_quantity').val());
 			var rate = parseInt($(this).parent().parent().find('#quotation_part_rate').val());
-			var sgst_rate = parseInt($(this).parent().parent().find('#quotation_part_sgst').val());
+			var discount = parseInt($(this).parent().parent().find('#quotation_discount').val());
 
-			var sgst_amount = (rate*sgst_rate/100)*quantity;
+			var sgst_rate = parseInt($(this).parent().parent().find('#quotation_part_sgst').val());
+			var discount_amount = discount*quantity*rate/100;
+
+			var sgst_amount = (rate*quantity - discount_amount)*sgst_rate/100;
 
 			$(this).parent().parent().find('#quotation_sgst_amount').val(sgst_amount);
 		});
@@ -428,9 +442,12 @@
 		{
 			var quantity = parseInt($(this).parent().parent().find('#quotation_part_quantity').val());
 			var rate = parseInt($(this).parent().parent().find('#quotation_part_rate').val());
-			var igst_rate = parseInt($(this).parent().parent().find('#quotation_part_igst').val());
+			var discount = parseInt($(this).parent().parent().find('#quotation_discount').val());
 
-			var igst_amount = (rate*igst_rate/100)*quantity;
+			var igst_rate = parseInt($(this).parent().parent().find('#quotation_part_igst').val());
+			var discount_amount = discount*quantity*rate/100;
+
+			var igst_amount = (rate*quantity - discount_amount)*igst_rate/100;
 
 			$(this).parent().parent().find('#quotation_igst_amount').val(igst_amount);
 		});
@@ -440,17 +457,45 @@
 		{
 			var quantity = parseInt($(this).parent().parent().find('#quotation_part_quantity').val());
 			var rate = parseInt($(this).parent().parent().find('#quotation_part_rate').val());
-			var cgst = parseInt($(this).parent().parent().find('#quotation_part_cgst').val());
-			var sgst = parseInt($(this).parent().parent().find('#quotation_part_sgst').val());
-			var igst = parseInt($(this).parent().parent().find('#quotation_part_igst').val());
+			var discount = parseInt($(this).parent().parent().find('#quotation_discount').val());
 
-			var total_price = (rate + (rate * (cgst+sgst+igst)/100))*quantity;
+			var cgst_amount = parseFloat($(this).parent().parent().find('#quotation_cgst_amount').val());
+			var sgst_amount = parseFloat($(this).parent().parent().find('#quotation_sgst_amount').val());
+			var igst_amount =parseFloat( $(this).parent().parent().find('#quotation_igst_amount').val());
+
+			var discount_amount = discount*quantity*rate/100;
+			var price = quantity*rate;
+			var total_price = quantity*rate - discount_amount +  cgst_amount + sgst_amount + igst_amount;
 
 			$(this).val(total_price);
 			//alert(total_price);
 		});
 
 	//on change of quantity, rate or gst after calculation
+		$('.quotation_entry_table tr #quotation_discount').keyup(function()
+		{
+			$(this).parent().parent().find('#quotation_part_total_price').val('calculate');
+
+		//updating gst amounts
+			var rate = parseInt($(this).parent().parent().find('#quotation_part_rate').val());
+			var quantity = parseInt($(this).parent().parent().find('#quotation_part_quantity').val());
+			var discount = $(this).val();
+
+			var cgst_rate = parseInt($(this).parent().parent().find('#quotation_part_cgst').val());
+			var sgst_rate = parseInt($(this).parent().parent().find('#quotation_part_sgst').val());
+			var igst_rate = parseInt($(this).parent().parent().find('#quotation_part_igst').val());
+
+			var discount_amount = discount*quantity*rate/100;
+
+			var cgst_amount = (rate*quantity - discount_amount)*cgst_rate/100;
+			var sgst_amount = (rate*quantity - discount_amount)*sgst_rate/100;
+			var igst_amount = (rate*quantity - discount_amount)*igst_rate/100;
+
+			$(this).parent().parent().find('#quotation_cgst_amount').val(cgst_amount);
+			$(this).parent().parent().find('#quotation_sgst_amount').val(sgst_amount);
+			$(this).parent().parent().find('#quotation_igst_amount').val(igst_amount);
+		});
+
 		$('.quotation_entry_table tr #quotation_part_quantity').keyup(function()
 		{
 			$(this).parent().parent().find('#quotation_part_total_price').val('calculate');
@@ -458,14 +503,17 @@
 		//updating gst amounts
 			var quantity = $(this).val();
 			var rate = parseInt($(this).parent().parent().find('#quotation_part_rate').val());
+			var discount = parseInt($(this).parent().parent().find('#quotation_discount').val());
 
 			var cgst_rate = parseInt($(this).parent().parent().find('#quotation_part_cgst').val());
 			var sgst_rate = parseInt($(this).parent().parent().find('#quotation_part_sgst').val());
 			var igst_rate = parseInt($(this).parent().parent().find('#quotation_part_igst').val());
 
-			var cgst_amount = (rate*cgst_rate/100)*quantity;
-			var sgst_amount = (rate*sgst_rate/100)*quantity;
-			var igst_amount = (rate*igst_rate/100)*quantity;
+			var discount_amount = discount*quantity*rate/100;
+
+			var cgst_amount = (rate*quantity - discount_amount)*cgst_rate/100;
+			var sgst_amount = (rate*quantity - discount_amount)*sgst_rate/100;
+			var igst_amount = (rate*quantity - discount_amount)*igst_rate/100;
 
 			$(this).parent().parent().find('#quotation_cgst_amount').val(cgst_amount);
 			$(this).parent().parent().find('#quotation_sgst_amount').val(sgst_amount);
@@ -479,14 +527,17 @@
 		//updating gst amounts
 			var rate = $(this).val();
 			var quantity = parseInt($(this).parent().parent().find('#quotation_part_quantity').val());
+			var discount = parseInt($(this).parent().parent().find('#quotation_discount').val());
 
 			var cgst_rate = parseInt($(this).parent().parent().find('#quotation_part_cgst').val());
 			var sgst_rate = parseInt($(this).parent().parent().find('#quotation_part_sgst').val());
 			var igst_rate = parseInt($(this).parent().parent().find('#quotation_part_igst').val());
 
-			var cgst_amount = (rate*cgst_rate/100)*quantity;
-			var sgst_amount = (rate*sgst_rate/100)*quantity;
-			var igst_amount = (rate*igst_rate/100)*quantity;
+			var discount_amount = discount*quantity*rate/100;
+
+			var cgst_amount = (rate*quantity - discount_amount)*cgst_rate/100;
+			var sgst_amount = (rate*quantity - discount_amount)*sgst_rate/100;
+			var igst_amount = (rate*quantity - discount_amount)*igst_rate/100;
 
 			$(this).parent().parent().find('#quotation_cgst_amount').val(cgst_amount);
 			$(this).parent().parent().find('#quotation_sgst_amount').val(sgst_amount);
@@ -508,7 +559,7 @@
 			$(this).parent().parent().find('#quotation_part_total_price').val('calculate');
 		});
 
-	//on clicking on delete goods button
+	//on clicking on delete item button
 		$('.quotation_entry_table tr .item_delete_icon').click(function()
 		{
 			$('.gen_quotation_span').html("<img class=\"gif_loader\" src=\"img/loaders1.gif\">");
@@ -532,7 +583,7 @@
 			});
 		});
 	
-	//on clicking on add new goods button
+	//on clicking on add new item button
 		$('#add_new_goods_button').click(function()
 		{
 			$('.gen_quotation_span').html("<img class=\"gif_loader\" src=\"img/loaders1.gif\">");
@@ -621,6 +672,8 @@
 			var quotation_customer_company = $.trim($('#quotation_customer option:selected').attr('customer_company'));
 
 			var quotation_date = $.trim($('#quotation_date').val());
+
+			var advance_payment = $.trim($('#advance_payment').val());	
 			var invoice_note = $.trim($('#invoice_note').val());	
 			
 			if(quotation_customer !="" && quotation_date !="" && quotation_num !="")
@@ -659,6 +712,8 @@
 					var quotation_purchase_order =$('.quotation_entry_table tr:nth-child('+ child_no + ') #quotation_purchase_order').val();
 					var quotation_part_quantity = parseInt($('.quotation_entry_table tr:nth-child('+ child_no + ') #quotation_part_quantity').val());
 					var quotation_part_rate = parseInt($('.quotation_entry_table tr:nth-child('+ child_no + ') #quotation_part_rate').val());
+					var quotation_discount = parseInt($('.quotation_entry_table tr:nth-child('+ child_no + ') #quotation_discount').val());
+
 					var quotation_part_cgst = parseInt($('.quotation_entry_table tr:nth-child('+ child_no + ') #quotation_part_cgst').val());
 					var quotation_part_sgst = parseInt($('.quotation_entry_table tr:nth-child('+ child_no + ') #quotation_part_sgst').val());
 					var quotation_part_igst = parseInt($('.quotation_entry_table tr:nth-child('+ child_no + ') #quotation_part_igst').val());
@@ -667,33 +722,21 @@
 					var in_stock = parseInt($('.quotation_entry_table tr:nth-child('+ child_no + ') #item_availability').val());
 
 					var quotation_serial_num = "";
-					var quotation_part_name = "";
-
-				//checking availability
-					// if(quotation_item_type == 'service')
-					// {
-					// 	to_display_button = to_display_button + 0;
-					// }
-					// else
-					// {
-					// 	if(quotation_part_quantity > in_stock)
-					// 	{
-					// 		to_display_button = to_display_button + 1;
-					// 	}
-					// 	else
-					// 	{
-					// 		to_display_button = to_display_button + 0;
-					// 	}	
-					// }
 
 				//if user forget to calculate total price
 					if(quotation_part_total_price == "calculate")
 					{
-						var quotation_part_total_price = (quotation_part_rate + (quotation_part_rate * (quotation_part_cgst+quotation_part_sgst+quotation_part_igst)/100))*quotation_part_quantity;
+						var cgst_amount = parseFloat($(this).parent().parent().find('#quotation_cgst_amount').val());
+						var sgst_amount = parseFloat($(this).parent().parent().find('#quotation_sgst_amount').val());
+						var igst_amount =parseFloat( $(this).parent().parent().find('#quotation_igst_amount').val());
+
+						var discount_amount = quotation_discount*quotation_part_quantity*quotation_part_rate/100;
+
+						var quotation_part_total_price = quotation_part_quantity*quotation_part_rate - discount_amount +  cgst_amount + sgst_amount + igst_amount;
 					}
 
 				//adding this to database	
-					var query_recieved = "UPDATE quotation SET type = '" + quotation_item_type + "', serial = '" + quotation_serial + "', description = '" + quotation_description + "', customer ='" + quotation_customer + "', customer_company = '" + quotation_customer_company + "', date ='" + quotation_date + "', brand = '" + quotation_brand + "', model_name = '" + quotation_model_name + "', model_number = '" + quotation_model_number + "', serial_num = '" + quotation_serial_num + "', service_id = '" + quotation_service_id + "', part_name = '" + quotation_part_name + "', quantity = '" + quotation_part_quantity + "', rate = '" + quotation_part_rate + "', cgst = '" + quotation_part_cgst + "', sgst = '" + quotation_part_sgst + "', igst = '" + quotation_part_igst + "', hsn_code = '" + quotation_part_hsn_code + "', total_price = '" + quotation_part_total_price + "', purchase_order = '" +  quotation_purchase_order + "' WHERE id = '" + quotation_id + "'";
+					var query_recieved = "UPDATE quotation SET type = '" + quotation_item_type + "', serial = '" + quotation_serial + "', description = '" + quotation_description + "', customer ='" + quotation_customer + "', customer_company = '" + quotation_customer_company + "', date ='" + quotation_date + "', brand = '" + quotation_brand + "', model_name = '" + quotation_model_name + "', model_number = '" + quotation_model_number + "', serial_num = '" + quotation_serial_num + "', service_id = '" + quotation_service_id + "', quantity = '" + quotation_part_quantity + "', rate = '" + quotation_part_rate + "', discount ='" + quotation_discount + "', cgst = '" + quotation_part_cgst + "', sgst = '" + quotation_part_sgst + "', igst = '" + quotation_part_igst + "', hsn_code = '" + quotation_part_hsn_code + "', total_price = '" + quotation_part_total_price + "', purchase_order = '" +  quotation_purchase_order + "', advance = '" + advance_payment + "' WHERE id = '" + quotation_id + "'";
 				
 					$.post('php/query_runner.php', {query_recieved:query_recieved}, function(e)
 					{
@@ -704,18 +747,6 @@
 							$('#add_new_goods_button').fadeOut();
 
 							$('.gen_quotation_span').text('Successfully edited').css('color','green');
-
-						// //checking availability 														
-						//     if(to_display_button == "0")
-						//     {
-						//     	$('#invoice_gen_edit_button').fadeIn();
-						//     	$('.gen_quotation_span').text('You can generate invoice now').css('color','green');
-						//     }
-						//     else
-						//     {
-						//     	$('#invoice_gen_edit_button').fadeOut();
-						//     	$('.gen_quotation_span').text("You have entered a quantity greater than its availability in stock. You are not able to generate invoice.").css('color', 'red');
-						//     }
 						}
 						else
 						{
@@ -742,15 +773,15 @@
 			var quotation_customer_company = $.trim($('#quotation_customer option:selected').attr('customer_company'));
 
 			var quotation_date = $.trim($('#quotation_date').val());
+
+			var advance_payment = $.trim($('#advance_payment').val());
 			var invoice_note = $.trim($('#invoice_note').val());	
 			
 			if(quotation_customer !="" && quotation_date !="" && quotation_num !="")
 			{
-				//$(this).fadeOut(0);
 
 			//updating note in the database
 				var query_recieved = "UPDATE notes SET note = '" + invoice_note + "' WHERE quotation_num = '" + quotation_num + "'";
-				//alert(query_recieved);
 				$.post('php/query_runner.php', {query_recieved: query_recieved}, function(l)
 				{
 					//alert(l);
@@ -782,6 +813,8 @@
 					var quotation_service_id = $('.quotation_entry_table tr:nth-child('+ child_no + ') #quotation_service_id').val();
 					var quotation_part_quantity = parseInt($('.quotation_entry_table tr:nth-child('+ child_no + ') #quotation_part_quantity').val());
 					var quotation_part_rate = parseInt($('.quotation_entry_table tr:nth-child('+ child_no + ') #quotation_part_rate').val());
+					var quotation_discount = parseInt($('.quotation_entry_table tr:nth-child('+ child_no + ') #quotation_discount').val());
+
 					var quotation_part_cgst = parseInt($('.quotation_entry_table tr:nth-child('+ child_no + ') #quotation_part_cgst').val());
 					var quotation_part_sgst = parseInt($('.quotation_entry_table tr:nth-child('+ child_no + ') #quotation_part_sgst').val());
 					var quotation_part_igst = parseInt($('.quotation_entry_table tr:nth-child('+ child_no + ') #quotation_part_igst').val());
@@ -791,8 +824,6 @@
 					var quotation_purchase_order =$('.quotation_entry_table tr:nth-child('+ child_no + ') #quotation_purchase_order').val();
 					
 					var in_stock = parseInt($('.quotation_entry_table tr:nth-child('+ child_no + ') #item_availability').val())
-
-					var quotation_part_name = "";
 
 				//checking availability
 					if(quotation_item_type == 'service')
@@ -814,13 +845,18 @@
 				//if user forget to calculate total price
 					if(quotation_part_total_price == "calculate")
 					{
-						var quotation_part_total_price = (quotation_part_rate + (quotation_part_rate * (quotation_part_cgst+quotation_part_sgst+quotation_part_igst)/100))*quotation_part_quantity;
+						var cgst_amount = parseFloat($(this).parent().parent().find('#quotation_cgst_amount').val());
+						var sgst_amount = parseFloat($(this).parent().parent().find('#quotation_sgst_amount').val());
+						var igst_amount =parseFloat( $(this).parent().parent().find('#quotation_igst_amount').val());
+
+						var discount_amount = quotation_discount*quotation_part_quantity*quotation_part_rate/100;
+
+						var quotation_part_total_price = quotation_part_quantity*quotation_part_rate - discount_amount +  cgst_amount + sgst_amount + igst_amount;
 					}
 
 				//adding this to database	
-					var query_recieved = "UPDATE quotation SET type = '" + quotation_item_type + "', serial = '" + quotation_serial + "', description = '" + quotation_description + "', customer ='" + quotation_customer + "', customer_company = '" + quotation_customer_company + "', date ='" + quotation_date + "', brand = '" + quotation_brand + "', model_name = '" + quotation_model_name + "', model_number = '" + quotation_model_number + "', serial_num = '" + quotation_serial_num + "', service_id = '" + quotation_service_id + "', purchase_order = '" + quotation_purchase_order + "', part_name = '" + quotation_part_name + "', quantity = '" + quotation_part_quantity + "', rate = '" + quotation_part_rate + "', cgst = '" + quotation_part_cgst + "', sgst = '" + quotation_part_sgst + "', igst = '" + quotation_part_igst + "', hsn_code = '" + quotation_part_hsn_code + "', total_price = '" + quotation_part_total_price + "', date_of_payment='' WHERE id = '" + quotation_id + "'";
+					var query_recieved = "UPDATE quotation SET type = '" + quotation_item_type + "', serial = '" + quotation_serial + "', description = '" + quotation_description + "', customer ='" + quotation_customer + "', customer_company = '" + quotation_customer_company + "', date ='" + quotation_date + "', brand = '" + quotation_brand + "', model_name = '" + quotation_model_name + "', model_number = '" + quotation_model_number + "', serial_num = '" + quotation_serial_num + "', service_id = '" + quotation_service_id + "', purchase_order = '" + quotation_purchase_order + "', quantity = '" + quotation_part_quantity + "', rate = '" + quotation_part_rate + "', discount ='" + quotation_discount + "', cgst = '" + quotation_part_cgst + "', sgst = '" + quotation_part_sgst + "', igst = '" + quotation_part_igst + "', hsn_code = '" + quotation_part_hsn_code + "', total_price = '" + quotation_part_total_price + "', date_of_payment='', advance='" + advance_payment + "' WHERE id = '" + quotation_id + "'";
 						
-					//alert(query_recieved);
 					$.post('php/query_runner.php', {query_recieved:query_recieved}, function(e)
 					{
 						if(e==1)

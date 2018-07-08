@@ -203,27 +203,6 @@
 		$pdf -> Line(0, 45, 219, 45);
 		$pdf->Cell(189, 6, '', 0, 1); //end of line
 
-	//quotation number and date line
-		// 	$pdf->SetFont('Arial', '', 12); //font
-		// 	$pdf->SetTextColor(0,0,0); //text color //black
-		// 	$pdf->Cell(20, 7, 'Date: ', 0, 0);
-			
-		// 	$pdf->SetTextColor(204,0,0); //text color //red
-		// 	$pdf->Cell(35, 7, $date_of_generation, 0, 0);
-
-		// 	$pdf->SetFont('Arial', '', 11); //font
-		// 	$pdf->SetTextColor(0,0,0); //text color //black
-		// 	$pdf->Cell(67, 7, 'Customer PO:' . $purchase_order , 0, 0);
-
-		// 	$pdf->SetFont('Arial', '', 12); //font
-		// 	$pdf->SetTextColor(0,0,0); //text color //black
-		// 	$pdf->Cell(35, 7, 'Invoice No: ', 0, 0);
-
-		// 	$pdf->SetTextColor(204,0,0); //text color //red
-		// 	$pdf->Cell(39, 7, $quotation_code, 0, 1);//end of line
-
-		// 	$pdf->Cell(189, 1, '', 0, 1); //end of line
-
 	//second line (billing shipping)
 		$pdf->SetTextColor(0,0,0); //text color //black
 
@@ -335,6 +314,8 @@
 			{
 				$item_discount = 0;
 			}
+
+			$advance_payment = $get_item_info_assoc['advance'];
 
 			$discount_amount = $item_discount*$item_quantity*$item_rate/100;
 			$net_price = $item_quantity*$item_rate - $item_discount*$item_quantity*$item_rate/100;
@@ -494,6 +475,29 @@
 		$pdf->Cell(30, 6, 'Total Amount', 1, 0);
 		$pdf->Cell(25, 6, $total_amount, 1, 1); //end of line
 
+	//advance payemnt
+		if($advance_payment != "")
+		{
+		//advance
+			$pdf->SetFont('Arial', '', 11); //font
+			$pdf->Cell(120, 7, '', 'LB', 0);
+
+			$pdf->SetFont('Arial', 'B', 11); //font
+			$pdf->Cell(46, 7, 'Less: Advances', 'B', 'R', 0);
+			$pdf->SetFont('Arial', '', 11); //font
+			$pdf->Cell(25, 7, $advance_payment, 1, 1); //end of line
+
+		//balance
+			$balance = $total_amount - $advance_payment;
+
+			$pdf->Cell(120, 7, '', 'LB', 0);
+
+			$pdf->SetFont('Arial', 'B', 11); //font
+			$pdf->Cell(46, 7, 'Balance', 'B', 'R', 0);
+			$pdf->SetFont('Arial', '', 11); //font
+			$pdf->Cell(25, 7, $balance, 1, 1); //end of line
+		}
+
 	//leaving blank space
 		$pdf->Cell(200, 3, '', 0, 1);
 
@@ -505,9 +509,7 @@
 		$pdf->Cell(189, 5, 'A/C Name: ' . $bank_accnt_name , 0,1);
 		$pdf->Cell(189, 5, 'A/C Number: ' . $bank_accnt_no , 0,1);
 		$pdf->Cell(189, 5, 'Bank Name: ' . $bank_name , 0,1);
-		$pdf->Cell(150, 5, 'IFS Code: ' . $bank_ifsc , 0,0);
-
-		$pdf->Cell(39, 5, 'Authorized Signatory', 0,1);
+		$pdf->Cell(150, 5, 'IFS Code: ' . $bank_ifsc , 0,1);
 
 	//Payment method
 		$pdf->Cell(189, 3, '', 0, 1);
@@ -516,7 +518,9 @@
 		$pdf->SetFont('Arial', '', 10); //font
 		
 		$pdf->Cell(32, 4, 'Payment Method:', 0, 0);
-		$pdf->Cell(110, 4, $payment_method, 0, 1);
+		$pdf->Cell(120, 4, $payment_method, 0, 0);
+
+		$pdf->Cell(39, 5, 'Authorized Signatory', 0,1);
 
 		$pdf->Cell(27, 4, 'Payment Date:', 0, 0);
 		$pdf->Cell(45, 4, $date_of_payment, 0, 1);

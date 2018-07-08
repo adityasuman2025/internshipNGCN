@@ -54,7 +54,7 @@
 				{
 					if(e == 1)
 					{
-						$('.inventory_feed').text('Inventory has been successfully added').css('color', 'green');
+						$('.inventory_feed').text('Successfully added').css('color', 'green');
 						$('.inventory_form').html("<img class=\"gif_loader\" src=\"img/loaders1.gif\">").fadeOut(0);
 						$('#inv_add_new_button').fadeIn(0);
 					}

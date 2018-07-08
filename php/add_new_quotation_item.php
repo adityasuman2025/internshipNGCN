@@ -74,6 +74,7 @@
 	?>
 
 	<td><input type="number" value="0" id="quotation_part_rate"></td>
+	<td><input type="number" value="0" id="quotation_discount"></td>
 
 	<td><input type="number" value="0" id="quotation_part_cgst"></td>
 	<td><input type="number" disabled="disabled" value="0" id="quotation_cgst_amount"></td>
@@ -188,9 +189,12 @@
 		{
 			var quantity = parseInt($(this).parent().parent().find('#quotation_part_quantity').val());
 			var rate = parseInt($(this).parent().parent().find('#quotation_part_rate').val());
-			var cgst_rate = parseInt($(this).parent().parent().find('#quotation_part_cgst').val());
+			var discount = parseInt($(this).parent().parent().find('#quotation_discount').val());
 
-			var cgst_amount = (rate*cgst_rate/100)*quantity;
+			var cgst_rate = parseInt($(this).parent().parent().find('#quotation_part_cgst').val());
+			var discount_amount = discount*quantity*rate/100;
+
+			var cgst_amount = (rate*quantity - discount_amount)*cgst_rate/100;
 
 			$(this).parent().parent().find('#quotation_cgst_amount').val(cgst_amount);
 		});
@@ -200,9 +204,12 @@
 		{
 			var quantity = parseInt($(this).parent().parent().find('#quotation_part_quantity').val());
 			var rate = parseInt($(this).parent().parent().find('#quotation_part_rate').val());
-			var sgst_rate = parseInt($(this).parent().parent().find('#quotation_part_sgst').val());
+			var discount = parseInt($(this).parent().parent().find('#quotation_discount').val());
 
-			var sgst_amount = (rate*sgst_rate/100)*quantity;
+			var sgst_rate = parseInt($(this).parent().parent().find('#quotation_part_sgst').val());
+			var discount_amount = discount*quantity*rate/100;
+
+			var sgst_amount = (rate*quantity - discount_amount)*sgst_rate/100;
 
 			$(this).parent().parent().find('#quotation_sgst_amount').val(sgst_amount);
 		});
@@ -212,9 +219,12 @@
 		{
 			var quantity = parseInt($(this).parent().parent().find('#quotation_part_quantity').val());
 			var rate = parseInt($(this).parent().parent().find('#quotation_part_rate').val());
-			var igst_rate = parseInt($(this).parent().parent().find('#quotation_part_igst').val());
+			var discount = parseInt($(this).parent().parent().find('#quotation_discount').val());
 
-			var igst_amount = (rate*igst_rate/100)*quantity;
+			var igst_rate = parseInt($(this).parent().parent().find('#quotation_part_igst').val());
+			var discount_amount = discount*quantity*rate/100;
+
+			var igst_amount = (rate*quantity - discount_amount)*igst_rate/100;
 
 			$(this).parent().parent().find('#quotation_igst_amount').val(igst_amount);
 		});
@@ -224,17 +234,45 @@
 		{
 			var quantity = parseInt($(this).parent().parent().find('#quotation_part_quantity').val());
 			var rate = parseInt($(this).parent().parent().find('#quotation_part_rate').val());
-			var cgst = parseInt($(this).parent().parent().find('#quotation_part_cgst').val());
-			var sgst = parseInt($(this).parent().parent().find('#quotation_part_sgst').val());
-			var igst = parseInt($(this).parent().parent().find('#quotation_part_igst').val());
+			var discount = parseInt($(this).parent().parent().find('#quotation_discount').val());
 
-			var total_price = (rate + (rate * (cgst+sgst+igst)/100))*quantity;
+			var cgst_amount = parseFloat($(this).parent().parent().find('#quotation_cgst_amount').val());
+			var sgst_amount = parseFloat($(this).parent().parent().find('#quotation_sgst_amount').val());
+			var igst_amount =parseFloat( $(this).parent().parent().find('#quotation_igst_amount').val());
+
+			var discount_amount = discount*quantity*rate/100;
+			var price = quantity*rate;
+			var total_price = quantity*rate - discount_amount +  cgst_amount + sgst_amount + igst_amount;
 
 			$(this).val(total_price);
 			//alert(total_price);
 		});
 
 	//on change of quantity, rate or gst after calculation
+		$('.quotation_entry_table tr #quotation_discount').keyup(function()
+		{
+			$(this).parent().parent().find('#quotation_part_total_price').val('calculate');
+
+		//updating gst amounts
+			var rate = parseInt($(this).parent().parent().find('#quotation_part_rate').val());
+			var quantity = parseInt($(this).parent().parent().find('#quotation_part_quantity').val());
+			var discount = $(this).val();
+
+			var cgst_rate = parseInt($(this).parent().parent().find('#quotation_part_cgst').val());
+			var sgst_rate = parseInt($(this).parent().parent().find('#quotation_part_sgst').val());
+			var igst_rate = parseInt($(this).parent().parent().find('#quotation_part_igst').val());
+
+			var discount_amount = discount*quantity*rate/100;
+
+			var cgst_amount = (rate*quantity - discount_amount)*cgst_rate/100;
+			var sgst_amount = (rate*quantity - discount_amount)*sgst_rate/100;
+			var igst_amount = (rate*quantity - discount_amount)*igst_rate/100;
+
+			$(this).parent().parent().find('#quotation_cgst_amount').val(cgst_amount);
+			$(this).parent().parent().find('#quotation_sgst_amount').val(sgst_amount);
+			$(this).parent().parent().find('#quotation_igst_amount').val(igst_amount);
+		});
+		
 		$('.quotation_entry_table tr #quotation_part_quantity').keyup(function()
 		{
 			$(this).parent().parent().find('#quotation_part_total_price').val('calculate');
@@ -242,14 +280,17 @@
 		//updating gst amounts
 			var quantity = $(this).val();
 			var rate = parseInt($(this).parent().parent().find('#quotation_part_rate').val());
+			var discount = parseInt($(this).parent().parent().find('#quotation_discount').val());
 
 			var cgst_rate = parseInt($(this).parent().parent().find('#quotation_part_cgst').val());
 			var sgst_rate = parseInt($(this).parent().parent().find('#quotation_part_sgst').val());
 			var igst_rate = parseInt($(this).parent().parent().find('#quotation_part_igst').val());
 
-			var cgst_amount = (rate*cgst_rate/100)*quantity;
-			var sgst_amount = (rate*sgst_rate/100)*quantity;
-			var igst_amount = (rate*igst_rate/100)*quantity;
+			var discount_amount = discount*quantity*rate/100;
+
+			var cgst_amount = (rate*quantity - discount_amount)*cgst_rate/100;
+			var sgst_amount = (rate*quantity - discount_amount)*sgst_rate/100;
+			var igst_amount = (rate*quantity - discount_amount)*igst_rate/100;
 
 			$(this).parent().parent().find('#quotation_cgst_amount').val(cgst_amount);
 			$(this).parent().parent().find('#quotation_sgst_amount').val(sgst_amount);
@@ -263,14 +304,17 @@
 		//updating gst amounts
 			var rate = $(this).val();
 			var quantity = parseInt($(this).parent().parent().find('#quotation_part_quantity').val());
+			var discount = parseInt($(this).parent().parent().find('#quotation_discount').val());
 
 			var cgst_rate = parseInt($(this).parent().parent().find('#quotation_part_cgst').val());
 			var sgst_rate = parseInt($(this).parent().parent().find('#quotation_part_sgst').val());
 			var igst_rate = parseInt($(this).parent().parent().find('#quotation_part_igst').val());
 
-			var cgst_amount = (rate*cgst_rate/100)*quantity;
-			var sgst_amount = (rate*sgst_rate/100)*quantity;
-			var igst_amount = (rate*igst_rate/100)*quantity;
+			var discount_amount = discount*quantity*rate/100;
+
+			var cgst_amount = (rate*quantity - discount_amount)*cgst_rate/100;
+			var sgst_amount = (rate*quantity - discount_amount)*sgst_rate/100;
+			var igst_amount = (rate*quantity - discount_amount)*igst_rate/100;
 
 			$(this).parent().parent().find('#quotation_cgst_amount').val(cgst_amount);
 			$(this).parent().parent().find('#quotation_sgst_amount').val(sgst_amount);

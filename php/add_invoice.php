@@ -200,7 +200,11 @@
 			<textarea id="invoice_note" style="width: 840px; height: 300px; resize: none;"></textarea>
 		</div>
 		
-		<br>
+		<br><br>
+		<b>Advance</b>
+		<input type="number" id="advance_payment">
+
+		<br><br>
 		<input type="button" value="Generate Invoice" id="quotation_gen_button" class="">
 
 	</div>
@@ -215,8 +219,6 @@
 		<input type="submit" value="No" id="mail_no">
 	</div>
 	
-	<button class="view_quotation_button">View Invoice</button>
-
 <!--------script-------->
 	<script type="text/javascript">
 		creator_branch_code = "<?php echo $creator_branch_code; ?>";
@@ -797,7 +799,9 @@
 			var quotation_customer = $.trim($('#quotation_customer').val());
 			var quotation_customer_company = $.trim($('#quotation_customer option:selected').attr('customer_company'));
 
-			var quotation_date = $.trim($('#quotation_date').val());	
+			var quotation_date = $.trim($('#quotation_date').val());
+
+			var advance_payment = $.trim($('#advance_payment').val());	
 			var invoice_note = $.trim($('#invoice_note').val());		
 
 			if(quotation_customer !="" && quotation_date !="" && quotation_num !="")
@@ -806,7 +810,6 @@
 				
 			//adding note in the database
 				var query_recieved = "INSERT INTO notes VALUES('', '" + quotation_num + "', '" + invoice_note + "')";
-				//alert(query_recieved);
 				$.post('php/query_runner.php', {query_recieved: query_recieved}, function(l)
 				{
 					//alert(l);
@@ -843,17 +846,21 @@
 					var quotation_part_igst = parseInt($('.quotation_entry_table tr:nth-child('+ child_no + ') #quotation_part_igst').val());
 
 					var quotation_part_total_price = $.trim($('.quotation_entry_table tr:nth-child('+ child_no + ') #quotation_part_total_price').val());
-								
-					var quotation_part_name = "";
-
+					
 				//if user forget to calculate total price
 					if(quotation_part_total_price == "calculate")
 					{
-						var quotation_part_total_price = (quotation_part_rate + (quotation_part_rate * (quotation_part_cgst+quotation_part_sgst+quotation_part_igst)/100))*quotation_part_quantity;
+						var cgst_amount = parseFloat($(this).parent().parent().find('#quotation_cgst_amount').val());
+						var sgst_amount = parseFloat($(this).parent().parent().find('#quotation_sgst_amount').val());
+						var igst_amount =parseFloat( $(this).parent().parent().find('#quotation_igst_amount').val());
+
+						var discount_amount = quotation_discount*quotation_part_quantity*quotation_part_rate/100;
+
+						var quotation_part_total_price = quotation_part_quantity*quotation_part_rate - discount_amount +  cgst_amount + sgst_amount + igst_amount;
 					}
 
 				//adding this to database					
-					$.post('php/create_quotation.php', {quotation_customer: quotation_customer, quotation_customer_company:quotation_customer_company, quotation_date: quotation_date, quotation_num:quotation_num, quotation_serial:quotation_serial, quotation_description:quotation_description, quotation_brand:quotation_brand, quotation_model_name:quotation_model_name, quotation_model_number:quotation_model_number, quotation_serial_num:quotation_serial_num, quotation_service_id:quotation_service_id, quotation_part_name:quotation_part_name, quotation_purchase_order:quotation_purchase_order, quotation_part_quantity:quotation_part_quantity, quotation_part_rate:quotation_part_rate, quotation_discount:quotation_discount, quotation_part_cgst:quotation_part_cgst, quotation_part_sgst:quotation_part_sgst, quotation_part_igst:quotation_part_igst, quotation_hsn_code:quotation_hsn_code, quotation_part_total_price:quotation_part_total_price, quotation_item_type:quotation_item_type}, function(e)
+					$.post('php/create_quotation.php', {quotation_customer: quotation_customer, quotation_customer_company:quotation_customer_company, quotation_date: quotation_date, quotation_num:quotation_num, quotation_serial:quotation_serial, quotation_description:quotation_description, quotation_brand:quotation_brand, quotation_model_name:quotation_model_name, quotation_model_number:quotation_model_number, quotation_serial_num:quotation_serial_num, quotation_service_id:quotation_service_id, quotation_purchase_order:quotation_purchase_order, quotation_part_quantity:quotation_part_quantity, quotation_part_rate:quotation_part_rate, quotation_discount:quotation_discount, quotation_part_cgst:quotation_part_cgst, quotation_part_sgst:quotation_part_sgst, quotation_part_igst:quotation_part_igst, quotation_hsn_code:quotation_hsn_code, quotation_part_total_price:quotation_part_total_price, quotation_item_type:quotation_item_type, advance_payment: advance_payment}, function(e)
 					{
 						if(e==1)
 						{
