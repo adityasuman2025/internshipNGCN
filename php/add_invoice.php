@@ -119,15 +119,15 @@
 					<th>Quantity</th>
 					<th>Availability</th>
 					<th>Rate</th>
-					<th>Discount (%)</th>
+					<th>Discount %</th>
 
-					<th>CGST Rate</th>
+					<th>CGST %</th>
 					<th>CGST Amount</th>
 					
-					<th>SGST Rate</th>
+					<th>SGST %</th>
 					<th>SGST Amount</th>
 
-					<th>IGST Rate</th>
+					<th>IGST %</th>
 					<th>IGST Amount</th>
 
 					<th>Total Amount</th>
@@ -167,15 +167,15 @@
 					<td><input type="number" value="0" id="quotation_part_quantity"></td>
 					<td><input type="number" disabled="disabled" id="item_availability"></td>
 					<td><input type="number" value="0" id="quotation_part_rate"></td>
-					<td><input type="number" value="0" id="quotation_discount"></td>
+					<td><input type="number" style="width: 70px;" value="0" id="quotation_discount"></td>
 
-					<td><input type="number" value="0" id="quotation_part_cgst"></td>
+					<td><input type="number" style="width: 70px;" value="0" id="quotation_part_cgst"></td>
 					<td><input type="number" disabled="disabled" value="0" id="quotation_cgst_amount"></td>
 
-					<td><input type="number" value="0" id="quotation_part_sgst"></td>
+					<td><input type="number" style="width: 70px;" value="0" id="quotation_part_sgst"></td>
 					<td><input type="number" disabled="disabled" value="0" id="quotation_sgst_amount"></td>
 
-					<td><input type="number" value="0" id="quotation_part_igst"></td>
+					<td><input type="number" style="width: 70px;" value="0" id="quotation_part_igst"></td>
 					<td><input type="number" disabled="disabled" value="0" id="quotation_igst_amount"></td>
 
 					<td><input type="button" style="background: #cc0000; color: white; margin: 2px; width: auto;" value="calculate" id="quotation_part_total_price"></td>

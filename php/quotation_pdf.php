@@ -51,6 +51,7 @@
 //getting the service id and purchase order fields from any of the item od that invoice
 	$service_id_org = "";
 	$purchase_order_org = "";
+	$discount_org = "";
 
 	$get_invoice_info_query_run = mysqli_query($connect_link, $query);
 	while($get_invoice_info_assoc = mysqli_fetch_assoc($get_invoice_info_query_run))
@@ -65,6 +66,12 @@
 		if($purchase_order != "")
 		{
 			$purchase_order_org = $purchase_order;
+		}
+
+		$discount = $get_invoice_info_assoc['discount'];
+		if($discount !="" AND $discount != "0")
+		{
+			$discount_org = "present";
 		}
 	}
 
@@ -181,27 +188,6 @@
 		$pdf -> Line(0, 45, 219, 45);
 		$pdf->Cell(189, 10, '', 0, 1); //end of line
 
-	//quotation number and date line
-		// $pdf->SetFont('Arial', '', 12); //font
-		// $pdf->SetTextColor(0,0,0); //text color //black
-		// $pdf->Cell(20, 7, 'Date: ', 0, 0);
-		
-		// $pdf->SetTextColor(204,0,0); //text color //red
-		// $pdf->Cell(35, 7, $date_of_generation, 0, 0);
-
-		// $pdf->SetFont('Arial', '', 11); //font
-		// $pdf->SetTextColor(0,0,0); //text color //black
-		// $pdf->Cell(67, 7, '', 0, 0);
-
-		// $pdf->SetFont('Arial', '', 12); //font
-		// $pdf->SetTextColor(0,0,0); //text color //black
-		// $pdf->Cell(35, 7, 'Quotation No: ', 0, 0);
-
-		// $pdf->SetTextColor(204,0,0); //text color //red
-		// $pdf->Cell(39, 7, $quotation_code, 0, 1);//end of line
-
-		// $pdf->Cell(189, 1, '', 0, 1); //end of line
-
 	//second line (billing shipping)
 		$pdf->SetTextColor(0,0,0); //text color //black
 
@@ -255,13 +241,17 @@
 		
 		$pdf->Cell(16, 5, 'HSN', 'LRT', 0, 'C');
 		$pdf->Cell(8, 5, 'Qty','LRT', 0, 'C');
-		$pdf->Cell(12, 5, 'Unit', 'LRT', 0, 'C');
-		$pdf->Cell(12, 5, 'Dscnt', 'LRT', 0, 'C');
+		$pdf->Cell(15, 5, 'Unit', 'LRT', 0, 'C');
+
+		if($discount_org == "present")
+		{
+			$pdf->Cell(11, 5, 'Dscnt', 'LRT', 0, 'C');
+		}
 		// $pdf->Cell(13, 5, 'Net', 'LRT', 0, 'C');
 
-		$pdf->Cell(11, 5, 'TAX', 'LRT', 0, 'C');
+		$pdf->Cell(10, 5, 'TAX', 'LRT', 0, 'C');
 		$pdf->Cell(11, 5, 'TAX', 'LRT',  0, 'C');
-		$pdf->Cell(16, 5, 'TAX', 'LRT', 0, 'C');
+		$pdf->Cell(15, 5, 'TAX', 'LRT', 0, 'C');
 		$pdf->Cell(17, 5, 'Total', 'LRT', 1, 'C');
 		
 		$pdf->Cell(8, 5, '','LRB', 0, 'C');
@@ -269,13 +259,17 @@
 
 		$pdf->Cell(16, 5, 'Code','LRB', 0, 'C');
 		$pdf->Cell(8, 5, '','LRB', 0, 'C');
-		$pdf->Cell(12, 5, 'Price','LRB', 0, 'C');
-		$pdf->Cell(12, 5, '%', 'LRB', 0, 'C');
+		$pdf->Cell(15, 5, 'Price','LRB', 0, 'C');
+		
+		if($discount_org == "present")
+		{
+			$pdf->Cell(11, 5, '%', 'LRB', 0, 'C');
+		}
 		// $pdf->Cell(13, 5, 'Price','LRB', 0, 'C');
 
-		$pdf->Cell(11, 5, 'Rate','LRB', 0, 'C');
+		$pdf->Cell(10, 5, 'Rate','LRB', 0, 'C');
 		$pdf->Cell(11, 5, 'Type', 'LRB', 0, 'C');
-		$pdf->Cell(16, 5, 'Amount', 'LRB', 0, 'C');
+		$pdf->Cell(15, 5, 'Amount', 'LRB', 0, 'C');
 		$pdf->Cell(17, 5, 'Amount', 'LRB', 1, 'C');
 
 	//get item infos
@@ -339,11 +333,16 @@
 				
 				$pdf->Cell(16, 5, $item_hsn_code ,  'L', 0,'C');
 				$pdf->Cell(8, 5, $item_quantity ,  'L', 0,'C');
-				$pdf->Cell(12, 5, $item_rate ,  'L', 0,'C');
-				$pdf->Cell(12, 5, $item_discount . "%" ,  'L', 0,'C');
-				$pdf->Cell(11, 5, $item_cgst . "%" ,  'L', 0,'C');
+				$pdf->Cell(15, 5, $item_rate ,  'L', 0,'C');
+
+				if($discount_org == "present")
+				{
+					$pdf->Cell(11, 5, $item_discount . "%" ,  'L', 0,'C');
+				}
+
+				$pdf->Cell(10, 5, $item_cgst . "%" ,  'L', 0,'C');
 				$pdf->Cell(11, 5, 'CGST' ,  'L', 0,'C');
-				$pdf->Cell(16, 5, $cgst_amount, 'L', 0, 'C');
+				$pdf->Cell(15, 5, $cgst_amount, 'L', 0, 'C');
 				$pdf->Cell(17, 5, '', 'LR', 1,'C'); //end of line
 
 			//type line
@@ -352,24 +351,42 @@
 				
 				$pdf->Cell(16, 5, '' ,  'L', 0,'C');
 				$pdf->Cell(8, 5, '' ,  'L', 0,'C');
-				$pdf->Cell(12, 5, '' ,  'L', 0,'C');
-				$pdf->Cell(12, 5, '' ,  'L', 0,'C');
+				$pdf->Cell(15, 5, '' ,  'L', 0,'C');
+
+				if($discount_org == "present")
+				{
+					$pdf->Cell(11, 5, '' ,  'L', 0,'C');				
+				}
+
+				$pdf->Cell(10, 5, '' ,  'L', 0,'C');
 				$pdf->Cell(11, 5, '' ,  'L', 0,'C');
-				$pdf->Cell(11, 5, '' ,  'L', 0,'C');
-				$pdf->Cell(16, 5, '', 'L', 0, 'C');
+				$pdf->Cell(15, 5, '', 'L', 0, 'C');
 				$pdf->Cell(17, 5, '', 'LR', 1,'C'); //end of line
 
 			//serial line
 				$pdf->Cell(8, 5, '', 'LR', 0, 'C');
-				$pdf->Cell(80, 5, 'SL: ' . $item_serial_number, 0, 0);
+
+				if($item_serial_number !="")
+				{
+					$pdf->Cell(80, 5, 'SL: ' . $item_serial_number, 0, 0);
+				}
+				else
+				{
+					$pdf->Cell(80, 5, '', 0, 0);
+				}
 				
 				$pdf->Cell(16, 5, '' ,  'L', 0,'C');
 				$pdf->Cell(8, 5, '' ,  'L', 0,'C');
-				$pdf->Cell(12, 5, '' ,  'L', 0,'C');
-				$pdf->Cell(12, 5, '' ,  'L', 0,'C');
-				$pdf->Cell(11, 5, $item_sgst . "%" , 'L', 0,'C');
+				$pdf->Cell(15, 5, '' ,  'L', 0,'C');
+				
+				if($discount_org == "present")
+				{
+					$pdf->Cell(11, 5, '' ,  'L', 0,'C');				
+				}
+
+				$pdf->Cell(10, 5, $item_sgst . "%" , 'L', 0,'C');
 				$pdf->Cell(11, 5, 'SGST' ,  'L', 0,'C');
-				$pdf->Cell(16, 5, $sgst_amount, 'L', 0, 'C');
+				$pdf->Cell(15, 5, $sgst_amount, 'L', 0, 'C');
 				$pdf->Cell(17, 5, '', 'LR', 1,'C'); //end of line
 
 			//hsn line
@@ -378,11 +395,16 @@
 				
 				$pdf->Cell(16, 5, '' ,  'L', 0,'C');
 				$pdf->Cell(8, 5, '' ,  'L', 0,'C');
-				$pdf->Cell(12, 5, '' ,  'L', 0,'C');
-				$pdf->Cell(12, 5, '' ,  'L', 0,'C');
+				$pdf->Cell(15, 5, '' ,  'L', 0,'C');
+				
+				if($discount_org == "present")
+				{
+					$pdf->Cell(11, 5, '' ,  'L', 0,'C');				
+				}
+
+				$pdf->Cell(10, 5, '' ,  'L', 0,'C');
 				$pdf->Cell(11, 5, '' ,  'L', 0,'C');
-				$pdf->Cell(11, 5, '' ,  'L', 0,'C');
-				$pdf->Cell(16, 5, '', 'L', 0, 'C');
+				$pdf->Cell(15, 5, '', 'L', 0, 'C');
 				$pdf->Cell(17, 5, '', 'LR', 1,'C'); //end of line
 
 			//desc line
@@ -391,11 +413,16 @@
 				
 				$pdf->Cell(16, 5, '' ,  'L', 0,'C');
 				$pdf->Cell(8, 5, '' ,  'L', 0,'C');
-				$pdf->Cell(12, 5, '' ,  'L', 0,'C');
-				$pdf->Cell(12, 5, '' ,  'L', 0,'C');
-				$pdf->Cell(11, 5, $item_igst . "%" , 'L', 0,'C');
+				$pdf->Cell(15, 5, '' ,  'L', 0,'C');
+				
+				if($discount_org == "present")
+				{
+					$pdf->Cell(11, 5, '' ,  'L', 0,'C');				
+				}
+
+				$pdf->Cell(10, 5, $item_igst . "%" , 'L', 0,'C');
 				$pdf->Cell(11, 5, 'IGST' ,  'L', 0,'C');
-				$pdf->Cell(16, 5, $igst_amount, 'L', 0, 'C');
+				$pdf->Cell(15, 5, $igst_amount, 'L', 0, 'C');
 				$pdf->Cell(17, 5, '', 'LR', 1,'C'); //end of line
 
 			//total amount line
@@ -404,11 +431,16 @@
 				
 				$pdf->Cell(16, 5, '' ,  'LB', 0,'C');
 				$pdf->Cell(8, 5, '' ,  'LB', 0,'C');
-				$pdf->Cell(12, 5, '' ,  'LB', 0,'C');
-				$pdf->Cell(12, 5, '' ,  'LB', 0,'C');
+				$pdf->Cell(15, 5, '' ,  'LB', 0,'C');
+				
+				if($discount_org == "present")
+				{
+					$pdf->Cell(11, 5, '' ,  'LB', 0,'C');				
+				}
+
+				$pdf->Cell(10, 5, '' ,  'LB', 0,'C');
 				$pdf->Cell(11, 5, '' ,  'LB', 0,'C');
-				$pdf->Cell(11, 5, '' ,  'LB', 0,'C');
-				$pdf->Cell(16, 5, '', 'LB', 0, 'C');
+				$pdf->Cell(15, 5, '', 'LB', 0, 'C');
 
 				$pdf->SetFont('Arial', 'B', 10); //font
 				$pdf->Cell(17, 5, $item_total_price, 'LRB', 1,'C'); //end of line
@@ -464,7 +496,15 @@
 		$in_words = "Rupees " . $result . "Only";
 
 		$pdf->SetFont('Arial', '', 11); //font
-		$pdf->Cell(136, 7, $in_words, 1, 0);
+
+		if($discount_org == "present")
+		{
+			$pdf->Cell(136, 7, $in_words, 1, 0);			
+		}
+		else
+		{
+			$pdf->Cell(125, 7, $in_words, 1, 0);
+		}
 
 		$pdf->SetFont('Arial', 'B', 12); //font
 		$pdf->SetTextColor(0, 0, 0); //text color //black
@@ -472,27 +512,27 @@
 		$pdf->Cell(25, 7, $total_amount, 1, 1); //end of line
 
 	//advance payemnt
-		if($advance_payment != "")
-		{
-		//advance
-			$pdf->SetFont('Arial', '', 11); //font
-			$pdf->Cell(120, 7, '', 'LB', 0);
+		// if($advance_payment != "")
+		// {
+		// //advance
+		// 	$pdf->SetFont('Arial', '', 11); //font
+		// 	$pdf->Cell(120, 7, '', 'LB', 0);
 
-			$pdf->SetFont('Arial', 'B', 11); //font
-			$pdf->Cell(46, 7, 'Less: Advances', 'B', 'R', 0);
-			$pdf->SetFont('Arial', '', 11); //font
-			$pdf->Cell(25, 7, $advance_payment, 1, 1); //end of line
+		// 	$pdf->SetFont('Arial', 'B', 11); //font
+		// 	$pdf->Cell(46, 7, 'Less: Advances', 'B', 'R', 0);
+		// 	$pdf->SetFont('Arial', '', 11); //font
+		// 	$pdf->Cell(25, 7, $advance_payment, 1, 1); //end of line
 
-		//balance
-			$balance = $total_amount - $advance_payment;
+		// //balance
+		// 	$balance = $total_amount - $advance_payment;
 
-			$pdf->Cell(120, 7, '', 'LB', 0);
+		// 	$pdf->Cell(120, 7, '', 'LB', 0);
 
-			$pdf->SetFont('Arial', 'B', 11); //font
-			$pdf->Cell(46, 7, 'Balance', 'B', 'R', 0);
-			$pdf->SetFont('Arial', '', 11); //font
-			$pdf->Cell(25, 7, $balance, 1, 1); //end of line
-		}
+		// 	$pdf->SetFont('Arial', 'B', 11); //font
+		// 	$pdf->Cell(46, 7, 'Balance', 'B', 'R', 0);
+		// 	$pdf->SetFont('Arial', '', 11); //font
+		// 	$pdf->Cell(25, 7, $balance, 1, 1); //end of line
+		// }
 
 	//leaving blank space
 		$pdf->Cell(200, 3, '', 0, 1);

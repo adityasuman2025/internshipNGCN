@@ -78,15 +78,15 @@
 					<th class="to_invoice">Availability</th>	
 
 					<th>Rate</th>
-					<th>Discount</th>
+					<th>Discount %</th>
 
-					<th>CGST Rate</th>
+					<th>CGST %</th>
 					<th>CGST Amount</th>
 
-					<th>SGST Rate</th>
+					<th>SGST %</th>
 					<th>SGST Amount</th>
 
-					<th>IGST Rate</th>
+					<th>IGST %</th>
 					<th>IGST Amount</th>
 
 					<th>Total Amount</th>
@@ -226,15 +226,15 @@
 							echo "<td><input type=\"number\" disabled=\"disabled\" value=\"$in_stock\" id=\"item_availability\"></td>";
 
 							echo "	<td><input type=\"number\" value=\"$rate\" id=\"quotation_part_rate\"></td>
-									<td><input type=\"number\" value=\"$discount\" id=\"quotation_discount\"></td>";
+									<td><input type=\"number\" style=\"width: 70px;\" value=\"$discount\" id=\"quotation_discount\"></td>";
 
-							echo "<td><input type=\"number\" value=\"$cgst\" id=\"quotation_part_cgst\"></td>";							
+							echo "<td><input type=\"number\" style=\"width: 70px;\" value=\"$cgst\" id=\"quotation_part_cgst\"></td>";							
 							echo "<td><input type=\"number\" disabled=\"disabled\" value=\"$cgst_amount\" id=\"quotation_cgst_amount\"></td>";
 
-							echo"<td><input type=\"number\" value=\"$sgst\" id=\"quotation_part_sgst\"></td>";
+							echo"<td><input type=\"number\" style=\"width: 70px;\" value=\"$sgst\" id=\"quotation_part_sgst\"></td>";
 							echo "<td><input type=\"number\" disabled=\"disabled\" value=\"$sgst_amount\" id=\"quotation_sgst_amount\"></td>";
 
-							echo"<td><input type=\"number\" value=\"$igst\" id=\"quotation_part_igst\"></td>";
+							echo"<td><input type=\"number\" style=\"width: 70px;\" value=\"$igst\" id=\"quotation_part_igst\"></td>";
 							echo "<td><input type=\"number\" disabled=\"disabled\" value=\"$igst_amount\" id=\"quotation_igst_amount\"></td>";
 
 							echo"<td><input type=\"button\" style=\"background: #cc0000; color: white; margin: 2px; width: auto;\" value=\"$total_price\" id=\"quotation_part_total_price\"></td>
