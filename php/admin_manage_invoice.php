@@ -587,15 +587,12 @@
 	//on clicking on user edit icon
 		$('.user_edit_icon').click(function()
 		{
-			var quotation_num =  $.trim($(this).attr('quotation_num'));						
-			$('.ajax_loader_bckgrnd').fadeIn(400);
-				
+			var quotation_num =  $.trim($(this).attr('quotation_num'));			
+						
 			$.post('php/edit_invoice.php', {quotation_num:quotation_num}, function(data)
 			{
-				//alert(data);
-				$('.ajax_loader_box').fadeIn(400);
-				$('.ajax_loader_content').html(data);
-			});						
+				$('.user_module_content').html("<img class=\"gif_loader\" src=\"img/loaders1.gif\">").html(data);	
+			});					
 		});
 
 

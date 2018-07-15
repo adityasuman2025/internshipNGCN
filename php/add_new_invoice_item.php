@@ -391,7 +391,7 @@
 			else
 			{
 				if(quantity > in_stock)
-			{
+				{
 					this_thing.css('border', 'red 1px solid');
 					$('.gen_quotation_span').text("You have entered a quantity greater than its avavilability in stock. Please change the quantity otherwise you are not able to create invoice.").css('color', 'red');
 
