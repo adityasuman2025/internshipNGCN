@@ -39,6 +39,11 @@ body, html
 		padding: 2%;
 	}
 
+	.login_portal img
+	{
+		width: 60%;
+	}
+
 	.login_button
 	{
 		width: 80px;

@@ -16,6 +16,11 @@
 		$mysql_db = "pnds_may_18_oxy";
 		$mysql_user = "pnds_may_18";
 	}
+	else if($website == "powernet.pnds.in")
+	{		
+		$mysql_db = "pnds_may_18_power";
+		$mysql_user = "pnds_may_18";
+	}
 	else if($website == "erp.voltatech.in")
 	{
 		$mysql_db = "voltatech_may_18";

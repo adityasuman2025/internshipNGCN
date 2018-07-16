@@ -298,48 +298,52 @@
 			<textarea id="invoice_note" style="width: 840px; height: 300px; resize: none;"><?php echo $get_note; ?></textarea>
 		</div>
 
-		<br><br>
-		<b>Advance</b>
-		<input type="number" value="<?php echo $advance_payment; ?>" id="advance_payment">
-		<br><br>
+		<br>
+		<div>
+			<h4>Advance</h4>
+			<input type="number" value="<?php echo $advance_payment; ?>" id="advance_payment">
+		</div>
 		
 	<!-------payment method and payment date----------->
-		<h4>Payment Method</h4>
-		<select id="payment_method1">
-			<option value="<?php echo $payment_method; ?>"><?php echo $payment_method; ?></option>
-			
-			<?php
-				if($payment_method == "Net")
-				{
-					echo "<option value=\"Credit\">Credit</option>";
-					echo "<option value=\"Cash\">Cash</option>";
-					echo "<option value=\"Card\">Credit/Debit Card</option>";
-				}
-				else if($payment_method == "Card")
-				{
-					echo "<option value=\"Credit\">Credit</option>";
-					echo "<option value=\"Cash\">Cash</option>";
-					echo "<option value=\"Net\">Net Banking</option>";
-				}
-				else if($payment_method == "Cash")
-				{
-					echo "<option value=\"Credit\">Credit</option>";
-					echo "<option value=\"Card\">Credit/Debit Card</option>";
-					echo "<option value=\"Net\">Net Banking</option>";
-				}
-				else if($payment_method == "Credit")
-				{
-					echo "<option value=\"Cash\">Cash</option>";
-					echo "<option value=\"Card\">Credit/Debit Card</option>";
-					echo "<option value=\"Net\">Net Banking</option>";
-				}
-			?>
-		</select>
-		<br>
-
-		<h4>Payment Date</h4>
-		<input type="date" value="<?php echo date('Y-m-d'); ?>" id="payment_date1">
-
+		<div>
+			<h4>Payment Method</h4>
+			<select id="payment_method1">
+				<option value="<?php echo $payment_method; ?>"><?php echo $payment_method; ?></option>
+				
+				<?php
+					if($payment_method == "Net")
+					{
+						echo "<option value=\"Credit\">Credit</option>";
+						echo "<option value=\"Cash\">Cash</option>";
+						echo "<option value=\"Card\">Credit/Debit Card</option>";
+					}
+					else if($payment_method == "Card")
+					{
+						echo "<option value=\"Credit\">Credit</option>";
+						echo "<option value=\"Cash\">Cash</option>";
+						echo "<option value=\"Net\">Net Banking</option>";
+					}
+					else if($payment_method == "Cash")
+					{
+						echo "<option value=\"Credit\">Credit</option>";
+						echo "<option value=\"Card\">Credit/Debit Card</option>";
+						echo "<option value=\"Net\">Net Banking</option>";
+					}
+					else if($payment_method == "Credit")
+					{
+						echo "<option value=\"Cash\">Cash</option>";
+						echo "<option value=\"Card\">Credit/Debit Card</option>";
+						echo "<option value=\"Net\">Net Banking</option>";
+					}
+				?>
+			</select>
+		</div>
+		
+		<div>
+			<h4>Payment Date</h4>
+			<input type="date" value="<?php echo $payment_date; ?>" id="payment_date1">
+		</div>
+		
 		<br><br>
 		<input type="button" value="Save Edit" id="quotation_gen_button">
 
