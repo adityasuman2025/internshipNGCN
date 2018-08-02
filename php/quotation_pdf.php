@@ -29,19 +29,7 @@
 	$this_year = date('y');
 	$next_year = $this_year +1;
 
-	$website = $_SERVER['HTTP_HOST'];
-	if($website == "localhost" OR $website == "volta.pnds.in" OR $website == "erp.voltatech.in")
-	{
-		$comp_code = "VOLTA/";
-	}
-	else if($website == "oxy.pnds.in")
-	{
-		$comp_code = "OXY/";
-	}
-	else
-	{
-		$comp_code = "VOLTA/";
-	}		
+	$comp_code = $_SESSION["comp_code"];	
 
 	$quotation_code = $comp_code . $this_year . "-" . $next_year . "/" . $quotation_num;
 
@@ -409,8 +397,16 @@
 
 			//desc line
 				$pdf->Cell(8, 5, '', 'LR', 0, 'C');
-				$pdf->Cell(80, 5, $item_description_2, 0, 0);
-				
+
+				if($item_description_2 != "" OR $item_description_2 != "")
+				{
+					$pdf->Cell(80, 5, "-" . $item_description_2, 0, 0);
+				}
+				else
+				{
+					$pdf->Cell(80, 5, '', 0, 0);
+				}
+							
 				$pdf->Cell(16, 5, '' ,  'L', 0,'C');
 				$pdf->Cell(8, 5, '' ,  'L', 0,'C');
 				$pdf->Cell(15, 5, '' ,  'L', 0,'C');
@@ -427,7 +423,15 @@
 
 			//total amount line
 				$pdf->Cell(8, 5, '', 'LB', 0, 'C');
-				$pdf->Cell(80, 5, $item_description_3, 'LB', 0);
+				
+				if($item_description_3 != "" OR $item_description_3 != "")
+				{
+					$pdf->Cell(80, 5, "-" . $item_description_3, 'LB', 0);
+				}
+				else
+				{
+					$pdf->Cell(80, 5, '', 'LB', 0);
+				}
 				
 				$pdf->Cell(16, 5, '' ,  'LB', 0,'C');
 				$pdf->Cell(8, 5, '' ,  'LB', 0,'C');
@@ -574,24 +578,9 @@
 		$pdf -> AddPage();
 
 	//terms and conditions
-		$website = $_SERVER['HTTP_HOST'];
-		
-		if($website == "localhost" OR $website == "volta.pnds.in" OR $website == "erp.voltatech.in")
-		{
-			$pdf->SetTextColor(0, 0, 0); //text color //black
-			$pdf->SetFont('Arial', 'B', 11); //font
-			$pdf->Cell(189, 5, 'Terms & Conditions:', 0, 1);
-		}
-		else if($website == "oxy.pnds.in")
-		{
-			
-		}
-		else
-		{
-			$pdf->SetTextColor(0, 0, 0); //text color //black
-			$pdf->SetFont('Arial', 'B', 11); //font
-			$pdf->Cell(189, 5, 'Terms & Conditions:', 0, 1);
-		}
+		$pdf->SetTextColor(0, 0, 0); //text color //black
+		$pdf->SetFont('Arial', 'B', 11); //font
+		$pdf->Cell(189, 5, 'Terms & Conditions:', 0, 1);	
 
 	//leaving blank space
 		$pdf->Cell(200, 5, '', 0, 1);
@@ -633,27 +622,9 @@
 			$website = $_SERVER['HTTP_HOST'];
 			$mail_email = $customer_email;
 
-				if($website == "localhost" OR $website == "volta.pnds.in" OR $website == "erp.voltatech.in")
-				{
-					$mail_subject = "Quotation from Voltatech";
-					$headers = "From: voltatech@voltatech.in";
-					
-					$mainMessage = "Dear Customer, \nQuotation generated from our online resource is attached with this mail. Please find your attached Quotation pdf file. \n \nRegards \nVoltatech \nhttp://" . $website;
-				}
-				else if($website == "oxy.pnds.in")
-				{
-					$mail_subject = "Quotation from OxyVin";
-					$headers = "From: oxyvin@pnds.in";
-					
-					$mainMessage = "Dear Customer, \nQuotation generated from our online resource is attached with this mail. Please find your attached invoice pdf file. \n \nRegards \nOxyVin \nhttp://" . $website;
-				}
-				else
-				{
-					$mail_subject = "Quotation from Voltatech";
-					$headers = "From: voltatech@pnds.in";
-					
-					$mainMessage = "Dear Customer, \nQuotation generated from our online resource is attached with this mail. Please find your attached Quotation pdf file. \n \nRegards \nVoltatech \nhttp://" . $website;
-				}
+			$mail_subject = $_SESSION["mail_subject_quot"];
+			$headers = $_SESSION["headers"];			
+			$mainMessage = $_SESSION["mainMessage_quot"];
 			
 			  $fileatt     = "http://" . $website . "/quotation/Quotation-" . $quotation_num . ".pdf"; //file location
 			  $fileatttype = "application/pdf";

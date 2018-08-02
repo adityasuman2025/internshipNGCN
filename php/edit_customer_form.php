@@ -59,7 +59,7 @@
 
 		Shipping Address:
 		<br>
-		<textarea id="user_entry_shipping_address" type="text"> <?php echo $shipping_address; ?></textarea>
+		<textarea id="user_entry_shipping_address" type="text"><?php echo $shipping_address; ?></textarea>
 		<br>
 
 		<br>

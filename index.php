@@ -1,5 +1,4 @@
 <?php
-
 //if user is already logged in
 	if(isset($_COOKIE['logged_username']) && $_COOKIE['isadmin'] ==1)
 	{

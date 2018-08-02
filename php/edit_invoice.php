@@ -1,4 +1,5 @@
 <?php
+	session_start();
 	include('connect_db.php');
 	$creator_branch_code = $_COOKIE['logged_username_branch_code'];
 
@@ -7,19 +8,7 @@
 	$this_year = date('y');
 	$next_year = $this_year +1;
 
-	$website = $_SERVER['HTTP_HOST'];
-	if($website == "localhost" OR $website == "volta.pnds.in" OR $website == "erp.voltatech.in")
-	{
-		$comp_code = "VOLTA/";
-	}
-	else if($website == "oxy.pnds.in")
-	{
-		$comp_code = "OXY/";
-	}
-	else
-	{
-		$comp_code = "VOLTA/";
-	}		
+	$comp_code = $_SESSION["comp_code"];	
 
 	$quotation_code = $comp_code . $this_year . "-" . $next_year . "/" . $quotation_num;
 
