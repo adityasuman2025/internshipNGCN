@@ -24,8 +24,16 @@
 		</tr>
 
 		<?php
-			$query = "SELECT * FROM quotation WHERE creator_branch_code = '$creator_branch_code' AND payment_method ='' GROUP BY quotation_num ORDER BY quotation_num DESC";
-			$list_quotation_query_run = mysqli_query($connect_link, $query);
+			$quot_query = "SELECT * FROM quotation WHERE creator_branch_code = '$creator_branch_code' AND payment_method ='' GROUP BY quotation_num ORDER BY quotation_num DESC";
+			if($list_quotation_query_run = mysqli_query($connect_link, $quot_query))
+			{
+				//echo "gud";
+			}
+			else
+			{	
+				//echo "bad";
+			}
+
 			while($list_quotation_assoc = mysqli_fetch_assoc($list_quotation_query_run))
 			{
 				$quotation_id = $list_quotation_assoc['id'];

@@ -1,5 +1,8 @@
 <?php
 	session_start();
+	$creator_branch_code = $_COOKIE['logged_username_branch_code'];
+	$user_username = $_COOKIE['logged_username'];
+	$is_admin = $_COOKIE['isadmin'];
 
 //getting invoice type
 	if(isset($_SESSION['quotation_type']))
@@ -34,7 +37,15 @@
 	$quotation_code = $comp_code . $this_year . "-" . $next_year . "/" . $quotation_num;
 
 //query
-	$query = "SELECT * FROM quotation WHERE quotation_num = '$quotation_num' AND payment_method='' ORDER BY serial";
+	if($is_admin ==1)
+	{
+		$query = "SELECT * FROM quotation WHERE quotation_num = '$quotation_num' AND payment_method='' ORDER BY serial";
+	}
+	else if($is_admin ==0)
+	{
+		$query = "SELECT * FROM quotation WHERE quotation_num = '$quotation_num' AND payment_method='' AND creator_branch_code ='$creator_branch_code' AND creator_username = '$user_username' ORDER BY serial";
+	}
+	
 	
 //getting the service id and purchase order fields from any of the item od that invoice
 	$service_id_org = "";
@@ -275,9 +286,9 @@
 			$item_description = $get_item_info_assoc['description'];
 
 			//breaking description in two lines
-				$item_description_1 = substr($item_description, 0,39);
-				$item_description_2 = substr($item_description, 39,44);
-				$item_description_3 = substr($item_description, 83,45);
+				$item_description_1 = substr($item_description, 0,35);
+				$item_description_2 = substr($item_description, 35,40);
+				$item_description_3 = substr($item_description, 75,40);
 
 			$item_hsn_code = $get_item_info_assoc['hsn_code'];
 			$type = $get_item_info_assoc['type'];
@@ -580,7 +591,14 @@
 	//terms and conditions
 		$pdf->SetTextColor(0, 0, 0); //text color //black
 		$pdf->SetFont('Arial', 'B', 11); //font
-		$pdf->Cell(189, 5, 'Terms & Conditions:', 0, 1);	
+		$pdf->Cell(189, 5, 'Terms & Conditions:', 0, 1);
+
+		$pdf->SetFont('Arial', '', 10); //font
+		$file_url = "../terms.txt";
+		$file = fopen($file_url, "r");
+		$terms = fread($file, filesize($file_url));
+		$pdf->MultiCell(189, 4, $terms, 0, 1);
+		fclose($file);	
 
 	//leaving blank space
 		$pdf->Cell(200, 5, '', 0, 1);
